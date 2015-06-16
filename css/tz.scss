@@ -12,13 +12,33 @@ $fg: #9cfff7;
 html, body {
 	background: $bg;
 	margin: 0; padding: 0;
+	width: 100%; height: 100%;
+}
+
+#disc-wrap2 {
+	display: table;
+	width: 100%; height: 100%;
+}
+
+#disc-wrap {
+	width: 100%; height: 100%;
+	display: table-cell;
+	vertical-align: middle;
+	text-align: center;
 }
 
 #disc {
-	$r: 400px;
-	margin: 100px auto;
+	display: inline-block;
+
+	//$r: 400px;
+	//margin: 100px auto;
 	position: relative;
-	width: $r; height: $r;
+	//width: $r; height: $r;
+
+	width: 40%;
+	height: 0;
+	padding-bottom: 40%;
+
 	border-radius: 50%;
 	border: 3px solid $fg;
 	color: $fg;
