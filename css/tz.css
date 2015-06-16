@@ -50,6 +50,7 @@ html, body {
       #disc .mark {
         font-size: 1.4em; } }
   #disc .person {
+    display: inline-block;
     position: absolute;
     text-decoration: none;
     -webkit-user-select: initial;
