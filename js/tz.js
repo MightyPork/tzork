@@ -1,5 +1,7 @@
 var people = [
 	{name: '@MightyPork', tz: 'Europe/Prague', color: '#EAF425'},
+	{name: '@lastofavari', tz: 'Europe/Minsk', color: '#4ECEFF'},
+
 	//{name: '@Locercus', tz: 'Europe/Copenhagen', color: '#EAF425'},
 	//{name: '@Creeper32605', tz: 'Europe/Copenhagen', color: '#EAF425'}, // (city?)
 	//{name: '@JesperJacoben', tz: 'Europe/Copenhagen', color: '#EAF425'},
