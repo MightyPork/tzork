@@ -77,7 +77,7 @@ function addPeople() {
 	//addPerson('Locercus', '#EAF425', 2);
 	//addPerson('CoolSquid', '#EAF425', 2);
 	//addPerson('Creeps', '#EAF425', 2);
-	addPerson('AntonvonRaumer', '#00BAFF', 1);
+	//addPerson('AntonvonRaumer', '#00BAFF', 2);
 	addPerson('ImReble548', '#69E79E', -4);
 	addPerson('Deli73', '#D13278', -5);
 }
