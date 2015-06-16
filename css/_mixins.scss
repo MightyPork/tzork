@@ -21,3 +21,35 @@
 	outline: 1px solid $color;
 	box-shadow: 0 0 3px 3px rgba($color, .2), inset 0 0 3px 3px rgba($color, .2);
 }
+
+// No margins, padding, borders
+@mixin naked() {
+	border: 0 none;
+	margin: 0;
+	padding: 0;
+	text-decoration: none;
+}
+
+
+@mixin helvetica() {
+	font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
+}
+
+$break-tiny: 320px;
+$break-small: 640px;
+$break-large: 1024px;
+
+@mixin respond-to($media) {
+	@if $media == tiny {
+		@media only screen and (max-width: $break-tiny) { @content; }
+	}
+	@else if $media == small {
+		@media only screen and (min-width: $break-tiny + 1) and (max-width: $break-small - 1) { @content; }
+	}
+	@else if $media == medium {
+		@media only screen and (min-width: $break-small + 1) and (max-width: $break-large - 1) { @content; }
+	}
+	@else if $media == large {
+		@media only screen and (min-width: $break-large) { @content; }
+	}
+}

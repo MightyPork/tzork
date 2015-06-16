@@ -32,7 +32,7 @@ function addPerson(obj) {
 	// Create a Moment and format it
 	var mmt = moment().tz(obj.tz);
 	var hms = mmt.format('H:m:s');
-	var hhmmss = mmt.format('HH:mm:ss');
+	var hhmmss = mmt.format('H:mm:ss');
 
 	// Get pieces of time, convert to seconds
 	var pts = hms.split(':');
@@ -49,7 +49,7 @@ function addPerson(obj) {
 	var bu = document.createElement('div');
 	bu.className = 'bullet';
 	bu.style.backgroundColor = obj.color;
-	positionAt(bu, angle, 50.5);
+	positionAt(bu, angle, 50.2);
 	disc.appendChild(bu);
 
 
@@ -57,16 +57,11 @@ function addPerson(obj) {
 	var la = document.createElement('div');
 	la.classList.add('person');
 	la.classList.add((t < 12) ? 'left' : 'right'); // left and right side of the clock
+	la.innerText = obj.name;
+	la.title = obj.tz + ', ' + hhmmss; // tooltip
+	la.style.color = obj.color;
 
-	// Box inside "label"
-	var inner = document.createElement('div');
-	inner.innerText = obj.name;
-	inner.title = obj.tz + ', ' + hhmmss; // tooltip
-	inner.style.color = obj.color;
-
-	la.appendChild(inner);
-
-	positionAt(la, angle, 54);
+	positionAt(la, angle, 53.5); // label distance
 	disc.appendChild(la);
 }
 
@@ -74,32 +69,50 @@ function init() {
 
 	disc = document.getElementById('disc');
 
+	// The clock marks
 	for (var i = 0; i < 24; i++) {
 		// mark div
 		var mark = document.createElement('div');
 		mark.classList.add('mark');
-		var inner = document.createElement('div');
-		inner.innerText = '' + i;
-		mark.appendChild(inner);
+		mark.innerText = '' + i;
 
 		var angle = hour2angle(i);
-		positionAt(mark, angle, 46);
+		positionAt(mark, angle, 45);
 		disc.appendChild(mark);
 	}
 
-	addPeople();
+	update();
 
 	// refresh the disc every N seconds
-	setInterval(addPeople, 1000*5);
+	setInterval(update, 1000*10);
+	setInterval(changeColon, 1000);
 
 	// force refresh after tab gets focused
-	window.onfocus = addPeople;
+	window.onfocus = update;
 }
 
 
-function addPeople() {
-	console.log('Redrawing marks');
+function changeColon() {
+	var s = (new Date()).getSeconds() % 2;
 
+	document.getElementById('loctimecolon').style.opacity = s ? 1 : 0;
+}
+
+
+function update() {
+	redrawPeople();
+
+	// redraw time
+	var mmt = moment();
+
+	var parts = mmt.format('H:mm').split(':');
+
+	document.getElementById('localtime').innerHTML = parts[0] + '<span id="loctimecolon">:</span>' + parts[1];
+	changeColon();
+}
+
+
+function redrawPeople() {
 	// Delete all old stuff
 	var x = document.querySelectorAll('.bullet, .person');
 	for (var i in x) {

@@ -12,19 +12,9 @@
 </head>
 <body onload="init()">
 
-<div id="disc-wrap2">
-	<div id="disc-wrap">
-		<div id="disc" onclick='test()'></div>
-	</div>
+<div id="disc" onclick='test()'>
+	<div id="localtime"></div>
 </div>
-
-<script>
-	function test() {
-		var now = moment();
-
-		console.log(now.tz('UTC').format('H:m:s'));
-	}
-</script>
 
 </body>
 </html>
