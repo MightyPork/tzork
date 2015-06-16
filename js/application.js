@@ -83,7 +83,7 @@ function addPerson(obj) {
 		bu.classList.add(clz);
 	}
 
-	la.innerText = obj.name;
+	la.textContent = obj.name;
 	la.title = hhmmss + ' (' + obj.tz + ')'; // tooltip
 	la.style.color = obj.color;
 
@@ -103,7 +103,7 @@ function buildClockMarks() {
 			mark.classList.add('sixth');
 		}
 
-		mark.innerText = '' + i;
+		mark.textContent = '' + i;
 
 		var angle = hour2angle(i);
 		positionAt(mark, angle, 45);
