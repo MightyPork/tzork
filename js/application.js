@@ -45,7 +45,7 @@ function addPerson(obj) {
 	disc.appendChild(bu);
 
 	// make it a link if it's twitter name
-	var twi = obj.name.indexOf('@') === 0;
+	var twi = (obj.name.indexOf('@') === 0);
 
 	// Create a label
 	var la = document.createElement(twi ? 'a' : 'span');
@@ -99,7 +99,7 @@ function buildClockMarks() {
 		mark.classList.add('mark');
 		mark.classList.add('hour-' + i);
 
-		if (i==0||i==6||i==12||i==18) {
+		if (i == 0 || i == 6 || i == 12 || i == 18) {
 			mark.classList.add('sixth');
 		}
 
