@@ -21,18 +21,22 @@ function addPerson(name, color, offset) {
 
 	var t = time + offset;
 
-	var pork = mkLabel(name);
-	pork.classList.add('person');
-	pork.classList.add((t < 12) ? 'left' : 'right');
-	pork.children[0].title = 'UTC' + (offset > 0 ? '+' + offset : offset) + ', ' + (Math.floor(t) + ':' + Math.floor(60 * (t - Math.floor(t))));
+	var person = mkLabel(name);
+	person.classList.add('person');
+	person.classList.add((t < 12) ? 'left' : 'right');
 
+	// add title to the inner div
+	person.children[0].title = 'UTC' + (offset > 0 ? '+' + offset : offset) + ', ' + (Math.floor(t) + ':' + Math.floor(60 * (t - Math.floor(t))));
+
+	// angle (deg)
 	var at = (18 - t) * 15;
 
-	positionAt(pork, at, 54);
-	disc.appendChild(pork);
+	positionAt(person, at, 54);
+	disc.appendChild(person);
 
-	pork.style.color = color;
+	person.style.color = color;
 
+	// bullet
 	var bu = document.createElement('div');
 	bu.classList.add('bullet');
 	bu.style.backgroundColor = color;
@@ -54,8 +58,10 @@ function init() {
 
 	addPeople();
 
+	// refresh the disc every N seconds
 	setInterval(addPeople, 1000 * 5);
 
+	// force refresh after tab gets focused
 	window.onfocus = addPeople;
 }
 
@@ -63,6 +69,7 @@ function init() {
 function addPeople() {
 	console.log('Redrawing marks');
 
+	// Delete all old stuff
 	var x = document.querySelectorAll('.bullet, .person');
 	for (var i in x) {
 		if (x.hasOwnProperty(i)) {
@@ -72,6 +79,7 @@ function addPeople() {
 			e.parentNode.removeChild(e);
 		}
 	}
+
 
 	addPerson('MightyPork', '#EAF425', 2);
 	//addPerson('Locercus', '#EAF425', 2);
