@@ -81,13 +81,14 @@ function addPeople() {
 	}
 
 
-	addPerson('MightyPork', '#EAF425', 2);
+	addPerson('MightyPork (CEST)', '#EAF425', 2);
 	//addPerson('Locercus', '#EAF425', 2);
 	//addPerson('CoolSquid', '#EAF425', 2);
 	//addPerson('Creeps', '#EAF425', 2);
 	//addPerson('AntonvonRaumer', '#00BAFF', 2);
 	addPerson('ImReble548', '#69E79E', -6);
-	addPerson('Deli73', '#D13278', -5);
+	//addPerson('Deli73', '#D13278', -5.5);
+	addPerson('TheBadFame', '#329AFF', -5);
 }
 
 function getTimeUTC() {
