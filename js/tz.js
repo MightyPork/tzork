@@ -1,6 +1,5 @@
 var people = [
 	{name: 'MightyPork', tz: 'Europe/Prague', color: '#EAF425'},
-	//{name: 'Locercus', tz: 'Europe/Copenhagen', color: '#45F425'},
 	{name: 'TheBadFame', tz: 'America/Mexico_City', color: '#329AFF'},
 	{name: 'ImReble548', tz: 'America/Denver', color: '#69E79E'},
 	{name: 'Deli731234', tz: 'America/Tijuana', color: '#F57126'},
@@ -22,17 +21,19 @@ function positionAt(element, angle, distance, unit) {
 
 
 function addPerson(obj) {
-
 	// Work out the local time
 	if (!moment.tz.zone(obj.tz)) {
 		console.error('Invalid timezone for ' + obj.name);
 		return;
 	}
 
+	// local time
+	var here = moment();
+
 	// Create a Moment and format it
-	var mmt = moment().tz(obj.tz);
-	var hms = mmt.format('H:m:s');
-	var hhmmss = mmt.format('H:mm:ss');
+	var there = moment().tz(obj.tz);
+	var hms = there.format('H:m:s');
+	var hhmmss = there.format('H:mm, MMM Do YYYY');
 
 	// Get pieces of time, convert to seconds
 	var pts = hms.split(':');
@@ -57,8 +58,34 @@ function addPerson(obj) {
 	var la = document.createElement('div');
 	la.classList.add('person');
 	la.classList.add((t < 12) ? 'left' : 'right'); // left and right side of the clock
+
+	var d0 = parseInt(here.format('DDD'));
+	var d1 = parseInt(there.format('DDD'));
+	var y0 = parseInt(here.format('YYYY'));
+	var y1 = parseInt(there.format('YYYY'));
+
+	var clz = null;
+
+	// resolve day changes
+	if (y1 < y0) {
+		clz = 'day_prev';
+	} else if (y1 > y0) {
+		clz = 'day_next';
+	} else {
+		if (d1 < d0) {
+			clz = 'day_prev';
+		} else if (d1 > d0) {
+			clz = 'day_next';
+		}
+	}
+
+	if (clz !== null) {
+		la.classList.add(clz);
+		bu.classList.add(clz);
+	}
+
 	la.innerText = obj.name;
-	la.title = obj.tz + ', ' + hhmmss; // tooltip
+	la.title = hhmmss + ' ('+obj.tz+')'; // tooltip
 	la.style.color = obj.color;
 
 	positionAt(la, angle, 53.5); // label distance
@@ -84,7 +111,7 @@ function init() {
 	update();
 
 	// refresh the disc every N seconds
-	setInterval(update, 1000*10);
+	setInterval(update, 1000 * 10);
 	setInterval(changeColon, 1000);
 
 	// force refresh after tab gets focused

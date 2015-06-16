@@ -53,11 +53,11 @@ html, body {
 		font-size: 2em;
 
 		@include respond-to(tiny) {
-			font-size: 0.8em;
+			font-size: 0.5em;
 		}
 
 		@include respond-to(small) {
-			font-size: 1em;
+			font-size: 0.7em;
 		}
 
 		@include respond-to(medium) {
@@ -118,6 +118,14 @@ html, body {
 		transform: translate(-50%, -50%);
 
 		border: 1px solid black;
+
+		&.day_prev {
+			box-shadow: 0 0 0.25em 0.1em red;
+		}
+
+		&.day_next {
+			box-shadow: 0 0 0.25em 0.1em yellow;
+		}
 	}
 }
 
@@ -135,15 +143,15 @@ html, body {
 	font-size: 6em;
 
 	@include respond-to(tiny) {
-		font-size: 1.5em;
+		font-size: 1.2em;
 	}
 
 	@include respond-to(small) {
-		font-size: 2.5em;
+		font-size: 2em;
 	}
 
 	@include respond-to(medium) {
-		font-size: 4em;
+		font-size: 3.5em;
 	}
 
 	span#loctimecolon {
