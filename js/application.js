@@ -1,18 +1,36 @@
 var disc;
 
 
+/**
+ * Convert hour to angle (deg)
+ *
+ * @param h hour 0..24
+ * @returns {number} angle in degrees
+ */
 function hour2angle(h) {
 	return (18 - h) * 15;
 }
 
-
+/**
+ * Position an element using polar coordinates
+ *
+ * @param element
+ * @param angle    degrees
+ * @param distance radius (in "unit")
+ * @param unit     unit to use
+ */
 function positionAt(element, angle, distance, unit) {
 	if (typeof unit == 'undefined') unit = '%';
 	element.style.left = 50 + distance * Math.cos((angle / 180) * Math.PI) + unit;
 	element.style.top = 50 - distance * Math.sin((angle / 180) * Math.PI) + unit;
 }
 
-
+/**
+ * Add a person to the clock.
+ *
+ * @param obj object with information about the person
+ *            (name, tz, color)
+ */
 function addPerson(obj) {
 	// Work out the local time
 	if (!moment.tz.zone(obj.tz)) {
@@ -51,21 +69,25 @@ function addPerson(obj) {
 	var la = document.createElement(twi ? 'a' : 'span');
 
 	if (twi) {
-		la.href = 'https://twitter.com/' + obj.name
+		la.href = 'https://twitter.com/' + obj.name;
 		la.classList.add('twitter-link');
 	}
 
 	la.classList.add('person');
 	la.classList.add((t < 12) ? 'left' : 'right'); // left and right side of the clock
 
+	// local
 	var d0 = here.dayOfYear();
-	var d1 = there.dayOfYear();
 	var y0 = here.year();
+
+	// remote
+	var d1 = there.dayOfYear();
 	var y1 = there.year();
 
+
+	// resolve day changes, add class for prev/next day
 	var clz = null;
 
-	// resolve day changes
 	if (y1 < y0) {
 		clz = 'day-prev';
 	} else if (y1 > y0) {
@@ -83,6 +105,7 @@ function addPerson(obj) {
 		bu.classList.add(clz);
 	}
 
+
 	la.textContent = obj.name;
 	la.title = hhmmss + ' (' + obj.tz + ')'; // tooltip
 	la.style.color = obj.color;
@@ -91,6 +114,10 @@ function addPerson(obj) {
 	disc.appendChild(la);
 }
 
+
+/**
+ * Build the hour numbers
+ */
 function buildClockMarks() {
 	// The clock marks
 	for (var i = 0; i < 24; i++) {
@@ -111,6 +138,10 @@ function buildClockMarks() {
 	}
 }
 
+
+/**
+ * Initialize the app
+ */
 function init() {
 
 	disc = document.getElementById('disc');
@@ -126,7 +157,9 @@ function init() {
 	window.onfocus = update;
 }
 
-
+/**
+ * Toggle colon visibility each second (uses sec % 2)
+ */
 function changeColon() {
 	var s = (new Date()).getSeconds() % 2;
 
@@ -134,19 +167,25 @@ function changeColon() {
 }
 
 
+/**
+ * Update people positions & time
+ */
 function update() {
 	redrawPeople();
 
-	// redraw time
+	// redraw time, wrap colon in span
 	var mmt = moment();
 
+	// need zero-padded minutes!
 	var parts = mmt.format('H:mm').split(':');
-
 	document.getElementById('localtime').innerHTML = parts[0] + '<span id="loctimecolon">:</span>' + parts[1];
 	changeColon();
 }
 
 
+/**
+ * Redraw people (actually deletes and re-adds them)
+ */
 function redrawPeople() {
 	// Delete all old stuff
 	var x = document.querySelectorAll('.bullet, .person');
