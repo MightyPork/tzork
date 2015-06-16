@@ -25,12 +25,10 @@ function addPerson(obj) {
 
 	// Create a Moment and format it
 	var there = moment().tz(obj.tz);
-	var hms = there.format('H:m:s');
 	var hhmmss = there.format('H:mm, MMM Do YYYY');
 
 	// Get pieces of time, convert to seconds
-	var pts = hms.split(':');
-	var secs = parseInt(pts[0]) * 3600 + parseInt(pts[1]) * 60 + parseInt(pts[2]);
+	var secs = there.hour() * 3600 + there.minute() * 60 + there.second();
 
 	// Convert to hours
 	var t = (secs / 3600);
@@ -60,10 +58,10 @@ function addPerson(obj) {
 	la.classList.add('person');
 	la.classList.add((t < 12) ? 'left' : 'right'); // left and right side of the clock
 
-	var d0 = parseInt(here.format('DDD'));
-	var d1 = parseInt(there.format('DDD'));
-	var y0 = parseInt(here.format('YYYY'));
-	var y1 = parseInt(there.format('YYYY'));
+	var d0 = here.dayOfYear();
+	var d1 = there.dayOfYear();
+	var y0 = here.year();
+	var y1 = there.year();
 
 	var clz = null;
 
