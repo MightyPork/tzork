@@ -2,7 +2,7 @@
 var disc;
 
 function positionAt(element, angle, distance, unit) {
-	if (unit == undefined) unit = '%';
+	if (unit === undefined) unit = '%';
 	element.style.left = 50 + distance * Math.cos((angle / 180) * Math.PI) + unit;
 	element.style.top = 50 - distance * Math.sin((angle / 180) * Math.PI) + unit;
 }
