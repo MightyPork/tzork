@@ -3,6 +3,7 @@ var people = [
 	//{name: 'Locercus', tz: 'Europe/Copenhagen', color: '#45F425'},
 	{name: 'TheBadFame', tz: 'America/Mexico_City', color: '#329AFF'},
 	{name: 'ImReble548', tz: 'America/Denver', color: '#69E79E'},
+	{name: 'Deli731234', tz: 'America/Tijuana', color: '#F57126'},
 ];
 
 var disc;
