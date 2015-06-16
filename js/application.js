@@ -93,21 +93,30 @@ function addPerson(obj) {
 	disc.appendChild(la);
 }
 
-function init() {
-
-	disc = document.getElementById('disc');
-
+function buildClockMarks() {
 	// The clock marks
 	for (var i = 0; i < 24; i++) {
 		// mark div
 		var mark = document.createElement('div');
 		mark.classList.add('mark');
+		mark.classList.add('hour-' + i);
+
+		if (i==0||i==6||i==12||i==18) {
+			mark.classList.add('sixth');
+		}
+
 		mark.innerText = '' + i;
 
 		var angle = hour2angle(i);
 		positionAt(mark, angle, 45);
 		disc.appendChild(mark);
 	}
+}
+
+function init() {
+
+	disc = document.getElementById('disc');
+	buildClockMarks();
 
 	update();
 

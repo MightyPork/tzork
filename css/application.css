@@ -40,15 +40,24 @@ html, body {
     transform: translate(-50%, -50%);
     font-family: monospace;
     font-size: 2em; }
+    #disc .mark.sixth {
+      font-weight: bold;
+      font-size: 2.8em; }
     @media only screen and (max-width: 320px) {
       #disc .mark {
-        font-size: 0.5em; } }
+        font-size: 0.5em; }
+        #disc .mark.sixth {
+          font-size: 0.7em; } }
     @media only screen and (min-width: 321px) and (max-width: 639px) {
       #disc .mark {
-        font-size: 0.7em; } }
+        font-size: 0.7em; }
+        #disc .mark.sixth {
+          font-size: 0.9em; } }
     @media only screen and (min-width: 641px) and (max-width: 1023px) {
       #disc .mark {
-        font-size: 1.4em; } }
+        font-size: 1.4em; }
+        #disc .mark.sixth {
+          font-size: 1.8em; } }
   #disc .person {
     display: inline-block;
     position: absolute;
