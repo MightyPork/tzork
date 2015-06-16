@@ -1,8 +1,9 @@
 var people = [
-	{name: 'MightyPork', tz: 'Europe/Prague', color: '#EAF425'},
-	{name: 'TheBadFame', tz: 'America/Mexico_City', color: '#329AFF'},
-	{name: 'ImReble548', tz: 'America/Denver', color: '#69E79E'},
-	{name: 'Deli731234', tz: 'America/Tijuana', color: '#F57126'},
+	{name: '@MightyPork', tz: 'Europe/Prague', color: '#EAF425'},
+	{name: '@TheBadFame', tz: 'America/Mexico_City', color: '#329AFF'},
+	{name: '@ImReble548', tz: 'America/Denver', color: '#69E79E'},
+	{name: '@Deli731234', tz: 'America/Tijuana', color: '#F57126'},
+	{name: '@eevblog', tz: 'Australia/Sydney', color: '#E63E3F'}
 ];
 
 var disc;
@@ -53,9 +54,17 @@ function addPerson(obj) {
 	positionAt(bu, angle, 50.2);
 	disc.appendChild(bu);
 
+	// make it a link if it's twitter name
+	var twi = obj.name.indexOf('@') === 0;
 
 	// Create a label
-	var la = document.createElement('div');
+	var la = document.createElement(twi ? 'a' : 'span');
+
+	if (twi) {
+		la.href = 'https://twitter.com/' + obj.name
+		la.classList.add('twitter-link');
+	}
+
 	la.classList.add('person');
 	la.classList.add((t < 12) ? 'left' : 'right'); // left and right side of the clock
 
@@ -68,14 +77,14 @@ function addPerson(obj) {
 
 	// resolve day changes
 	if (y1 < y0) {
-		clz = 'day_prev';
+		clz = 'day-prev';
 	} else if (y1 > y0) {
-		clz = 'day_next';
+		clz = 'day-next';
 	} else {
 		if (d1 < d0) {
-			clz = 'day_prev';
+			clz = 'day-prev';
 		} else if (d1 > d0) {
-			clz = 'day_next';
+			clz = 'day-next';
 		}
 	}
 
@@ -85,7 +94,7 @@ function addPerson(obj) {
 	}
 
 	la.innerText = obj.name;
-	la.title = hhmmss + ' ('+obj.tz+')'; // tooltip
+	la.title = hhmmss + ' (' + obj.tz + ')'; // tooltip
 	la.style.color = obj.color;
 
 	positionAt(la, angle, 53.5); // label distance

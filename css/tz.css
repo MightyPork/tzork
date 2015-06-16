@@ -51,6 +51,7 @@ html, body {
         font-size: 1.4em; } }
   #disc .person {
     position: absolute;
+    text-decoration: none;
     -webkit-user-select: initial;
     -khtml-user-select: initial;
     -moz-user-select: initial;
@@ -91,9 +92,9 @@ html, body {
       #disc .bullet {
         width: 0.7em;
         height: 0.7em; } }
-    #disc .bullet.day_prev {
-      box-shadow: 0 0 0.25em 0.1em red; }
-    #disc .bullet.day_next {
+    #disc .bullet.day-prev {
+      box-shadow: 0 0 0.25em 0.1em #ff151b; }
+    #disc .bullet.day-next {
       box-shadow: 0 0 0.25em 0.1em yellow; }
 
 #localtime {

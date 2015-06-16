@@ -67,6 +67,7 @@ html, body {
 
 	.person {
 		position: absolute;
+		text-decoration: none;
 
 		@include can-select();
 		@include helvetica();
@@ -119,11 +120,11 @@ html, body {
 
 		border: 1px solid black;
 
-		&.day_prev {
-			box-shadow: 0 0 0.25em 0.1em red;
+		&.day-prev {
+			box-shadow: 0 0 0.25em 0.1em #ff151b;
 		}
 
-		&.day_next {
+		&.day-next {
 			box-shadow: 0 0 0.25em 0.1em yellow;
 		}
 	}
