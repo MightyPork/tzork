@@ -1,4 +1,4 @@
-# TZork, your world clock **
+# TZork, your world clock
 
 TZork lives at [tzork.com](http://tzork.com).
 
