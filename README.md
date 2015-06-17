@@ -14,7 +14,7 @@ The project is open source, contributions are welcome!
 ## What's left to do
 
 - [ ] A way to show more names in one timezone
-- [x] Support for timezone abbreviations
+- [x] Support for timezone aliases
 - [ ] An interface for adding, removing and editing names, timezones and colors (`people` array)
 - [ ] Saving the `people` array in `localStorage` (and loading it)
 - [ ] Rewrite the clock into SVG using Raphael.js (or other lib?)
