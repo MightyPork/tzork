@@ -1,5 +1,6 @@
 var disc;
 
+// req. global arrays: tz_aliases, people.
 
 /**
  * Convert hour to angle (deg)
@@ -25,6 +26,26 @@ function positionAt(element, angle, distance, unit) {
 	element.style.top = 50 - distance * Math.sin((angle / 180) * Math.PI) + unit;
 }
 
+
+function resolveTZ(tz) {
+
+	// Resolve, if it's alias
+	if (tz in tz_aliases) {
+		var old = tz;
+		tz = tz_aliases[tz];
+
+		console.log('TZ "' + old + '" resolved as "' + tz + '"');
+	}
+
+	// Check if it's valid for Moment.js
+	if (!moment.tz.zone(tz)) {
+		return false;
+	}
+
+	return tz;
+}
+
+
 /**
  * Add a person to the clock.
  *
@@ -32,17 +53,21 @@ function positionAt(element, angle, distance, unit) {
  *            (name, tz, color)
  */
 function addPerson(obj) {
-	// Work out the local time
-	if (!moment.tz.zone(obj.tz)) {
+
+	// Resolve timezone, cache result in the object.
+	var tz = obj._tz_cached;
+	if (!tz) {
+		tz = obj._tz_cached = resolveTZ(obj.tz);
+	}
+	if (tz === false) {
 		console.error('Invalid timezone for ' + obj.name);
-		return;
 	}
 
 	// local time
 	var here = moment();
 
 	// Create a Moment and format it
-	var there = moment().tz(obj.tz);
+	var there = moment().tz(tz);
 	var hhmmss = there.format('H:mm, MMM Do YYYY');
 
 	// Get pieces of time, convert to seconds
@@ -104,7 +129,6 @@ function addPerson(obj) {
 		la.classList.add(clz);
 		bu.classList.add(clz);
 	}
-
 
 	la.textContent = obj.name;
 	la.title = hhmmss + ' (' + obj.tz + ')'; // tooltip
