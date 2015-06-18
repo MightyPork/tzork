@@ -372,6 +372,7 @@ var tz_aliases = {
 	"Marshall Islands, Kwajalein": "Pacific/Kwajalein",
 
 	// Mexico
+	"Mexico": "America/Mexico_City", // shortcut for the most common
 	"Mexico, Mexico City": "America/Mexico_City",
 	"Mexico, Cancun": "America/Cancun",
 	"Mexico, Merida": "America/Merida",

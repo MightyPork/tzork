@@ -173,6 +173,7 @@ html, body {
 		font-size: 3.5em;
 	}
 
+	// make the colon "smooth" when blinking
 	span#loctimecolon {
 		opacity: 1;
 		transition: opacity .05s ease-in-out;
