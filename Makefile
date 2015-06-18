@@ -1,15 +1,17 @@
-JSFILES = js/app/_zone-names.js js/app/_zone-aliases.js js/app/_people.js js/app/application.js
+JSFILES = js/source/_zone-names.js
+JSFILES += js/source/_zone-aliases.js
+JSFILES += js/source/_people.js
+JSFILES += js/source/_utils.js
+JSFILES += js/source/_tz_utils.js
+JSFILES += js/source/application.js
 
 js: $(JSFILES)
 	@## Concatenate files
-	cat $(JSFILES) > .tmp.js
+	cat $(JSFILES) > js/application.js
 
 	@## Compress the temporary file to output
-	yuicompressor .tmp.js -o js/application.js
+	yuicompressor js/application.js -o js/application.min.js
 	@# --nomunge
-
-	@## Remove temporary concatenated file
-	rm .tmp.js
 
 css:
 	scss --update css:css
