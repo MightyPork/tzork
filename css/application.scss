@@ -106,7 +106,7 @@ html, body {
 
 		@for $i from 2 through 15 {
 			&.count-#{$i} {
-				transition: height .05s * $i linear;
+				transition: height .07s * $i/2;
 				height: $lh * $i;
 			}
 		}

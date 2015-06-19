@@ -884,7 +884,8 @@ var people = [
 	{name: '@elakdawalla',   tz: 'USA, Pacific Time',  color: '#C49B6D'},
 	{name: '@Vangoule273',   tz: 'United Kingdom',     color: '#FF0095'},
 	{name: '@xTordX',        tz: 'Romania',            color: '#AE1AF7'},
-	{name: '@ljfa2',          tz: 'Germany',            color: '#78FCFF'},
+	{name: '@ljfa2',         tz: 'Germany',            color: '#78FCFF'},
+	{name: '@Rafmaninoff',   tz: 'Spain',              color: '#00CC00'},
 ];
 /**
  * Convert hour to angle (deg)
