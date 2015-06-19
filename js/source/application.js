@@ -210,7 +210,6 @@ function createPersonLabel(obj) {
 
 	if (twi) {
 		la.href = 'https://twitter.com/' + obj.name;
-		la.classList.add('twitter-link');
 		la.target = '_blank';
 	}
 
