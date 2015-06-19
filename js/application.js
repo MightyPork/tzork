@@ -1028,7 +1028,7 @@ function init() {
 	update();
 
 	// refresh the disc every N seconds
-	setInterval(update, 1000 * 10);
+	setInterval(update, 1000 * 30);
 	setInterval(changeColon, 1000);
 
 	// force refresh after tab gets focused
