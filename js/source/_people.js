@@ -18,4 +18,5 @@ var people = [
 	{name: '@elakdawalla',   tz: 'USA, Pacific Time',  color: '#C49B6D'},
 	{name: '@Vangoule273',   tz: 'United Kingdom',     color: '#09AEC3'},
 	{name: '@DanTwoHundred', tz: 'United Kingdom',     color: '#77A4F4'},
+	{name: '@xTordX',        tz: 'Romania',            color: '#AE1AF7'},
 ];
