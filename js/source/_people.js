@@ -15,4 +15,7 @@ var people = [
 	{name: '@iamSethD',      tz: 'USA, Eastern Time',  color: '#ED2222'},
 	{name: '@eevblog',       tz: 'Australia, Sydney',  color: '#E63E3F'},
 	{name: '@AntonvonRaumer',tz: 'Germany',            color: '#FF8585'},
+	{name: '@elakdawalla',   tz: 'USA, Pacific Time',  color: '#C49B6D'},
+	{name: '@Vangoule273',   tz: 'United Kingdom',     color: '#09AEC3'},
+	{name: '@DanTwoHundred', tz: 'United Kingdom',     color: '#77A4F4'},
 ];

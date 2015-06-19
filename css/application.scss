@@ -169,14 +169,6 @@ html, body {
 
 	text-shadow: 0 0 4px black, 0 0 2px black;
 
-	&.left {
-		text-align: right;
-	}
-
-	&.right {
-		text-align: left;
-	}
-
 	@include respond-to(tiny) {
 		@include plist-em-offset(0.7em);
 	}

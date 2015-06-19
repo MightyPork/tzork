@@ -208,7 +208,12 @@ var tz_aliases = {
 	"U.S. Virgin Islands": "America/St_Thomas",
 	"Uganda": "Africa/Kampala",
 	"United Arab Emirates": "Asia/Dubai",
+
 	"United Kingdom": "Europe/London",
+	"UK": "Europe/London",
+	"GB": "Europe/London",
+	"Great Britain": "Europe/London",
+
 	"Uruguay": "America/Montevideo",
 	"Vanuatu": "Pacific/Efate",
 	"Vatican": "Europe/Vatican",
