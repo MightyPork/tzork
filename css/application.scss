@@ -149,7 +149,7 @@ html, body {
 	@for $i from 2 through 15 {
 		.count-#{$i} &:first-child:after {
 			transition: opacity .1s linear;
-			content: ' + #{$i}';
+			content: ' + #{$i - 1}';
 		}
 	}
 }

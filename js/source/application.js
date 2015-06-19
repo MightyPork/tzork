@@ -186,18 +186,18 @@ function addPeopleAtTime(secs, people) {
 	for (i = 0; i < people.length; i++) {
 		var peep = people[i];
 		var chld = createPersonLabel(peep);
-		chld.title = there.format('H:mm, MMM Do') + '; ' + peep.tz;
+		chld.title = there.format('H:mm, MMM Do') + ' — ' + peep.tz;
 		list.appendChild(chld);
 	}
 
 	positionAt(list, angle, 53.5, octant); // label distance
 	disc.appendChild(list);
 
-	list.addEventListener('mouseover', function (event) {
+	list.addEventListener('mouseover', function (e) {
 		mouse_hovering_list = true;
 	});
 
-	list.addEventListener('mouseout', function (event) {
+	list.addEventListener('mouseout', function (e) {
 		mouse_hovering_list = false;
 	})
 }
