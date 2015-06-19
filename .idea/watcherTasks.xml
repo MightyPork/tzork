@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectTasksOptions">
     <TaskOptions isEnabled="true">
-      <option name="arguments" value="--update $FileName$:$FileNameWithoutExtension$.css" />
+      <option name="arguments" value="--update $FileName$:$FileNameWithoutExtension$.css --style compressed --sourcemap=none" />
       <option name="checkSyntaxErrors" value="true" />
       <option name="description" value="Compiles .scss files into .css files" />
       <option name="exitCodeBehavior" value="ERROR" />
