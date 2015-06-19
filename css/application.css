@@ -83,6 +83,27 @@ html, body {
     @media only screen and (min-width: 641px) and (max-width: 1023px) {
       #disc .person {
         font-size: 1em; } }
+  #disc .people-list {
+    -webkit-user-select: initial;
+    -khtml-user-select: initial;
+    -moz-user-select: initial;
+    -ms-user-select: initial;
+    user-select: initial;
+    font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
+    display: block;
+    position: absolute;
+    text-decoration: none;
+    font-size: 1.2em;
+    text-shadow: 0 0 4px black, 0 0 2px black; }
+    @media only screen and (max-width: 320px) {
+      #disc .people-list {
+        font-size: 0.7em; } }
+    @media only screen and (min-width: 321px) and (max-width: 639px) {
+      #disc .people-list {
+        font-size: 0.9em; } }
+    @media only screen and (min-width: 641px) and (max-width: 1023px) {
+      #disc .people-list {
+        font-size: 1em; } }
   #disc .bullet {
     position: absolute;
     width: 1em;

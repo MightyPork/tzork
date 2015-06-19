@@ -16,12 +16,34 @@ function hour2angle(h) {
  * @param element
  * @param angle    degrees
  * @param distance radius (in "unit")
- * @param unit     unit to use
+ * @param quadrant what quadrant it's in (determines from where we're positioning)
  */
-function positionAt(element, angle, distance, unit) {
-	if (typeof unit == 'undefined') unit = '%';
-	element.style.left = 50 + distance * Math.cos((angle / 180) * Math.PI) + unit;
-	element.style.top = 50 - distance * Math.sin((angle / 180) * Math.PI) + unit;
+function positionAt(element, angle, distance, quadrant) {
+	if (typeof quadrant === 'undefined') {
+		quadrant = 0;
+	}
+
+	var xx = distance * Math.cos((angle / 180) * Math.PI);
+	var yy = distance * Math.sin((angle / 180) * Math.PI);
+
+	switch (quadrant) {
+		case 0:
+			element.style.left = 50 + xx + '%';
+			element.style.top = 50 - yy + '%';
+			break;
+		case 1:
+			element.style.left = 50 + xx + '%';
+			element.style.top = 50 - yy + '%';
+			break;
+		case 2:
+			element.style.left = 50 + xx + '%';
+			element.style.top = 50 - yy + '%';
+			break;
+		case 3:
+			element.style.left = 50 + xx + '%';
+			element.style.top = 50 - yy + '%';
+			break;
+	}
 }
 
 
@@ -40,10 +62,6 @@ function mmtDayCompare(here, there) {
 	// remote
 	var d1 = there.dayOfYear();
 	var y1 = there.year();
-
-
-	// resolve day changes, add class for prev/next day
-	var clz = null;
 
 	if (y1 < y0) {
 		return -1;

@@ -110,6 +110,51 @@ html, body {
 		}
 	}
 
+	.people-list {
+		@include can-select();
+		@include helvetica();
+	//	@include highlight(yellow);
+
+		display: block;
+		position: absolute;
+		text-decoration: none;
+
+		font-size: 1.2em;
+		text-shadow: 0 0 4px black, 0 0 2px black;
+
+//		&.left {
+//			&.up {
+//				transform: translate(-100%, -100%);
+//			}
+//
+//			&.down {
+//				transform: translate(-100%, 0%);
+//			}
+//		}
+//
+//		&.right {
+//			&.up {
+//				transform: translate(0%, -100%);
+//			}
+//
+//			&.down {
+//				transform: translate(0%, 0%);
+//			}
+//		}
+
+		@include respond-to(tiny) {
+			font-size: 0.7em;
+		}
+
+		@include respond-to(small) {
+			font-size: 0.9em;
+		}
+
+		@include respond-to(medium) {
+			font-size: 1em;
+		}
+	}
+
 	.bullet {
 		position: absolute;
 

@@ -59,7 +59,7 @@ function update() {
 /** Redraw people (actually deletes and re-adds them) */
 function redrawPeople() {
 	// Delete all old stuff
-	var x = document.querySelectorAll('.bullet, .person');
+	var x = document.querySelectorAll('.bullet, .person, .people-list');
 	for (var i in x) {
 		if (x.hasOwnProperty(i)) {
 			var e = x[i];
@@ -121,9 +121,50 @@ function buildPeople() {
 
 
 /** Add a bunch of people at specified time (s) */
-function addPeopleAtTime(time, people) {
-	// TODO real implementation with stacking!!!
-	people.forEach(addPerson);
+function addPeopleAtTime(secs, people) {
+	var first = people[0];
+
+	// Convert to hours & to degrees
+	var t = secs / 3600;
+	var angle = hour2angle(t);
+
+	// Create a bullet
+	var bu = document.createElement('div');
+	bu.className = 'bullet';
+	bu.style.backgroundColor = first.color;
+	positionAt(bu, angle, 50.2);
+	disc.appendChild(bu);
+
+
+	// Create a label
+
+	// make it a link if it's twitter name
+	var la = document.createElement('div');
+	la.classList.add('people-list');
+
+	// add location classes
+	la.classList.add((t < 12) ? 'left' : 'right');
+	la.classList.add((t < 6 || t > 18) ? 'down' : 'up');
+
+
+
+	// Determine if this is in prev / next day
+	var here = moment();
+	var there = moment().tz(getTimezoneForPerson(first));
+	var i = mmtDayCompare(here, there);
+	var clz = (i == -1) ? 'day-prev' : (i == 1) ? 'day-next' : null;
+	if (clz !== null) {
+		la.classList.add(clz);
+		bu.classList.add(clz);
+	}
+
+	la.innerHTML = first.name+'<br>hello';
+	if (people.length > 1) la.innerHTML += '<br> + '+(people.length-1);
+	la.title = there.format('H:mm, MMM Do YYYY'); // tooltip
+	la.style.color = first.color;
+
+	positionAt(la, angle, 51.5); // label distance
+	disc.appendChild(la);
 }
 
 

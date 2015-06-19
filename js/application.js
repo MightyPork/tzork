@@ -1,3 +1,9 @@
+//////////////////////////////////////////////////////////////////////////////
+// THIS IS A GENERATED FILE, CHANGES WILL BE LOST!!!                        //
+//                                                                          //
+// Please edit files in js/source, and then run 'make js' in project root.  //
+//////////////////////////////////////////////////////////////////////////////
+
 // Names of all timezones
 var tz_names = [
 	"Europe/Andorra",
@@ -887,12 +893,34 @@ function hour2angle(h) {
  * @param element
  * @param angle    degrees
  * @param distance radius (in "unit")
- * @param unit     unit to use
+ * @param quadrant what quadrant it's in (determines from where we're positioning)
  */
-function positionAt(element, angle, distance, unit) {
-	if (typeof unit == 'undefined') unit = '%';
-	element.style.left = 50 + distance * Math.cos((angle / 180) * Math.PI) + unit;
-	element.style.top = 50 - distance * Math.sin((angle / 180) * Math.PI) + unit;
+function positionAt(element, angle, distance, quadrant) {
+	if (typeof quadrant === 'undefined') {
+		quadrant = 0;
+	}
+
+	var xx = distance * Math.cos((angle / 180) * Math.PI);
+	var yy = distance * Math.sin((angle / 180) * Math.PI);
+
+	switch (quadrant) {
+		case 0:
+			element.style.left = 50 + xx + '%';
+			element.style.top = 50 - yy + '%';
+			break;
+		case 1:
+			element.style.left = 50 + xx + '%';
+			element.style.top = 50 - yy + '%';
+			break;
+		case 2:
+			element.style.left = 50 + xx + '%';
+			element.style.top = 50 - yy + '%';
+			break;
+		case 3:
+			element.style.left = 50 + xx + '%';
+			element.style.top = 50 - yy + '%';
+			break;
+	}
 }
 
 
@@ -911,10 +939,6 @@ function mmtDayCompare(here, there) {
 	// remote
 	var d1 = there.dayOfYear();
 	var y1 = there.year();
-
-
-	// resolve day changes, add class for prev/next day
-	var clz = null;
 
 	if (y1 < y0) {
 		return -1;
@@ -1040,7 +1064,7 @@ function update() {
 /** Redraw people (actually deletes and re-adds them) */
 function redrawPeople() {
 	// Delete all old stuff
-	var x = document.querySelectorAll('.bullet, .person');
+	var x = document.querySelectorAll('.bullet, .person, .people-list');
 	for (var i in x) {
 		if (x.hasOwnProperty(i)) {
 			var e = x[i];
@@ -1102,9 +1126,50 @@ function buildPeople() {
 
 
 /** Add a bunch of people at specified time (s) */
-function addPeopleAtTime(time, people) {
-	// TODO real implementation with stacking!!!
-	people.forEach(addPerson);
+function addPeopleAtTime(secs, people) {
+	var first = people[0];
+
+	// Convert to hours & to degrees
+	var t = secs / 3600;
+	var angle = hour2angle(t);
+
+	// Create a bullet
+	var bu = document.createElement('div');
+	bu.className = 'bullet';
+	bu.style.backgroundColor = first.color;
+	positionAt(bu, angle, 50.2);
+	disc.appendChild(bu);
+
+
+	// Create a label
+
+	// make it a link if it's twitter name
+	var la = document.createElement('div');
+	la.classList.add('people-list');
+
+	// add location classes
+	la.classList.add((t < 12) ? 'left' : 'right');
+	la.classList.add((t < 6 || t > 18) ? 'down' : 'up');
+
+
+
+	// Determine if this is in prev / next day
+	var here = moment();
+	var there = moment().tz(getTimezoneForPerson(first));
+	var i = mmtDayCompare(here, there);
+	var clz = (i == -1) ? 'day-prev' : (i == 1) ? 'day-next' : null;
+	if (clz !== null) {
+		la.classList.add(clz);
+		bu.classList.add(clz);
+	}
+
+	la.innerHTML = first.name+'<br>hello';
+	if (people.length > 1) la.innerHTML += '<br> + '+(people.length-1);
+	la.title = there.format('H:mm, MMM Do YYYY'); // tooltip
+	la.style.color = first.color;
+
+	positionAt(la, angle, 51.5); // label distance
+	disc.appendChild(la);
 }
 
 
