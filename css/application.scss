@@ -94,13 +94,15 @@ html, body {
 	padding: 0 $lh * $padding_ratio;
 	border-radius: 5px;
 
-	&.multiple:hover {
+	&:hover {
 		background-color: rgba(black, .7);
 
 		// really thick black shadow
 		text-shadow: 0 0 6px black, 0 0 6px black, 0 0 6px black, 0 0 6px black, 0 0 6px black;
-
 		z-index: 1000;
+	}
+
+	&.multiple:hover {
 
 		@for $i from 2 through 15 {
 			&.count-#{$i} {

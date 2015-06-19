@@ -1,5 +1,3 @@
-
-
 var people = [
 	{name: '@MightyPork',    tz: 'Czech Republic',     color: '#FFAD00'},
 	{name: '@lastofavari',   tz: 'Belarus',            color: '#05CDC0'},
@@ -16,7 +14,7 @@ var people = [
 	{name: '@eevblog',       tz: 'Australia, Sydney',  color: '#E63E3F'},
 	{name: '@AntonvonRaumer',tz: 'Germany',            color: '#FF8585'},
 	{name: '@elakdawalla',   tz: 'USA, Pacific Time',  color: '#C49B6D'},
-	{name: '@Vangoule273',   tz: 'United Kingdom',     color: '#09AEC3'},
-	{name: '@DanTwoHundred', tz: 'United Kingdom',     color: '#77A4F4'},
+	{name: '@Vangoule273',   tz: 'United Kingdom',     color: '#FF0095'},
 	{name: '@xTordX',        tz: 'Romania',            color: '#AE1AF7'},
+	{name: '@ljfa2',          tz: 'Germany',            color: '#78FCFF'},
 ];
