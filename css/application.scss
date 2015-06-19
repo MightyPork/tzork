@@ -83,51 +83,77 @@ html, body {
 // Offsets for people lists, so they look aligned with the dots
 @mixin plist-em-offset($lineheight) {
 	font-size: $lineheight;
-	line-height: $lineheight;
 
-	height: $lineheight*1.4;
-	padding: $lineheight*0.2;
+	$lh: $lineheight*1.4;
+
+	line-height: $lh;
+
+	$padding_ratio: 0.2;
+
+	height: $lh;
+	padding: 0 $lh * $padding_ratio;
 	border-radius: 3px;
 
-
 	&.multiple:hover {
-		background-color: rgba(black, .5);
+		background-color: rgba(black, .4);
+
+		// really thick black shadow
+		text-shadow: 0 0 6px black, 0 0 6px black, 0 0 6px black, 0 0 6px black, 0 0 6px black;
+
 		z-index: 1000;
 
 		@for $i from 2 through 15 {
 			&.count-#{$i} {
-				transition: height .05s*$i linear;
-				height: $i*$lineheight+$lineheight*0.2*2;
+				transition: height .05s * $i linear;
+				height: $lh * $i;
 			}
+		}
+
+		.person-label:after {
+			opacity: 0;
 		}
 	}
 
 	&.oct1,
 	&.oct2 {
-		transform: translate(0, -0.8*$lineheight);
+		transform: translate(0, -0.8*$lh);
 	}
 
 	&.oct7 {
-		transform: translate(0, -0.5*$lineheight);
+		transform: translate(0, -0.5*$lh);
 	}
 
 	&.oct0 {
-		transform: translate(0, -0.5*$lineheight);
+		transform: translate(0, -0.5*$lh);
 	}
 
 	&.oct3 {
-		transform: translate(0, -0.5*$lineheight);
+		transform: translate(0, -0.5*$lh);
 	}
 
 	&.oct4 {
-		transform: translate(0, -0.5*$lineheight);
+		transform: translate(0, -0.5*$lh);
 	}
 
 	&.oct5,
 	&.oct6 {
-		transform: translate(0, 0.5*$lineheight);
+		transform: translate(0, 0.5*$lh);
 	}
 }
+
+
+.person-label {
+	display: block;
+	@include naked();
+
+	@for $i from 2 through 15 {
+		.count-#{$i} &:first-child:after {
+			transition: opacity .1s linear;
+			content: ' + #{$i}';
+		}
+	}
+}
+
 
 .people-list {
 	@include nowrap();
@@ -160,7 +186,6 @@ html, body {
 	}
 
 	@include respond-to(medium) {
-		@include highlight(red);
 		@include plist-em-offset(1em);
 	}
 }

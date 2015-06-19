@@ -11,11 +11,11 @@ function init() {
 	update();
 
 	// refresh the disc every N seconds
-//	setInterval(update, 1000 * 10);
-//	setInterval(changeColon, 1000);
+	setInterval(update, 1000 * 10);
+	setInterval(changeColon, 1000);
 
 	// force refresh after tab gets focused
-//	window.onfocus = update;
+	window.onfocus = update;
 }
 
 
@@ -122,6 +122,8 @@ function buildPeople() {
 
 /** Add a bunch of people at specified time (s) */
 function addPeopleAtTime(secs, people) {
+	var i, j;
+
 	var first = people[0];
 
 	// Convert to hours & to degrees
@@ -145,99 +147,59 @@ function addPeopleAtTime(secs, people) {
 	// Create a label
 
 	// make it a link if it's twitter name
-	var la = document.createElement('div');
-	la.classList.add('people-list');
-
+	var list = document.createElement('div');
+	list.classList.add('people-list');
 
 	// add location classes
-	la.classList.add(is_left ? 'left' : 'right');
-	la.classList.add(is_up ? 'up' : 'down');
+	list.classList.add(is_left ? 'left' : 'right');
+	list.classList.add(is_up ? 'up' : 'down');
 
-	la.classList.add('quad' + quadrant);
-	la.classList.add('oct' + octant);
+	list.classList.add('quad' + quadrant);
+	list.classList.add('oct' + octant);
 
 
 	// Determine if this is in prev / next day
 	var here = moment();
 	var there = moment().tz(getTimezoneForPerson(first));
-	var i = mmtDayCompare(here, there);
+	i = mmtDayCompare(here, there);
 	var clz = (i == -1) ? 'day-prev' : (i == 1) ? 'day-next' : null;
+
 	if (clz !== null) {
-		la.classList.add(clz);
+		list.classList.add(clz);
 		bu.classList.add(clz);
 	}
 
-	la.innerHTML = first.name;
 	if (people.length > 1) {
-		la.classList.add('multiple');
-		la.classList.add('count-'+people.length);
-		la.innerHTML += ' + ' + (people.length - 1);
-
-		for (var j = 1; j < people.length; j++) {
-			la.innerHTML += '<br>' + people[j].name;
-		}
+		list.classList.add('multiple');
+		list.classList.add('count-' + people.length);
 	}
-	la.title = there.format('H:mm, MMM Do YYYY'); // tooltip
-	la.style.color = first.color;
 
-	positionAt(la, angle, 53.5, octant); // label distance
-	disc.appendChild(la);
+	list.title = there.format('H:mm, MMM Do YYYY'); // tooltip
+	list.style.color = first.color;
+
+	// add the people
+	for (i = 0; i < people.length; i++) {
+		list.appendChild(createPersonLabel(people[i]));
+	}
+
+	positionAt(list, angle, 53.5, octant); // label distance
+	disc.appendChild(list);
 }
 
 
-/**
- * Add a person to the clock.
- *
- * @param obj info about the person (name, tz, color)
- */
-function addPerson(obj) {
-	var secs = obj._t;
-
-	// Convert to hours & to degrees
-	var t = (secs / 3600);
-	var angle = hour2angle(t);
-
-
-	// Create a bullet
-	var bu = document.createElement('div');
-	bu.className = 'bullet';
-	bu.style.backgroundColor = obj.color;
-	positionAt(bu, angle, 50.2);
-	disc.appendChild(bu);
-
-
-	// Create a label
-
-	// make it a link if it's twitter name
+function createPersonLabel(obj) {
 	var twi = (obj.name.indexOf('@') === 0);
 	var la = document.createElement(twi ? 'a' : 'span');
+	la.classList.add('person-label');
 
 	if (twi) {
 		la.href = 'https://twitter.com/' + obj.name;
 		la.classList.add('twitter-link');
+		la.target = '_blank';
 	}
 
-	la.classList.add('person');
-	la.classList.add((t < 12) ? 'left' : 'right'); // left and right side of the clock
-
-
-	// Determine if person is in prev / next day
-	var here = moment();
-	var there = moment().tz(getTimezoneForPerson(obj));
-	var i = mmtDayCompare(here, there);
-	var clz = (i == -1) ? 'day-prev' : (i == 1) ? 'day-next' : null;
-
-	if (clz !== null) {
-		la.classList.add(clz);
-		bu.classList.add(clz);
-	}
-
-
-	la.textContent = obj.name;
-	la.title = there.format('H:mm, MMM Do YYYY') + ' (' + obj.tz + ')'; // tooltip
 	la.style.color = obj.color;
+	la.textContent = obj.name;
 
-	positionAt(la, angle, 53.5); // label distance
-	disc.appendChild(la);
+	return la;
 }
-
