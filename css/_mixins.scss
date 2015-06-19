@@ -36,8 +36,8 @@
 	word-wrap: normal;
 }
 
-@mixin helvetica() {
-	font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
+@mixin basefont() {
+	font-family: "Droid Sans", sans-serif;
 }
 
 $break-tiny: 320px;

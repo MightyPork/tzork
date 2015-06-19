@@ -92,10 +92,10 @@ html, body {
 
 	height: $lh;
 	padding: 0 $lh * $padding_ratio;
-	border-radius: 3px;
+	border-radius: 5px;
 
 	&.multiple:hover {
-		background-color: rgba(black, .4);
+		background-color: rgba(black, .7);
 
 		// really thick black shadow
 		text-shadow: 0 0 6px black, 0 0 6px black, 0 0 6px black, 0 0 6px black, 0 0 6px black;
@@ -158,7 +158,7 @@ html, body {
 .people-list {
 	@include nowrap();
 	@include can-select();
-	@include helvetica();
+	@include basefont();
 
 	display: block;
 	position: absolute;
@@ -226,7 +226,7 @@ html, body {
 
 #localtime {
 	@include naked();
-	@include helvetica();
+	@include basefont();
 	@include can-select();
 	position: absolute;
 	left: 50%; top: 50%;

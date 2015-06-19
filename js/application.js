@@ -875,6 +875,7 @@ var people = [
 	{name: '@TheBadFame',    tz: 'Mexico',             color: '#329AFF'},
 	{name: '@ImReble548',    tz: 'USA, Mountain Time', color: '#69E79E'},
 	{name: '@Deli731234',    tz: 'USA, Pacific Time',  color: '#A659E2'},
+	{name: '@iamSethD',      tz: 'USA, Eastern Time',  color: '#ED2222'},
 	{name: '@eevblog',       tz: 'Australia, Sydney',  color: '#E63E3F'},
 ];
 /**
@@ -1189,12 +1190,14 @@ function addPeopleAtTime(secs, people) {
 		list.classList.add('count-' + people.length);
 	}
 
-	list.title = there.format('H:mm, MMM Do YYYY'); // tooltip
 	list.style.color = first.color;
 
 	// add the people
 	for (i = 0; i < people.length; i++) {
-		list.appendChild(createPersonLabel(people[i]));
+		var peep = people[i];
+		var chld = createPersonLabel(peep);
+		chld.title = there.format('H:mm, MMM Do') + '; ' + peep.tz;
+		list.appendChild(chld);
 	}
 
 	positionAt(list, angle, 53.5, octant); // label distance

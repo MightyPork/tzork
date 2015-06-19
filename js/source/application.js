@@ -174,12 +174,14 @@ function addPeopleAtTime(secs, people) {
 		list.classList.add('count-' + people.length);
 	}
 
-	list.title = there.format('H:mm, MMM Do YYYY'); // tooltip
 	list.style.color = first.color;
 
 	// add the people
 	for (i = 0; i < people.length; i++) {
-		list.appendChild(createPersonLabel(people[i]));
+		var peep = people[i];
+		var chld = createPersonLabel(peep);
+		chld.title = there.format('H:mm, MMM Do') + '; ' + peep.tz;
+		list.appendChild(chld);
 	}
 
 	positionAt(list, angle, 53.5, octant); // label distance
