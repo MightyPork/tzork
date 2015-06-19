@@ -10,5 +10,14 @@ var people = [
 	{name: '@TheBadFame', tz: 'Mexico', color: '#329AFF'},
 	{name: '@ImReble548', tz: 'USA, Mountain Time', color: '#69E79E'},
 	{name: '@Deli731234', tz: 'USA, Pacific Time', color: '#F57126'},
-	{name: '@eevblog', tz: 'Australia, Sydney', color: '#E63E3F'}
+	{name: '@eevblog', tz: 'Australia, Sydney', color: '#E63E3F'},
+	{name: 'dummy1', tz: 'Asia/Shanghai', color: 'green'},
+	{name: 'dummy2', tz: 'Hawaii', color: 'green'},
+	{name: 'dummy2', tz: 'Hawaii', color: 'green'},
+	{name: 'dummy2', tz: 'Hawaii', color: 'green'},
+	{name: 'dummy2', tz: 'Hawaii', color: 'green'},
+	{name: 'dummy2', tz: 'Hawaii', color: 'green'},
+	{name: 'dummy2', tz: 'Hawaii', color: 'green'},
+	{name: 'Thick Dummy 3', tz: 'America/Thule', color: 'green'},
+	{name: 'Long Dummy 4', tz: 'GMT', color: 'green'}
 ];

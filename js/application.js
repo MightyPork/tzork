@@ -873,9 +873,17 @@ var people = [
 	{name: '@TheBadFame', tz: 'Mexico', color: '#329AFF'},
 	{name: '@ImReble548', tz: 'USA, Mountain Time', color: '#69E79E'},
 	{name: '@Deli731234', tz: 'USA, Pacific Time', color: '#F57126'},
-	{name: '@eevblog', tz: 'Australia, Sydney', color: '#E63E3F'}
+	{name: '@eevblog', tz: 'Australia, Sydney', color: '#E63E3F'},
+	{name: 'dummy1', tz: 'Asia/Shanghai', color: 'green'},
+	{name: 'dummy2', tz: 'Hawaii', color: 'green'},
+	{name: 'dummy2', tz: 'Hawaii', color: 'green'},
+	{name: 'dummy2', tz: 'Hawaii', color: 'green'},
+	{name: 'dummy2', tz: 'Hawaii', color: 'green'},
+	{name: 'dummy2', tz: 'Hawaii', color: 'green'},
+	{name: 'dummy2', tz: 'Hawaii', color: 'green'},
+	{name: 'Thick Dummy 3', tz: 'America/Thule', color: 'green'},
+	{name: 'Long Dummy 4', tz: 'GMT', color: 'green'}
 ];
-
 /**
  * Convert hour to angle (deg)
  *
@@ -883,7 +891,9 @@ var people = [
  * @returns {number} angle in degrees
  */
 function hour2angle(h) {
-	return (18 - h) * 15;
+	var a = (18 - h) * 15;
+	while (a < 0) a += 360;
+	return a;
 }
 
 
@@ -893,32 +903,39 @@ function hour2angle(h) {
  * @param element
  * @param angle    degrees
  * @param distance radius (in "unit")
- * @param quadrant what quadrant it's in (determines from where we're positioning)
+ * @param octant what octant it's in (determines from where we're positioning)
  */
-function positionAt(element, angle, distance, quadrant) {
-	if (typeof quadrant === 'undefined') {
-		quadrant = 0;
+function positionAt(element, angle, distance, octant) {
+	if (typeof octant === 'undefined') {
+		octant = 0;
 	}
 
 	var xx = distance * Math.cos((angle / 180) * Math.PI);
 	var yy = distance * Math.sin((angle / 180) * Math.PI);
 
-	switch (quadrant) {
+	switch (octant) {
 		case 0:
-			element.style.left = 50 + xx + '%';
-			element.style.top = 50 - yy + '%';
-			break;
 		case 1:
-			element.style.left = 50 + xx + '%';
-			element.style.top = 50 - yy + '%';
+		case 7:
+			element.style.left = (50 + xx) + '%';
+			element.style.top = (50 - yy) + '%';
 			break;
+
 		case 2:
-			element.style.left = 50 + xx + '%';
-			element.style.top = 50 - yy + '%';
-			break;
 		case 3:
-			element.style.left = 50 + xx + '%';
-			element.style.top = 50 - yy + '%';
+		case 4:
+			element.style.right = (50 - xx) + '%';
+			element.style.top = (50 - yy) + '%';
+			break;
+
+		case 5:
+			element.style.right = (50 - xx) + '%';
+			element.style.bottom = (50 + yy) + '%';
+			break;
+
+		case 6:
+			element.style.left = (50 + xx) + '%';
+			element.style.bottom = (50 + yy) + '%';
 			break;
 	}
 }
@@ -1016,11 +1033,11 @@ function init() {
 	update();
 
 	// refresh the disc every N seconds
-	setInterval(update, 1000 * 10);
-	setInterval(changeColon, 1000);
+//	setInterval(update, 1000 * 10);
+//	setInterval(changeColon, 1000);
 
 	// force refresh after tab gets focused
-	window.onfocus = update;
+//	window.onfocus = update;
 }
 
 
@@ -1133,6 +1150,13 @@ function addPeopleAtTime(secs, people) {
 	var t = secs / 3600;
 	var angle = hour2angle(t);
 
+	var octant = Math.floor(angle / 45);
+	var quadrant = Math.floor(octant / 2);
+	var is_up = quadrant < 2;
+	var is_left = (quadrant > 0 && quadrant < 3);
+
+	console.log('angle = ' + angle + ', octant ' + octant + ', quadrant ' + quadrant + ', up ' + is_up + ', left ' + is_left);
+
 	// Create a bullet
 	var bu = document.createElement('div');
 	bu.className = 'bullet';
@@ -1140,17 +1164,19 @@ function addPeopleAtTime(secs, people) {
 	positionAt(bu, angle, 50.2);
 	disc.appendChild(bu);
 
-
 	// Create a label
 
 	// make it a link if it's twitter name
 	var la = document.createElement('div');
 	la.classList.add('people-list');
 
-	// add location classes
-	la.classList.add((t < 12) ? 'left' : 'right');
-	la.classList.add((t < 6 || t > 18) ? 'down' : 'up');
 
+	// add location classes
+	la.classList.add(is_left ? 'left' : 'right');
+	la.classList.add(is_up ? 'up' : 'down');
+
+	la.classList.add('quad' + quadrant);
+	la.classList.add('oct' + octant);
 
 
 	// Determine if this is in prev / next day
@@ -1163,12 +1189,20 @@ function addPeopleAtTime(secs, people) {
 		bu.classList.add(clz);
 	}
 
-	la.innerHTML = first.name+'<br>hello';
-	if (people.length > 1) la.innerHTML += '<br> + '+(people.length-1);
+	la.innerHTML = first.name;
+	if (people.length > 1) {
+		la.classList.add('multiple');
+		la.classList.add('count-'+people.length);
+		la.innerHTML += ' + ' + (people.length - 1);
+
+		for (var j = 1; j < people.length; j++) {
+			la.innerHTML += '<br>' + people[j].name;
+		}
+	}
 	la.title = there.format('H:mm, MMM Do YYYY'); // tooltip
 	la.style.color = first.color;
 
-	positionAt(la, angle, 51.5); // label distance
+	positionAt(la, angle, 53.5, octant); // label distance
 	disc.appendChild(la);
 }
 

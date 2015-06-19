@@ -11,11 +11,11 @@ function init() {
 	update();
 
 	// refresh the disc every N seconds
-	setInterval(update, 1000 * 10);
-	setInterval(changeColon, 1000);
+//	setInterval(update, 1000 * 10);
+//	setInterval(changeColon, 1000);
 
 	// force refresh after tab gets focused
-	window.onfocus = update;
+//	window.onfocus = update;
 }
 
 
@@ -128,6 +128,13 @@ function addPeopleAtTime(secs, people) {
 	var t = secs / 3600;
 	var angle = hour2angle(t);
 
+	var octant = Math.floor(angle / 45);
+	var quadrant = Math.floor(octant / 2);
+	var is_up = quadrant < 2;
+	var is_left = (quadrant > 0 && quadrant < 3);
+
+	console.log('angle = ' + angle + ', octant ' + octant + ', quadrant ' + quadrant + ', up ' + is_up + ', left ' + is_left);
+
 	// Create a bullet
 	var bu = document.createElement('div');
 	bu.className = 'bullet';
@@ -135,17 +142,19 @@ function addPeopleAtTime(secs, people) {
 	positionAt(bu, angle, 50.2);
 	disc.appendChild(bu);
 
-
 	// Create a label
 
 	// make it a link if it's twitter name
 	var la = document.createElement('div');
 	la.classList.add('people-list');
 
-	// add location classes
-	la.classList.add((t < 12) ? 'left' : 'right');
-	la.classList.add((t < 6 || t > 18) ? 'down' : 'up');
 
+	// add location classes
+	la.classList.add(is_left ? 'left' : 'right');
+	la.classList.add(is_up ? 'up' : 'down');
+
+	la.classList.add('quad' + quadrant);
+	la.classList.add('oct' + octant);
 
 
 	// Determine if this is in prev / next day
@@ -158,12 +167,20 @@ function addPeopleAtTime(secs, people) {
 		bu.classList.add(clz);
 	}
 
-	la.innerHTML = first.name+'<br>hello';
-	if (people.length > 1) la.innerHTML += '<br> + '+(people.length-1);
+	la.innerHTML = first.name;
+	if (people.length > 1) {
+		la.classList.add('multiple');
+		la.classList.add('count-'+people.length);
+		la.innerHTML += ' + ' + (people.length - 1);
+
+		for (var j = 1; j < people.length; j++) {
+			la.innerHTML += '<br>' + people[j].name;
+		}
+	}
 	la.title = there.format('H:mm, MMM Do YYYY'); // tooltip
 	la.style.color = first.color;
 
-	positionAt(la, angle, 51.5); // label distance
+	positionAt(la, angle, 53.5, octant); // label distance
 	disc.appendChild(la);
 }
 

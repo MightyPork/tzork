@@ -14,7 +14,6 @@ html, body {
 	background: $bg;
 	margin: 0; padding: 0;
 	width: 100%; height: 100%;
-
 	font-size: 1em;
 }
 
@@ -23,11 +22,9 @@ html, body {
 	position: absolute;
 	left: 50%; top: 50%;
 	transform: translate(-50%, -50%);
-
 	width: 40%;
 	height: 0;
 	padding-bottom: 40%;
-
 	border-radius: 50%;
 	border: 3px solid $fg;
 	color: $fg;
@@ -45,166 +42,171 @@ html, body {
 	}
 
 	@include no-select();
+}
 
-	.mark {
-		position: absolute;
-		transform: translate(-50%, -50%);
-		font-family: monospace;
-		font-size: 2em;
+.mark {
+	position: absolute;
+	transform: translate(-50%, -50%);
+	font-family: monospace;
+	font-size: 2em;
+
+	&.sixth {
+		font-weight: bold;
+		font-size: 2.8em;
+	}
+
+	@include respond-to(tiny) {
+		font-size: 0.5em;
 
 		&.sixth {
-			font-weight: bold;
-			font-size: 2.8em;
-		}
-
-		@include respond-to(tiny) {
-			font-size: 0.5em;
-
-			&.sixth {
-				font-size: 0.7em;
-			}
-		}
-
-		@include respond-to(small) {
 			font-size: 0.7em;
-
-			&.sixth {
-				font-size: 0.9em;
-			}
-		}
-
-		@include respond-to(medium) {
-			font-size: 1.4em;
-
-			&.sixth {
-				font-size: 1.8em;
-			}
 		}
 	}
 
-	.person {
-		display: inline-block;
-		position: absolute;
-		text-decoration: none;
+	@include respond-to(small) {
+		font-size: 0.7em;
 
-		@include can-select();
-		@include helvetica();
-
-		font-size: 1.2em;
-		text-shadow: 0 0 4px black, 0 0 2px black;
-
-		&.left { transform: translate(-100%, -50%);	}
-
-		&.right { transform: translate(0, -50%); }
-
-		@include respond-to(tiny) {
-			font-size: 0.7em;
-		}
-
-		@include respond-to(small) {
+		&.sixth {
 			font-size: 0.9em;
 		}
-
-		@include respond-to(medium) {
-			font-size: 1em;
-		}
 	}
 
-	.people-list {
-		@include can-select();
-		@include helvetica();
-	//	@include highlight(yellow);
+	@include respond-to(medium) {
+		font-size: 1.4em;
 
-		display: block;
-		position: absolute;
-		text-decoration: none;
-
-		font-size: 1.2em;
-		text-shadow: 0 0 4px black, 0 0 2px black;
-
-
-//		&.left {
-//			&.up {
-//				transform: translate(-100%, -100%);
-//			}
-//
-//			&.down {
-//				transform: translate(-100%, 0%);
-//			}
-//		}
-//
-//		&.right {
-//			&.up {
-//				transform: translate(0%, -100%);
-//			}
-//
-//			&.down {
-//				transform: translate(0%, 0%);
-//			}
-//		}
-
-		@include respond-to(tiny) {
-			font-size: 0.7em;
-		}
-
-		@include respond-to(small) {
-			font-size: 0.9em;
-		}
-
-		@include respond-to(medium) {
-			font-size: 1em;
-		}
-	}
-
-	.bullet {
-		position: absolute;
-
-		$w: 1em;
-		width: $w;
-		height: $w;
-
-		@include respond-to(tiny) {
-			width: $w*0.3;
-			height: $w*0.3;
-		}
-
-		@include respond-to(small) {
-			width: $w*0.5;
-			height: $w*0.5;
-		}
-
-		@include respond-to(medium) {
-			width: $w*0.7;
-			height: $w*0.7;
-		}
-
-		border-radius: 50%;
-
-		transform: translate(-50%, -50%);
-
-		border: 1px solid black;
-
-		&.day-prev {
-			box-shadow: 0 0 0.25em 0.1em #ff151b;
-		}
-
-		&.day-next {
-			box-shadow: 0 0 0.25em 0.1em yellow;
+		&.sixth {
+			font-size: 1.8em;
 		}
 	}
 }
 
+// Offsets for people lists, so they look aligned with the dots
+@mixin plist-em-offset($lineheight) {
+	font-size: $lineheight;
+	line-height: $lineheight;
+
+	height: $lineheight*1.4;
+	padding: $lineheight*0.2;
+	border-radius: 3px;
+
+
+	&.multiple:hover {
+		background-color: rgba(black, .5);
+		z-index: 1000;
+
+		@for $i from 2 through 15 {
+			&.count-#{$i} {
+				transition: height .05s*$i linear;
+				height: $i*$lineheight+$lineheight*0.2*2;
+			}
+		}
+	}
+
+	&.oct1,
+	&.oct2 {
+		transform: translate(0, -0.8*$lineheight);
+	}
+
+	&.oct7 {
+		transform: translate(0, -0.5*$lineheight);
+	}
+
+	&.oct0 {
+		transform: translate(0, -0.5*$lineheight);
+	}
+
+	&.oct3 {
+		transform: translate(0, -0.5*$lineheight);
+	}
+
+	&.oct4 {
+		transform: translate(0, -0.5*$lineheight);
+	}
+
+	&.oct5,
+	&.oct6 {
+		transform: translate(0, 0.5*$lineheight);
+	}
+}
+
+.people-list {
+	@include nowrap();
+	@include can-select();
+	@include helvetica();
+
+	display: block;
+	position: absolute;
+	text-decoration: none;
+
+	@include plist-em-offset(1.2em);
+	overflow: hidden;
+
+	text-shadow: 0 0 4px black, 0 0 2px black;
+
+	&.left {
+		text-align: right;
+	}
+
+	&.right {
+		text-align: left;
+	}
+
+	@include respond-to(tiny) {
+		@include plist-em-offset(0.7em);
+	}
+
+	@include respond-to(small) {
+		@include plist-em-offset(0.9em);
+	}
+
+	@include respond-to(medium) {
+		@include highlight(red);
+		@include plist-em-offset(1em);
+	}
+}
+
+.bullet {
+	position: absolute;
+	$w: 1em;
+	width: $w;
+	height: $w;
+
+	@include respond-to(tiny) {
+		width: $w*0.3;
+		height: $w*0.3;
+	}
+
+	@include respond-to(small) {
+		width: $w*0.5;
+		height: $w*0.5;
+	}
+
+	@include respond-to(medium) {
+		width: $w*0.7;
+		height: $w*0.7;
+	}
+
+	border-radius: 50%;
+	transform: translate(-50%, -50%);
+	border: 1px solid black;
+
+	&.day-prev {
+		box-shadow: 0 0 0.25em 0.1em #ff151b;
+	}
+
+	&.day-next {
+		box-shadow: 0 0 0.25em 0.1em yellow;
+	}
+}
 
 #localtime {
 	@include naked();
 	@include helvetica();
 	@include can-select();
-
 	position: absolute;
 	left: 50%; top: 50%;
 	transform: translate(-50%, -50%);
 	text-align: center;
-
 	font-size: 6em;
 
 	@include respond-to(tiny) {

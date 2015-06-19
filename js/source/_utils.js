@@ -1,4 +1,3 @@
-
 /**
  * Convert hour to angle (deg)
  *
@@ -6,7 +5,9 @@
  * @returns {number} angle in degrees
  */
 function hour2angle(h) {
-	return (18 - h) * 15;
+	var a = (18 - h) * 15;
+	while (a < 0) a += 360;
+	return a;
 }
 
 
@@ -16,32 +17,39 @@ function hour2angle(h) {
  * @param element
  * @param angle    degrees
  * @param distance radius (in "unit")
- * @param quadrant what quadrant it's in (determines from where we're positioning)
+ * @param octant what octant it's in (determines from where we're positioning)
  */
-function positionAt(element, angle, distance, quadrant) {
-	if (typeof quadrant === 'undefined') {
-		quadrant = 0;
+function positionAt(element, angle, distance, octant) {
+	if (typeof octant === 'undefined') {
+		octant = 0;
 	}
 
 	var xx = distance * Math.cos((angle / 180) * Math.PI);
 	var yy = distance * Math.sin((angle / 180) * Math.PI);
 
-	switch (quadrant) {
+	switch (octant) {
 		case 0:
-			element.style.left = 50 + xx + '%';
-			element.style.top = 50 - yy + '%';
-			break;
 		case 1:
-			element.style.left = 50 + xx + '%';
-			element.style.top = 50 - yy + '%';
+		case 7:
+			element.style.left = (50 + xx) + '%';
+			element.style.top = (50 - yy) + '%';
 			break;
+
 		case 2:
-			element.style.left = 50 + xx + '%';
-			element.style.top = 50 - yy + '%';
-			break;
 		case 3:
-			element.style.left = 50 + xx + '%';
-			element.style.top = 50 - yy + '%';
+		case 4:
+			element.style.right = (50 - xx) + '%';
+			element.style.top = (50 - yy) + '%';
+			break;
+
+		case 5:
+			element.style.right = (50 - xx) + '%';
+			element.style.bottom = (50 + yy) + '%';
+			break;
+
+		case 6:
+			element.style.left = (50 + xx) + '%';
+			element.style.bottom = (50 + yy) + '%';
 			break;
 	}
 }
