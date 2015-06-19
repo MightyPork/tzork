@@ -976,7 +976,7 @@ function resolveTZ(tz) {
 		var old = tz;
 		tz = tz_aliases[tz];
 
-		console.log('TZ "' + old + '" resolved as "' + tz + '"');
+		//console.log('TZ "' + old + '" resolved as "' + tz + '"');
 	}
 
 	// Check if it's valid for Moment.js
@@ -1016,6 +1016,7 @@ function getTimeForPerson(obj) {
 	return mmt.hour() * 3600 + mmt.minute() * 60 + mmt.second();
 }
 var disc;
+var mouse_hovering_list; // flag that user is hovering a list -> suppress redraw
 // req. global arrays: tz_aliases, people.
 
 
@@ -1028,7 +1029,7 @@ function init() {
 	update();
 
 	// refresh the disc every N seconds
-	setInterval(update, 1000 * 30);
+	setInterval(update, 1000 * 10);
 	setInterval(changeColon, 1000);
 
 	// force refresh after tab gets focused
@@ -1075,6 +1076,11 @@ function update() {
 
 /** Redraw people (actually deletes and re-adds them) */
 function redrawPeople() {
+	if (mouse_hovering_list) {
+		console.log('Mouse over list, not redrawing.');
+		return;
+	}
+
 	// Delete all old stuff
 	var x = document.querySelectorAll('.bullet, .person, .people-list');
 	for (var i in x) {
@@ -1131,7 +1137,7 @@ function buildPeople() {
 	});
 
 	resolved.forEach(function (x) {
-		console.log('Time ' + x.t + ', people #: ' + x.p.length);
+		//console.log('Time ' + x.t + ', people #: ' + x.p.length);
 		addPeopleAtTime(x.t, x.p);
 	});
 }
@@ -1139,7 +1145,7 @@ function buildPeople() {
 
 /** Add a bunch of people at specified time (s) */
 function addPeopleAtTime(secs, people) {
-	var i, j;
+	var i;
 
 	var first = people[0];
 
@@ -1152,7 +1158,7 @@ function addPeopleAtTime(secs, people) {
 	var is_up = quadrant < 2;
 	var is_left = (quadrant > 0 && quadrant < 3);
 
-	console.log('angle = ' + angle + ', octant ' + octant + ', quadrant ' + quadrant + ', up ' + is_up + ', left ' + is_left);
+	//console.log('angle = ' + angle + ', octant ' + octant + ', quadrant ' + quadrant + ', up ' + is_up + ', left ' + is_left);
 
 	// Create a bullet
 	var bu = document.createElement('div');
@@ -1203,6 +1209,14 @@ function addPeopleAtTime(secs, people) {
 
 	positionAt(list, angle, 53.5, octant); // label distance
 	disc.appendChild(list);
+
+	list.addEventListener('mouseover', function (event) {
+		mouse_hovering_list = true;
+	});
+
+	list.addEventListener('mouseout', function (event) {
+		mouse_hovering_list = false;
+	})
 }
 
 

@@ -8,7 +8,7 @@ function resolveTZ(tz) {
 		var old = tz;
 		tz = tz_aliases[tz];
 
-		console.log('TZ "' + old + '" resolved as "' + tz + '"');
+		//console.log('TZ "' + old + '" resolved as "' + tz + '"');
 	}
 
 	// Check if it's valid for Moment.js
