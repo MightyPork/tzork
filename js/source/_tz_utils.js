@@ -36,7 +36,7 @@ function loadPeopleArray(onDone) {
 	});
 
 	var probe = function () {
-		console.log('probe');
+		//console.log('probe');
 
 		if (people_loading <= 0) {
 			console.log('LOADING DONE');
@@ -51,6 +51,7 @@ function loadPeopleArray(onDone) {
 	probe();
 }
 
+var last_google_call_timestamp = 0;
 
 /** Work out timezone from a name (country name, timezone name etc) */
 function resolveTimezone(obj) {
@@ -69,12 +70,35 @@ function resolveTimezone(obj) {
 	}
 
 	// Ask Google what it is
+	scheduleGoogleReq(obj);
+}
 
+// Must not poll the GEO api faster than 10x per second
+function scheduleGoogleReq(obj) {
+	var elapsed = (Date.now() - last_google_call_timestamp);
+	var t = Math.max(0, (110 - elapsed));
+
+	//console.log('Scheduling Google request in ' + t + 'ms');
+
+	if (t == 0) {
+		last_google_call_timestamp = Date.now();
+		getTimezoneFromGoogleApis(obj);
+		return;
+	}
+
+	setTimeout(function () {
+		//console.log('GOOGLE REQUEST NOW');
+		scheduleGoogleReq(obj);
+	}, t);
+}
+
+
+function getTimezoneFromGoogleApis(obj) {
 	var url1 = "https://maps.googleapis.com/maps/api/geocode/json?sensor=false&address=" + encodeURIComponent(obj.tz);
 	callAjax(url1, function (resp) {
 		try {
 			var rj = JSON.parse(resp);
-			console.log('Reply from Google:', rj);
+			//console.log('Reply from Google:', rj);
 
 			if (rj.status === 'OK') {
 
@@ -82,9 +106,10 @@ function resolveTimezone(obj) {
 				console.log('resp. is OK');
 
 				var results = rj.results;
+				console.log(results);
 
 				if (results.length > 1) {
-					console.log('WARNING: Google found multiple matches. Try to be more specific.');
+					console.error('WARNING: Google found multiple matches. Try to be more specific at "' + obj.tz + '"');
 				}
 
 				var lat = results[0].geometry.location.lat;
@@ -95,14 +120,14 @@ function resolveTimezone(obj) {
 				// Get TZ for location
 				var url2 = "https://maps.googleapis.com/maps/api/timezone/json?location=" + lat + "," + lon + "&timestamp=" + timestamp + "&sensor=false";
 				callAjax(url2, function (resp) {
-					console.log('Success tzAPI: ' + resp);
+					//console.log('Success tzAPI: ' + resp);
 
 					try {
 						var rj = JSON.parse(resp);
-						console.log('Reply from Google:', rj);
+						//console.log('Reply from Google:', rj);
 
 						if (rj.status === 'OK') {
-							console.log('Resolved TZ as '+rj.timeZoneId);
+							console.log('Resolved TZ as ' + rj.timeZoneId);
 							obj._tz_cached = rj.timeZoneId;
 						} else {
 							obj._valid = false;

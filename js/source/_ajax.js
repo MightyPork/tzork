@@ -21,7 +21,7 @@ function callAjax(url, success, failure) {
 			failure(-1);
 	};
 
-	console.log('request sent');
+	//console.log('request sent');
 
 	request.send();
 }
