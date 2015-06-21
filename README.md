@@ -16,8 +16,9 @@ The project is open source, contributions are welcome!
 - [x] A way to show more names in one timezone
 - [x] Support for timezone aliases
 - [x] Do not rebuild existing bullets and people if mouse is over a list
-- [ ] An interface for adding, removing and editing names, timezones and colors (`people` array)
-- [ ] Saving the `people` array in `localStorage` (and loading it)
+- [x] An interface for adding, removing and editing names, timezones and colors (`people` array)
+- [x] Saving the `people` array in `localStorage` (and loading it)
+- [ ] More user friendly config GUI
 - [ ] Rewrite the clock into SVG using Raphael.js (or other lib?)
 - [ ] Themes :D
 
