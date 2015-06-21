@@ -23,5 +23,10 @@ The project is open source, contributions are welcome!
 - [ ] Themes :D
 
 
+## Credits
 
+- "Earth from space" wallpaper from [www.phhub.net](http://www.phhub.net/)
+- Fonts from Google Web Fonts
+- Time library - moment.js
+- City and country to timezone conversion - Google APIs
 

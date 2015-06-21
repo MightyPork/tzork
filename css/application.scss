@@ -1,6 +1,6 @@
 @import "mixins";
 
-$bg: #0a2223;
+$bg: #0b2e3d; //#0a2223
 $fg: #9cfff7;
 
 // --- reset ---
@@ -32,6 +32,12 @@ html, body {
 	border: 3px solid $fg;
 	color: $fg;
 
+	box-shadow: 0 0 3px 1px black, inset 0 0 3px 1px black;
+
+	background-image: url("../images/earth-from-space-small.jpg");
+	background-size: cover;
+
+
 	@include respond-to(tiny) {
 		border-width: 1px;
 	}
@@ -52,6 +58,8 @@ html, body {
 	transform: translate(-50%, -50%);
 	font-family: monospace;
 	font-size: 2em;
+
+	text-shadow: 0 0 2px black,0 0 4px black;
 
 	&.sixth {
 		font-weight: bold;
@@ -173,7 +181,7 @@ html, body {
 	@include plist-em-offset(1.2em);
 	overflow: hidden;
 
-	text-shadow: 0 0 4px black, 0 0 2px black;
+	text-shadow: 0 0 2px black, 0 0 3px black;
 
 	@include respond-to(tiny) {
 		@include plist-em-offset(0.7em);
@@ -254,6 +262,9 @@ html, body {
 		-moz-transition: opacity .05s ease-in-out;
 		-webkit-transition: opacity .05s ease-in-out;
 	}
+
+	text-shadow: 0 0 8px black, 0 0 4px black;
+
 }
 
 @import "setup";
