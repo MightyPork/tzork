@@ -108,7 +108,7 @@
 		callAjax(url1, function (resp) {
 			try {
 				var rj = JSON.parse(resp);
-				//console.log('Reply from Google:', rj);
+				console.log('Reply from getAPI:', rj);
 
 				if (rj.status === 'OK') {
 
@@ -130,11 +130,11 @@
 					// Get TZ for location
 					var url2 = "https://maps.googleapis.com/maps/api/timezone/json?location=" + lat + "," + lon + "&timestamp=" + timestamp + "&sensor=false";
 					callAjax(url2, function (resp) {
-						//console.log('Success tzAPI: ' + resp);
+						console.log('Reply from tzAPI: ' + resp);
 
 						try {
 							var rj = JSON.parse(resp);
-							//console.log('Reply from Google:', rj);
+							console.log('Reply from Google:', rj);
 
 							if (rj.status === 'OK') {
 								console.log('Resolved TZ as ' + rj.timeZoneId);

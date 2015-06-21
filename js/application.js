@@ -1116,7 +1116,7 @@ function mmtDayCompare(here, there) {
 		callAjax(url1, function (resp) {
 			try {
 				var rj = JSON.parse(resp);
-				//console.log('Reply from Google:', rj);
+				console.log('Reply from getAPI:', rj);
 
 				if (rj.status === 'OK') {
 
@@ -1138,11 +1138,11 @@ function mmtDayCompare(here, there) {
 					// Get TZ for location
 					var url2 = "https://maps.googleapis.com/maps/api/timezone/json?location=" + lat + "," + lon + "&timestamp=" + timestamp + "&sensor=false";
 					callAjax(url2, function (resp) {
-						//console.log('Success tzAPI: ' + resp);
+						console.log('Reply from tzAPI: ' + resp);
 
 						try {
 							var rj = JSON.parse(resp);
-							//console.log('Reply from Google:', rj);
+							console.log('Reply from Google:', rj);
 
 							if (rj.status === 'OK') {
 								console.log('Resolved TZ as ' + rj.timeZoneId);
@@ -1542,7 +1542,7 @@ var people_orig;
 		for (i = 0; i < people.length; i++) {
 			var peep = people[i];
 			var child = createPersonLabel(peep);
-			child.title = there.format('H:mm, MMM Do') + ' — ' + peep.tz;
+			child.title = there.format('H:mm, MMM Do') + ' — ' + peep._tz_cached;
 			list.appendChild(child);
 		}
 

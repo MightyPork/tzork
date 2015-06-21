@@ -243,7 +243,7 @@ var people_orig;
 		for (i = 0; i < people.length; i++) {
 			var peep = people[i];
 			var child = createPersonLabel(peep);
-			child.title = there.format('H:mm, MMM Do') + ' — ' + peep.tz;
+			child.title = there.format('H:mm, MMM Do') + ' — ' + peep._tz_cached;
 			list.appendChild(child);
 		}
 
