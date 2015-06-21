@@ -19,6 +19,7 @@ html, body {
 
 #disc {
 	// centering
+	cursor: default;
 	position: absolute;
 	left: 50%; top: 50%;
 	transform: translate(-50%, -50%);
@@ -146,6 +147,7 @@ html, body {
 
 .person-label {
 	display: block;
+	cursor: initial;
 	@include naked();
 
 	@for $i from 2 through 15 {
@@ -186,6 +188,8 @@ html, body {
 
 .bullet {
 	position: absolute;
+	cursor: default;
+
 	$w: 1em;
 	width: $w;
 	height: $w;
@@ -221,7 +225,9 @@ html, body {
 #localtime {
 	@include naked();
 	@include basefont();
-	@include can-select();
+
+	cursor: default;
+
 	position: absolute;
 	left: 50%; top: 50%;
 	transform: translate(-50%, -50%);
