@@ -4,6 +4,7 @@ JSFILES += js/source/_people.js
 JSFILES += js/source/_ajax.js
 JSFILES += js/source/_utils.js
 JSFILES += js/source/_tz_utils.js
+JSFILES += js/source/_setup.js
 JSFILES += js/source/application.js
 
 JSTARGET = js/application.js

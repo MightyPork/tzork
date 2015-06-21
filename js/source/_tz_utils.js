@@ -83,7 +83,7 @@
 		scheduleGoogleReq(obj);
 	}
 
-// Must not poll the GEO api faster than 10x per second
+	// Must not poll the GEO api faster than 10x per second
 	function scheduleGoogleReq(obj) {
 		var elapsed = (Date.now() - last_google_call_timestamp);
 		var t = Math.max(0, (110 - elapsed));
@@ -177,6 +177,7 @@
 
 	// Public functions
 	window.loadPeopleArray = loadPeopleArray;
+	window.resolvePeopleTimezones = resolvePeopleTimezones;
 })();
 
 

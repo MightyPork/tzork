@@ -2,7 +2,6 @@
 
 @mixin no-select() {
 	-webkit-user-select: none;
-	-khtml-user-select: none;
 	-moz-user-select: none;
 	-ms-user-select: none;
 	user-select: none;
@@ -10,10 +9,16 @@
 
 @mixin can-select() {
 	-webkit-user-select: initial;
-	-khtml-user-select: initial;
 	-moz-user-select: initial;
 	-ms-user-select: initial;
 	user-select: initial;
+}
+
+@mixin tab-size($ts) {
+	tab-size: $ts;
+	-moz-tab-size: $ts;
+	-o-tab-size: $ts;
+	-khtml-tab-size: $ts;
 }
 
 // Add a highlight for debugging

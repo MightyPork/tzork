@@ -1,0 +1,71 @@
+#setup_btn {
+	position: absolute;
+	right: 0;
+	top: 0;
+	font-size: 1.2em;
+	padding: .5em;
+	color: $fg;
+
+	opacity: .3;
+
+	cursor: pointer;
+
+	&:hover {
+		opacity: 1;
+	}
+}
+
+.Modal {
+	position: absolute;
+	left: 0; right: 0; top: 0; bottom: 0;
+	background: rgba(black, 0.2);
+	z-index: 9999;
+	cursor: default;
+
+	transition: opacity .2s;
+
+	.Dialog {
+		max-width: 100%;
+		border-radius: 2px;
+		background: #eaeaea;
+		box-shadow: 0 10px 20px black;
+
+		width: 600px;
+
+		text-align: center;
+
+		position: absolute;
+		left: 50%;
+		top: 50%;
+		transform: translate(-50%, -50%);
+
+		padding: 5px;
+
+		.Title {
+			padding: 0 0 .3em 0;
+			font-size: 1.4em;
+			font-weight: bold;
+			color: #333;
+		}
+
+		.Error {
+			padding: .3em;
+			color: #ad1b31;
+		}
+
+		.Buttons {
+			padding: .3em;
+		}
+	}
+}
+
+#people_json {
+	display: block;
+	width: 100%;
+	height: 30em;
+	max-height: 80%;
+
+	resize: none;
+
+	@include tab-size(4);
+}

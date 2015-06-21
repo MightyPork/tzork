@@ -2,7 +2,7 @@
 <html>
 <head>
 	<meta charset="UTF-8">
-	<title>TZork, your world clock</title>
+	<title>Tzork, your world clock</title>
 
 	<!--
 	TZork is a tool for tracking time in different timezones.
@@ -12,8 +12,8 @@
 	<link rel="github" href="https://github.com/MightyPork/tzork">
 
 	<!-- SEO stuff for Google -->
-	<meta name="description" content="Track local time of your friends with TZork! TZork is a simple open source web app.">
-	<meta name="keywords" content="world clock,time,tracker,app,open source">
+	<meta name="description" content="Track local time of your friends with Tzork! Tzork is an open source web app.">
+	<meta name="keywords" content="world clock,time,tracker,app,open source,tzork,time zone">
 	<meta name="author" content="Ondřej Hruška & contributors">
 	<link rel="author" href="https://plus.google.com/+OndrejHruska">
 
@@ -32,6 +32,22 @@
 	<script src="js/application.js"></script>
 </head>
 <body onload="init()">
+<div class="Modal" id="setup_dialog" style="opacity: 0; display: none;">
+	<div class="Dialog">
+		<div>
+			<div class="Title">Your Tzork configuration</div>
+			<textarea id="people_json"></textarea>
+			<div class="Error" id="people_error"></div>
+			<div class="Buttons">
+				<a href="#" class="button orange" onClick="submitPeopleEdit('defaults'); return false;">Use Defaults</a><!--
+				--><a href="#" class="button red" onClick="submitPeopleEdit('close'); return false;">Discard Changes</a><!--
+				--><a href="#" class="button green" onClick="submitPeopleEdit('save'); return false;">Apply & Save</a>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div id="setup_btn">Configure</div>
 
 <div id="disc">
 	<div id="localtime"></div>

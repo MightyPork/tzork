@@ -1091,7 +1091,7 @@ function mmtDayCompare(here, there) {
 		scheduleGoogleReq(obj);
 	}
 
-// Must not poll the GEO api faster than 10x per second
+	// Must not poll the GEO api faster than 10x per second
 	function scheduleGoogleReq(obj) {
 		var elapsed = (Date.now() - last_google_call_timestamp);
 		var t = Math.max(0, (110 - elapsed));
@@ -1185,6 +1185,7 @@ function mmtDayCompare(here, there) {
 
 	// Public functions
 	window.loadPeopleArray = loadPeopleArray;
+	window.resolvePeopleTimezones = resolvePeopleTimezones;
 })();
 
 
@@ -1206,59 +1207,201 @@ function getTimeForPerson(obj) {
 	// Get pieces of time, convert to seconds
 	return mmt.hour() * 3600 + mmt.minute() * 60 + mmt.second();
 }
-var disc;
+function openSetupDialog() {
+	// Clear error text
+	document.getElementById('people_error').textContent = '';
+
+	// Populate the textarea
+	var ta = document.getElementById('people_json');
+
+	var people_clone = JSON.parse(JSON.stringify(people));
+	people_clone.forEach(function (obj) {
+		delete obj._t;
+		delete obj._valid;
+		delete obj._tz_cached;
+	});
+
+	ta.value = JSON.stringify(people_clone, null, '\t');
+
+	var modal = document.getElementById('setup_dialog');
+	modal.style.display = 'block';
+
+	setTimeout(function () {
+		modal.style.opacity = 1;
+	}, 1);
+}
+
+
+// called from "onClick"
+function submitPeopleEdit(action) {
+	switch (action) {
+		case 'defaults':
+			localStorage['people'] = JSON.stringify(people_orig);
+			init();
+			hideSetupModal();
+			break;
+
+		case 'close':
+			hideSetupModal();
+			break;
+
+		case 'save':
+			try {
+				var ta = document.getElementById('people_json');
+				var pp = JSON.parse(ta.value);
+
+				pp.forEach(function (obj) {
+					if (typeof obj.name == 'undefined') {
+						throw new SyntaxError('Missing "name"');
+					}
+
+					if (typeof obj.tz == 'undefined') {
+						throw new SyntaxError('Missing "tz" for '+obj.name);
+					}
+
+					if (typeof obj.color == 'undefined') {
+						throw new SyntaxError('Missing "color" for '+obj.name);
+					}
+				});
+
+
+				localStorage['people'] = JSON.stringify(pp);
+				init();
+				hideSetupModal();
+			} catch (e) {
+				var er = document.getElementById('people_error');
+
+				if (e.message.match(/^Unexpected token [,\]}]/g)) {
+					er.textContent = 'Syntax error: trailing comma ?';
+				} else if (e.message.match(/^Unexpected string/g)) {
+					er.textContent = 'Syntax error: missing comma ?';
+				} else {
+					er.textContent = 'Syntax error: ' + e.message;
+				}
+
+				console.log('Error in user-entered JSON', e);
+			}
+
+			break;
+	}
+
+
+}
+
+
+function hideSetupModal() {
+	// Hide modal
+	var modal = document.getElementById('setup_dialog');
+	modal.style.opacity = 0;
+	setTimeout(function () {
+		modal.style.display = 'none';
+	}, 500);
+}
 // req. global arrays: tz_aliases, people.
 
-
-/** Initialize the app */
-function init() {
-	disc = document.getElementById('disc');
-	buildClockMarks();
-
-	updateTime();
-	setInterval(updateTime, 1000);
-
-	loadPeopleArray(function () {
-		updatePeople();
-
-		// refresh the disc every N seconds
-		setInterval(updatePeople, 1000 * 10);
-
-		// force refresh after tab gets focused
-		window.onfocus = function () {
-			updatePeople();
-			updateTime();
-		};
-	});
-}
-
-
-/** Build the hour numbers */
-function buildClockMarks() {
-	// The clock marks
-	for (var i = 0; i < 24; i++) {
-		// mark div
-		var mark = document.createElement('div');
-		mark.classList.add('mark');
-		mark.classList.add('hour-' + i);
-
-		if (i == 0 || i == 6 || i == 12 || i == 18) {
-			mark.classList.add('sixth');
-		}
-
-		mark.textContent = '' + i;
-
-		var angle = hour2angle(i);
-		positionAt(mark, angle, 45);
-		disc.appendChild(mark);
-	}
-}
-
-
+var people_orig;
 
 (function () {
 	var mouse_on_list; // flag that user is hovering a list -> suppress redraw
 	var last_time; // time when last time the time was redrawn
+	var disc;
+
+	var interval_time;
+	var interval_people;
+
+	var first_init = true;
+
+	/** Initialize the app */
+	function init() {
+		var i;
+
+		if (first_init) {
+
+			// save cleaned orig people
+			resolvePeopleTimezones(function () {
+				people_orig = JSON.parse(JSON.stringify(people)); // save "defaults"
+				people_orig.forEach(function (obj) {
+					delete obj._t;
+					delete obj._valid;
+					delete obj._tz_cached;
+				});
+			});
+
+			// Fix textarea & tab key
+			var textareas = document.getElementsByTagName('textarea');
+			var count = textareas.length;
+			for (i = 0; i < count; i++) {
+				textareas[i].onkeydown = function (e) {
+					if (e.keyCode == 9 || e.which == 9) {
+						e.preventDefault();
+						var s = this.selectionStart;
+						this.value = this.value.substring(0, this.selectionStart) + "\t" + this.value.substring(this.selectionEnd);
+						this.selectionEnd = s + 1;
+					}
+				}
+			}
+
+
+			first_init = false;
+		}
+
+
+		// Clean up (it may be called second time)
+		var old = document.querySelectorAll('.mark, .bullet, .person-label, .people-list');
+		for (i = 0; i < old.length; i++) {
+			old[i].parentNode.removeChild(old[i]);
+		}
+		clearInterval(interval_people);
+		clearInterval(interval_time);
+
+
+		// init
+		disc = document.getElementById('disc');
+		buildClockMarks();
+
+		updateTime();
+		interval_time = setInterval(updateTime, 1000);
+
+		loadPeopleArray(function () {
+			updatePeople();
+
+			// refresh the disc every N seconds
+			interval_people = setInterval(updatePeople, 1000 * 10);
+
+			// force refresh after tab gets focused
+			window.onFocus = function () {
+				updatePeople();
+				updateTime();
+			};
+
+			var e = document.getElementById('setup_btn');
+			e.addEventListener('click', function () {
+				openSetupDialog();
+			});
+		});
+	}
+
+
+	/** Build the hour numbers */
+	function buildClockMarks() {
+		// The clock marks
+		for (var i = 0; i < 24; i++) {
+			// mark div
+			var mark = document.createElement('div');
+			mark.classList.add('mark');
+			mark.classList.add('hour-' + i);
+
+			if (i == 0 || i == 6 || i == 12 || i == 18) {
+				mark.classList.add('sixth');
+			}
+
+			mark.textContent = '' + i;
+
+			var angle = hour2angle(i);
+			positionAt(mark, angle, 45);
+			disc.appendChild(mark);
+		}
+	}
 
 
 	/** Update the local time display */
@@ -1439,4 +1582,5 @@ function buildClockMarks() {
 	// public
 	window.updatePeople = updatePeople;
 	window.updateTime = updateTime;
+	window.init = init;
 })();

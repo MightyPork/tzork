@@ -1,0 +1,78 @@
+@mixin fancy-btn-base() {
+	cursor: pointer;
+	display: inline-block;
+	border-radius: 3px;
+	padding: 0 0.5em;
+	margin-left: 0.7em;
+
+	&:active {
+		position: relative;
+		top: 2px;
+	}
+
+	&, &:active, &:hover, &:visited {
+		text-decoration: none;
+	}
+}
+
+@mixin fancy-btn-colors($text, $back, $back_a) {
+	background-color: $back;
+	box-shadow: 0 3px 0 darken($back, 10);
+	color: $text;
+
+	&:hover, &:active {
+		background-color: $back_a;
+	}
+
+	&:hover {
+		box-shadow: 0 3px 0 darken($back_a, 12);
+	}
+
+	&:active {
+		box-shadow: 0 1px 0 darken($back_a, 12);
+	}
+}
+
+@mixin fancy-btn($text, $back, $back_a) {
+	@include fancy-btn-base();
+	@include fancy-btn-colors($text, $back, $back_a);
+}
+
+a.button {
+	@include fancy-btn-base();
+	line-height: 1.8em;
+	font-size: 110%;
+
+	&.blue {
+		@include fancy-btn-colors(#CFF1FF, #2398c8, #15b3e1);
+	}
+
+	&.red {
+		@include fancy-btn-colors(#FFE9EA, #D43137, #FF3A4A);
+	}
+
+	&.black {
+		@include fancy-btn-colors(#FFEAD5, #231200, #310B00);
+	}
+
+	&.green {
+		@include fancy-btn-colors(#c3ffd5, #458945, #2dae42);
+	}
+
+	&.cyan {
+		@include fancy-btn-colors(#112927, #4f9d9d, #2DAEA6);
+	}
+
+	&.orange {
+		@include fancy-btn-colors(#ffd7c3, #ED5D31, #e84b1b);
+	}
+
+	&.yellow {
+		@include fancy-btn-colors(#4C2B00, #D4D054, #E3DD34);
+	}
+
+	&.white {
+		@include fancy-btn-colors(#525252, #E6E6E6, #E3F1FC);
+	}
+
+}
