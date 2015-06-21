@@ -8,15 +8,20 @@ function init() {
 	disc = document.getElementById('disc');
 	buildClockMarks();
 
+	updateTime();
+	setInterval(updateTime, 1000);
+
 	loadPeopleArray(function(){
-		update(); // places people
+		updatePeople();
 
 		// refresh the disc every N seconds
-		setInterval(update, 1000 * 10);
-		setInterval(changeColon, 1000);
+		setInterval(updatePeople, 1000 * 10);
 
 		// force refresh after tab gets focused
-		window.onfocus = update;
+		window.onfocus = function() {
+			updatePeople();
+			updateTime();
+		};
 	});
 }
 
@@ -43,25 +48,8 @@ function buildClockMarks() {
 }
 
 
-/** Toggle colon visibility each second (uses sec % 2) */
-function changeColon() {
-	var s = (new Date()).getSeconds() % 2;
-
-	document.getElementById('loctimecolon').style.opacity = s ? 1 : 0;
-}
-
-
-
-
-/** Update people positions & time */
-function update() {
-	redrawPeople();
-	redrawTime();
-}
-
-
 /** Redraw people (actually deletes and re-adds them) */
-function redrawPeople() {
+function updatePeople() {
 	if (mouse_on_list) {
 		console.log('Mouse over list, not redrawing.');
 		return;
@@ -83,16 +71,21 @@ function redrawPeople() {
 }
 
 
+var last_time;
 /** Update the local time display */
-function redrawTime() {
+function updateTime() {
 	// redraw time, wrap colon in span
 	var mmt = moment();
 
-	// need zero-padded minutes!
-	var parts = mmt.format('H:mm').split(':');
-	document.getElementById('localtime').innerHTML = parts[0] + '<span id="loctimecolon">:</span>' + parts[1];
+	var t = mmt.format('H:mm');
+	if (t !== last_time) {
+		// need zero-padded minutes!
+		var parts = t.split(':');
+		document.getElementById('localtime').innerHTML = parts[0] + '<span id="loctimecolon">:</span>' + parts[1];
+	}
 
-	changeColon();
+	var s = (new Date()).getSeconds() % 2;
+	document.getElementById('loctimecolon').style.opacity = s ? 1 : 0;
 }
 
 
