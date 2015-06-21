@@ -888,6 +888,37 @@ var people = [
 	{name: '@Vangoule273',   tz: 'United Kingdom',     color: '#00FF2C'},
 	{name: '@xTordX',        tz: 'Romania',            color: '#AE1AF7'},
 ];
+function callAjax(url, success, failure) {
+	var request = new XMLHttpRequest();
+	request.open('GET', url, true);
+
+	request.onreadystatechange = function () {
+		if (request.readyState == 4) {
+			if (request.status >= 200 && request.status < 400) {
+				if (typeof success == 'function')
+					success(request.responseText);
+			} else {
+				// We reached our target server, but it returned an error
+				if (typeof failure == 'function')
+					failure(xhr.status)
+			}
+		}
+	};
+
+	request.onError = function () {
+		// There was a connection error of some sort
+		if (typeof failure == 'function')
+			failure(-1);
+	};
+
+	console.log('request sent');
+
+	request.send();
+}
+if (!Date.now) {
+	Date.now = function() { return new Date().getTime(); }
+}
+
 /**
  * Convert hour to angle (deg)
  *
@@ -977,39 +1008,151 @@ function mmtDayCompare(here, there) {
 }
 // TimeZone resolving utilities
 
+var people_loading = 0;
+
+function loadPeopleArray(onDone) {
+	var localPeople = localStorage['people'];
+	if (typeof localPeople != 'undefined') {
+		try {
+			people = JSON.parse(localPeople);
+		} catch (e) {
+			console.error('Error when parsing people array from localstorage', e);
+		}
+	}
+
+	people_loading = 0;
+
+	// Parse timezones, mark invalid people
+	people.forEach(function (obj) {
+		obj._valid = true;
+
+		// check if person valid
+		var bad = false;
+		['name', 'color', 'tz'].forEach(function (e) {
+			if (typeof(obj[e]) == 'undefined') {
+				console.error('Missing "' + e + '" field in person object', obj);
+				bad = true;
+			}
+		});
+		if (bad) {
+			obj._valid = false; // mark as bad
+			return;
+		}
+
+		people_loading++;
+		resolveTimezone(obj);
+	});
+
+	var probe = function () {
+		console.log('probe');
+
+		if (people_loading <= 0) {
+			console.log('LOADING DONE');
+			onDone();
+			return;
+		}
+
+		setTimeout(probe, 10);
+	};
+
+	// launch probing
+	probe();
+}
+
 
 /** Work out timezone from a name (country name, timezone name etc) */
-function resolveTZ(tz) {
-	// Resolve, if it's alias
-	if (tz in tz_aliases) {
-		var old = tz;
-		tz = tz_aliases[tz];
+function resolveTimezone(obj) {
+	obj._tz_cached = obj.tz;
 
-		//console.log('TZ "' + old + '" resolved as "' + tz + '"');
+	// Resolve, if it's alias
+	if (obj.tz in tz_aliases) {
+		obj._tz_cached = tz_aliases[obj.tz];
+		console.log('TZ "' + obj.tz + '" resolved as "' + obj._tz_cached + '"');
 	}
 
 	// Check if it's valid for Moment.js
-	if (!moment.tz.zone(tz)) {
-		return false;
+	if (moment.tz.zone(obj._tz_cached)) {
+		people_loading--; // valid
+		return;
 	}
-	return tz;
+
+	// Ask Google what it is
+
+	var url1 = "https://maps.googleapis.com/maps/api/geocode/json?sensor=false&address=" + encodeURIComponent(obj.tz);
+	callAjax(url1, function (resp) {
+		try {
+			var rj = JSON.parse(resp);
+			console.log('Reply from Google:', rj);
+
+			if (rj.status === 'OK') {
+
+				// we got something
+				console.log('resp. is OK');
+
+				var results = rj.results;
+
+				if (results.length > 1) {
+					console.log('WARNING: Google found multiple matches. Try to be more specific.');
+				}
+
+				var lat = results[0].geometry.location.lat;
+				var lon = results[0].geometry.location.lng;
+
+				var timestamp = Math.floor(Date.now() / 1000);
+
+				// Get TZ for location
+				var url2 = "https://maps.googleapis.com/maps/api/timezone/json?location=" + lat + "," + lon + "&timestamp=" + timestamp + "&sensor=false";
+				callAjax(url2, function (resp) {
+					console.log('Success tzAPI: ' + resp);
+
+					try {
+						var rj = JSON.parse(resp);
+						console.log('Reply from Google:', rj);
+
+						if (rj.status === 'OK') {
+							console.log('Resolved TZ as '+rj.timeZoneId);
+							obj._tz_cached = rj.timeZoneId;
+						} else {
+							obj._valid = false;
+						}
+
+					} catch (e) {
+						console.log(e);
+						obj._valid = false;
+					}
+
+					people_loading--; // final
+
+				}, function (resp) {
+					console.log('FAIL tzAPI: ' + resp);
+					obj._valid = false;
+					people_loading--; // final, fail
+				});
+
+			} else {
+				obj._valid = false;
+				people_loading--; // final, fail
+			}
+
+		} catch (e) {
+			console.log(e);
+			obj._valid = false;
+
+			people_loading--; // final, fail
+		}
+
+	}, function (resp) {
+		console.log('FAIL geoAPI: ' + resp);
+		obj._valid = false;
+		people_loading--; // final, fail
+	});
 }
 
 
 /** Get proper timezone name for a person */
 function getTimezoneForPerson(obj) {
 	// Resolve timezone, cache result in the object.
-	var tz = obj._tz_cached;
-	if (!tz) {
-		tz = obj._tz_cached = resolveTZ(obj.tz);
-	}
-
-	if (tz === false) {
-		console.error('Invalid timezone for ' + obj.name);
-		return false;
-	}
-
-	return tz;
+	return obj._tz_cached;
 }
 
 
@@ -1025,24 +1168,25 @@ function getTimeForPerson(obj) {
 	return mmt.hour() * 3600 + mmt.minute() * 60 + mmt.second();
 }
 var disc;
-var mouse_hovering_list; // flag that user is hovering a list -> suppress redraw
+var mouse_on_list; // flag that user is hovering a list -> suppress redraw
 // req. global arrays: tz_aliases, people.
 
 
 /** Initialize the app */
 function init() {
-
 	disc = document.getElementById('disc');
 	buildClockMarks();
 
-	update();
+	loadPeopleArray(function(){
+		update(); // places people
 
-	// refresh the disc every N seconds
-	setInterval(update, 1000 * 10);
-	setInterval(changeColon, 1000);
+		// refresh the disc every N seconds
+		setInterval(update, 1000 * 10);
+		setInterval(changeColon, 1000);
 
-	// force refresh after tab gets focused
-	window.onfocus = update;
+		// force refresh after tab gets focused
+		window.onfocus = update;
+	});
 }
 
 
@@ -1076,6 +1220,8 @@ function changeColon() {
 }
 
 
+
+
 /** Update people positions & time */
 function update() {
 	redrawPeople();
@@ -1085,7 +1231,7 @@ function update() {
 
 /** Redraw people (actually deletes and re-adds them) */
 function redrawPeople() {
-	if (mouse_hovering_list) {
+	if (mouse_on_list) {
 		console.log('Mouse over list, not redrawing.');
 		return;
 	}
@@ -1101,6 +1247,7 @@ function redrawPeople() {
 		}
 	}
 
+	// Rebuild
 	buildPeople();
 }
 
@@ -1124,6 +1271,8 @@ function buildPeople() {
 
 	// Group people with similar time
 	people.forEach(function (obj) {
+		if (!obj._valid) return;
+
 		var t = getTimeForPerson(obj);
 		if (t === false) return; // fail in TZ?
 
@@ -1162,30 +1311,31 @@ function addPeopleAtTime(secs, people) {
 	var t = secs / 3600;
 	var angle = hour2angle(t);
 
+
+	// Work out position
 	var octant = Math.floor(angle / 45);
 	var quadrant = Math.floor(octant / 2);
 	var is_up = quadrant < 2;
 	var is_left = (quadrant > 0 && quadrant < 3);
 
-	//console.log('angle = ' + angle + ', octant ' + octant + ', quadrant ' + quadrant + ', up ' + is_up + ', left ' + is_left);
 
-	// Create a bullet
+	// --- Create & place a bullet ---
 	var bu = document.createElement('div');
 	bu.className = 'bullet';
 	bu.style.backgroundColor = first.color;
 	positionAt(bu, angle, 50.2);
 	disc.appendChild(bu);
 
-	// Create a label
 
-	// make it a link if it's twitter name
+	// --- Create a list element ---
+
 	var list = document.createElement('div');
 	list.classList.add('people-list');
 
-	// add location classes
+
+	// add location classes (where the list is)
 	list.classList.add(is_left ? 'left' : 'right');
 	list.classList.add(is_up ? 'up' : 'down');
-
 	list.classList.add('quad' + quadrant);
 	list.classList.add('oct' + octant);
 
@@ -1195,37 +1345,41 @@ function addPeopleAtTime(secs, people) {
 	var there = moment().tz(getTimezoneForPerson(first));
 	i = mmtDayCompare(here, there);
 	var clz = (i == -1) ? 'day-prev' : (i == 1) ? 'day-next' : null;
-
 	if (clz !== null) {
 		list.classList.add(clz);
 		bu.classList.add(clz);
 	}
 
+
+	// Add classes for multi-person list
 	if (people.length > 1) {
 		list.classList.add('multiple');
 		list.classList.add('count-' + people.length);
 	}
 
-	list.style.color = first.color;
 
 	// add the people
 	for (i = 0; i < people.length; i++) {
 		var peep = people[i];
-		var chld = createPersonLabel(peep);
-		chld.title = there.format('H:mm, MMM Do') + ' — ' + peep.tz;
-		list.appendChild(chld);
+		var child = createPersonLabel(peep);
+		child.title = there.format('H:mm, MMM Do') + ' — ' + peep.tz;
+		list.appendChild(child);
 	}
 
-	positionAt(list, angle, 53.5, octant); // label distance
-	disc.appendChild(list);
 
-	list.addEventListener('mouseover', function (e) {
-		mouse_hovering_list = true;
+	// Mouse listeners, to suppress redraw when mouse is on list
+	list.addEventListener('mouseover', function () {
+		mouse_on_list = true;
 	});
 
-	list.addEventListener('mouseout', function (e) {
-		mouse_hovering_list = false;
-	})
+	list.addEventListener('mouseout', function () {
+		mouse_on_list = false;
+	});
+
+
+	// --- Place the list ---
+	positionAt(list, angle, 53.5, octant);
+	disc.appendChild(list);
 }
 
 

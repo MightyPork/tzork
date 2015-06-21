@@ -1,22 +1,23 @@
 var disc;
-var mouse_hovering_list; // flag that user is hovering a list -> suppress redraw
+var mouse_on_list; // flag that user is hovering a list -> suppress redraw
 // req. global arrays: tz_aliases, people.
 
 
 /** Initialize the app */
 function init() {
-
 	disc = document.getElementById('disc');
 	buildClockMarks();
 
-	update();
+	loadPeopleArray(function(){
+		update(); // places people
 
-	// refresh the disc every N seconds
-	setInterval(update, 1000 * 10);
-	setInterval(changeColon, 1000);
+		// refresh the disc every N seconds
+		setInterval(update, 1000 * 10);
+		setInterval(changeColon, 1000);
 
-	// force refresh after tab gets focused
-	window.onfocus = update;
+		// force refresh after tab gets focused
+		window.onfocus = update;
+	});
 }
 
 
@@ -50,6 +51,8 @@ function changeColon() {
 }
 
 
+
+
 /** Update people positions & time */
 function update() {
 	redrawPeople();
@@ -59,7 +62,7 @@ function update() {
 
 /** Redraw people (actually deletes and re-adds them) */
 function redrawPeople() {
-	if (mouse_hovering_list) {
+	if (mouse_on_list) {
 		console.log('Mouse over list, not redrawing.');
 		return;
 	}
@@ -75,6 +78,7 @@ function redrawPeople() {
 		}
 	}
 
+	// Rebuild
 	buildPeople();
 }
 
@@ -98,6 +102,8 @@ function buildPeople() {
 
 	// Group people with similar time
 	people.forEach(function (obj) {
+		if (!obj._valid) return;
+
 		var t = getTimeForPerson(obj);
 		if (t === false) return; // fail in TZ?
 
@@ -136,30 +142,31 @@ function addPeopleAtTime(secs, people) {
 	var t = secs / 3600;
 	var angle = hour2angle(t);
 
+
+	// Work out position
 	var octant = Math.floor(angle / 45);
 	var quadrant = Math.floor(octant / 2);
 	var is_up = quadrant < 2;
 	var is_left = (quadrant > 0 && quadrant < 3);
 
-	//console.log('angle = ' + angle + ', octant ' + octant + ', quadrant ' + quadrant + ', up ' + is_up + ', left ' + is_left);
 
-	// Create a bullet
+	// --- Create & place a bullet ---
 	var bu = document.createElement('div');
 	bu.className = 'bullet';
 	bu.style.backgroundColor = first.color;
 	positionAt(bu, angle, 50.2);
 	disc.appendChild(bu);
 
-	// Create a label
 
-	// make it a link if it's twitter name
+	// --- Create a list element ---
+
 	var list = document.createElement('div');
 	list.classList.add('people-list');
 
-	// add location classes
+
+	// add location classes (where the list is)
 	list.classList.add(is_left ? 'left' : 'right');
 	list.classList.add(is_up ? 'up' : 'down');
-
 	list.classList.add('quad' + quadrant);
 	list.classList.add('oct' + octant);
 
@@ -169,37 +176,41 @@ function addPeopleAtTime(secs, people) {
 	var there = moment().tz(getTimezoneForPerson(first));
 	i = mmtDayCompare(here, there);
 	var clz = (i == -1) ? 'day-prev' : (i == 1) ? 'day-next' : null;
-
 	if (clz !== null) {
 		list.classList.add(clz);
 		bu.classList.add(clz);
 	}
 
+
+	// Add classes for multi-person list
 	if (people.length > 1) {
 		list.classList.add('multiple');
 		list.classList.add('count-' + people.length);
 	}
 
-	list.style.color = first.color;
 
 	// add the people
 	for (i = 0; i < people.length; i++) {
 		var peep = people[i];
-		var chld = createPersonLabel(peep);
-		chld.title = there.format('H:mm, MMM Do') + ' — ' + peep.tz;
-		list.appendChild(chld);
+		var child = createPersonLabel(peep);
+		child.title = there.format('H:mm, MMM Do') + ' — ' + peep.tz;
+		list.appendChild(child);
 	}
 
-	positionAt(list, angle, 53.5, octant); // label distance
-	disc.appendChild(list);
 
-	list.addEventListener('mouseover', function (e) {
-		mouse_hovering_list = true;
+	// Mouse listeners, to suppress redraw when mouse is on list
+	list.addEventListener('mouseover', function () {
+		mouse_on_list = true;
 	});
 
-	list.addEventListener('mouseout', function (e) {
-		mouse_hovering_list = false;
-	})
+	list.addEventListener('mouseout', function () {
+		mouse_on_list = false;
+	});
+
+
+	// --- Place the list ---
+	positionAt(list, angle, 53.5, octant);
+	disc.appendChild(list);
 }
 
 
