@@ -1,6 +1,6 @@
 @import "mixins";
 
-$bg: #0d2e40; //#0a2223
+$bg: #07151D; //#0a2223
 $fg: #9cfff7;
 
 // --- reset ---
@@ -59,7 +59,7 @@ html, body {
 	font-family: monospace;
 	font-size: 2em;
 
-	text-shadow: 0 0 2px black,0 0 4px black;
+	text-shadow: 0 0 3px black,0 0 4px black,0 0 6px black;
 
 	&.sixth {
 		font-weight: bold;
