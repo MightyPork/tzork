@@ -3,7 +3,7 @@ function openSetupDialog() {
 	document.getElementById('people_error').textContent = '';
 
 	// Populate the textarea
-	var ta = document.getElementById('people_json');
+	//var ta = document.getElementById('people_json');
 
 	var people_clone = JSON.parse(JSON.stringify(people));
 	people_clone.forEach(function (obj) {
@@ -12,7 +12,7 @@ function openSetupDialog() {
 		delete obj._tz_cached;
 	});
 
-	ta.value = JSON.stringify(people_clone, null, '\t');
+	//ta.value = JSON.stringify(people_clone, null, '\t');
 
 	var modal = document.getElementById('setup_dialog');
 	modal.style.display = 'block';

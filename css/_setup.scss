@@ -69,3 +69,12 @@
 
 	@include tab-size(4);
 }
+
+
+.PeopleList {
+	@include highlight(red);
+
+	.PersonEntry {
+		@include highlight(green);
+	}
+}

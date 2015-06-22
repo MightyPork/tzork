@@ -36,7 +36,16 @@
 	<div class="Dialog">
 		<div>
 			<div class="Title">Your Tzork configuration</div>
-			<textarea id="people_json" spellcheck="false"></textarea>
+			<!--<textarea id="people_json" spellcheck="false"></textarea>-->
+			<div class="PeopleList">
+				<div class="PersonEntry">
+					<input type="text" class="name">
+					<input type="text" class="tz">
+					<input type="text" class="color">
+					<input type="checkbox" id="visible_1" class="visible">
+					<label for="visible_1">Show</label>
+				</div>
+			</div>
 			<div class="Error" id="people_error"></div>
 			<div class="Buttons">
 				<a href="#" class="button orange" onClick="submitPeopleEdit('defaults'); return false;">Use Defaults</a><!--
