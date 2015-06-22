@@ -867,26 +867,81 @@ var tz_aliases = {
 	"CEST": "Europe/Berlin" // it'll be the same
 };
 var people = [
-	{name: '@AntonvonRaumer',tz: 'Germany',            color: '#FF8585'},
-	{name: '@ciba43',        tz: 'Latvia',             color: '#FE2F77'},
-	{name: '@coolsquid_',    tz: 'Norway',             color: '#079DE9'},
-	{name: '@Creeper32605',  tz: 'Denmark',            color: '#C8F080'},
-	{name: '@Deli731234',    tz: 'USA, Pacific Time',  color: '#A659E2'},
-	{name: '@eevblog',       tz: 'Australia, Sydney',  color: '#E63E3F'},
-	{name: '@elakdawalla',   tz: 'USA, Pacific Time',  color: '#C49B6D'},
-	{name: '@iamSethD',      tz: 'USA, Eastern Time',  color: '#ED2222'},
-	{name: '@ImReble548',    tz: 'USA, Mountain Time', color: '#69E79E'},
-	{name: '@Jaredlll08',    tz: 'South Africa',       color: '#F86752'},
-	{name: '@JesperJacoben', tz: 'Denmark',            color: 'skyblue'},
-	{name: '@lastofavari',   tz: 'Belarus',            color: '#05CDC0'},
-	{name: '@ljfa2',         tz: 'Germany',            color: '#78FCFF'},
-	{name: '@Locercus',      tz: 'Denmark',            color: '#32CD32'},
-	{name: '@Lunatrius',     tz: 'Slovenia',           color: '#00CCFF'},
-	{name: '@MightyPork',    tz: 'Czech Republic',     color: '#FFAD00'},
-	{name: '@Rafmaninoff',   tz: 'Spain',              color: '#00CC00'},
-	{name: '@TheBadFame',    tz: 'Mexico',             color: '#329AFF'},
-	{name: '@Vangoule273',   tz: 'United Kingdom',     color: '#00FF2C'},
-	{name: '@xTordX',        tz: 'Romania',            color: '#AE1AF7'},
+	{
+		"name": "@emmablackery",
+		"tz": "United Kingdom",
+		"color": "#F431A9"
+	},
+	{
+		"name": "@thetomska",
+		"tz": "United Kingdom",
+		"color": "#5BDFA8"
+	},
+	{
+		"name": "@MightyPork",
+		"tz": "Europe/Prague",
+		"color": "orange"
+	},
+	{
+		"name": "Pacific Time",
+		"tz": "USA, Pacific Time",
+		"color": "#B2FF5D"
+	},
+	{
+		"name": "Mountain Time",
+		"tz": "USA, Mountain Time",
+		"color": "#EAFF5D"
+	},
+	{
+		"name": "Central Time",
+		"tz": "USA, Central Time",
+		"color": "#FFD55D"
+	},
+	{
+		"name": "Eastern Time",
+		"tz": "USA, Eastern Time",
+		"color": "#FFA55D"
+	},
+	{
+		"name": "Москва",
+		"tz": "Москва",
+		"color": "red"
+	},
+	{
+		"name": "Sydney",
+		"tz": "Australia/Sydney",
+		"color": "#36CBFF"
+	},
+	{
+		"name": "Athens",
+		"tz": "Athens",
+		"color": "#87E0FF"
+	},
+	{
+		"name": "@pontifex",
+		"tz": "Vatican",
+		"color": "white"
+	},
+	{
+		"name": "@potus",
+		"tz": "Washington DC",
+		"color": "skyblue"
+	},
+	{
+		"name": "@BritishMonarchy",
+		"tz": "United Kingdom",
+		"color": "#D3213D"
+	},
+	{
+		"name": "Christmas Island",
+		"tz": "Cristmas Island",
+		"color": "teal"
+	},
+	{
+		"name": "Grand Canyon",
+		"tz": "Grand Canyon",
+		"color": "#DEA84B"
+	}
 ];
 function callAjax(url, success, failure) {
 	var request = new XMLHttpRequest();
@@ -1316,15 +1371,11 @@ var people_orig;
 		var i;
 
 		if (first_init) {
-
-			// save cleaned orig people
-			resolvePeopleTimezones(function () {
-				people_orig = JSON.parse(JSON.stringify(people)); // save "defaults"
-				people_orig.forEach(function (obj) {
-					delete obj._t;
-					delete obj._valid;
-					delete obj._tz_cached;
-				});
+			people_orig = JSON.parse(JSON.stringify(people)); // save "defaults"
+			people_orig.forEach(function (obj) {
+				delete obj._t;
+				delete obj._valid;
+				delete obj._tz_cached;
 			});
 
 			// Fix textarea & tab key
@@ -1340,7 +1391,6 @@ var people_orig;
 					}
 				}
 			}
-
 
 			first_init = false;
 		}

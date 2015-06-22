@@ -17,15 +17,11 @@ var people_orig;
 		var i;
 
 		if (first_init) {
-
-			// save cleaned orig people
-			resolvePeopleTimezones(function () {
-				people_orig = JSON.parse(JSON.stringify(people)); // save "defaults"
-				people_orig.forEach(function (obj) {
-					delete obj._t;
-					delete obj._valid;
-					delete obj._tz_cached;
-				});
+			people_orig = JSON.parse(JSON.stringify(people)); // save "defaults"
+			people_orig.forEach(function (obj) {
+				delete obj._t;
+				delete obj._valid;
+				delete obj._tz_cached;
 			});
 
 			// Fix textarea & tab key
@@ -41,7 +37,6 @@ var people_orig;
 					}
 				}
 			}
-
 
 			first_init = false;
 		}
