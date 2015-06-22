@@ -256,16 +256,7 @@ html, body {
 		font-size: 3.5em;
 	}
 
-	// make the colon "smooth" when blinking
-	span#loctimecolon {
-		opacity: 1;
-		transition: opacity .05s ease-in-out;
-		-moz-transition: opacity .05s ease-in-out;
-		-webkit-transition: opacity .05s ease-in-out;
-	}
-
 	text-shadow: 0 0 8px black, 0 0 4px black;
-
 }
 
 @import "setup";

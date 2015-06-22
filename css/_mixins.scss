@@ -7,6 +7,14 @@
 	user-select: none;
 }
 
+
+@mixin fix-weird-chrome-flicker() {
+	-webkit-backface-visibility: hidden;
+	-moz-backface-visibility: hidden;
+	backface-visibility: hidden;
+}
+
+
 @mixin can-select() {
 	-webkit-user-select: initial;
 	-moz-user-select: initial;

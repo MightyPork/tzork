@@ -119,7 +119,7 @@ var people_orig;
 		}
 
 		var s = (new Date()).getSeconds() % 2;
-		document.getElementById('loctimecolon').style.opacity = s ? 1 : 0;
+		document.getElementById('loctimecolon').style.visibility = s ? 'visible' : 'hidden';
 	}
 
 
