@@ -18,10 +18,14 @@ The project is open source, contributions are welcome!
 - [x] Do not rebuild existing bullets and people if mouse is over a list
 - [x] An interface for adding, removing and editing names, timezones and colors (`people` array)
 - [x] Saving the `people` array in `localStorage` (and loading it)
+- [ ] Profiles (multiple sets of settings)
+- [ ] Customizable background image(s) and colors
+- [ ] Option to show to 12-hour time
 - [ ] More user friendly config GUI
+- [ ] User accounts, saving Tzorks on the server (local saving will still work)
+- [ ] Public Tzorks, shared with an URL
+- [ ] Sharing Tzork ownership by multiple users? (maybe)
 - [ ] Rewrite the clock into SVG using Raphael.js (or other lib?)
-- [ ] Themes :D
-
 
 ## Credits
 
