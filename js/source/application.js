@@ -1,8 +1,19 @@
 // req. global arrays: tz_aliases, people.
 
-var people_orig;
+(function (window) {
 
-(function () {
+	window.Tzork = {
+		repository: null,
+		profile: null
+	};
+
+	function initTzork() {
+		Tzork.repository = new LocalRepository();
+		Tzork.repository.load();
+
+
+	}
+
 	var mouse_on_list; // flag that user is hovering a list -> suppress redraw
 	var last_time; // time when last time the time was redrawn
 	var disc;
@@ -13,34 +24,10 @@ var people_orig;
 	var first_init = true;
 
 	/** Initialize the app */
-	function init() {
+	function buildClock() {
 		var i;
 
-		if (first_init) {
-			people_orig = JSON.parse(JSON.stringify(people)); // save "defaults"
-			people_orig.forEach(function (obj) {
-				delete obj._t;
-				delete obj._valid;
-				delete obj._tz_cached;
-			});
-
-			// Fix textarea & tab key
-			var textareas = document.getElementsByTagName('textarea');
-			var count = textareas.length;
-			for (i = 0; i < count; i++) {
-				textareas[i].onkeydown = function (e) {
-					if (e.keyCode == 9 || e.which == 9) {
-						e.preventDefault();
-						var s = this.selectionStart;
-						this.value = this.value.substring(0, this.selectionStart) + "\t" + this.value.substring(this.selectionEnd);
-						this.selectionEnd = s + 1;
-					}
-				}
-			}
-
-			first_init = false;
-		}
-
+		fixTextareaTabKey();
 
 		// Clean up (it may be called second time)
 		var old = document.querySelectorAll('.mark, .bullet, .person-label, .people-list');
@@ -219,7 +206,7 @@ var people_orig;
 		// Determine if this is in prev / next day
 		var here = moment();
 		var there = moment().tz(getTimezoneForPerson(first));
-		i = mmtDayCompare(here, there);
+		i = momentDayCompare(here, there);
 		var clz = (i == -1) ? 'day-prev' : (i == 1) ? 'day-next' : null;
 		if (clz !== null) {
 			list.classList.add(clz);
@@ -277,6 +264,5 @@ var people_orig;
 
 	// public
 	window.updatePeople = updatePeople;
-	window.updateTime = updateTime;
-	window.init = init;
-})();
+	window.buildClock = buildClock;
+})(window);

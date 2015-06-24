@@ -20,4 +20,4 @@
 *.css.map
 
 # SCSS cache folder
-.sass-cache/
+.sass-cache

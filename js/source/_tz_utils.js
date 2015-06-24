@@ -14,14 +14,14 @@
 			}
 		}
 
-		resolvePeopleTimezones(onDone);
+		resolvePeopleTimezones(people, onDone);
 	}
 
 
 	var people_loading = 0;
 
-	function resolvePeopleTimezones(onDone) {
-		people_loading = 0;
+	function resolvePeopleTimezones(people, onDone) {
+		//people_loading = 0;
 
 		// Parse timezones, mark invalid people
 		people.forEach(function (obj) {

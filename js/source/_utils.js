@@ -65,7 +65,7 @@ function positionAt(element, angle, distance, octant) {
  *
  * Returns -1, 0, 1 if "there"-day is before, at, or after "here".
  */
-function mmtDayCompare(here, there) {
+function momentDayCompare(here, there) {
 
 	// local
 	var d0 = here.dayOfYear();
@@ -88,4 +88,22 @@ function mmtDayCompare(here, there) {
 	}
 
 	return 0;
+}
+
+
+
+/** Make <tab> key work properly in textareas */
+function fixTextareaTabKey() {
+	var textareas = document.getElementsByTagName('textarea');
+	var count = textareas.length;
+	for (var i = 0; i < count; i++) {
+		textareas[i].onKeyDown = function (e) {
+			if (e.keyCode == 9 || e.which == 9) {
+				e.preventDefault();
+				var s = this.selectionStart;
+				this.value = this.value.substring(0, this.selectionStart) + "\t" + this.value.substring(this.selectionEnd);
+				this.selectionEnd = s + 1;
+			}
+		}
+	}
 }
