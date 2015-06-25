@@ -3,7 +3,8 @@
 
 function main(): void {
     var repo = new Tzork.LocalRepository();
-    repo.load(()=> {
+    repo.load(function () {
         Tzork.init(repo)
     });
 }
+

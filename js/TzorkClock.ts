@@ -32,7 +32,7 @@ module Tzork {
 
 
         /** Populate with a profile */
-        public populate(profile: Profile) {
+        private populate(profile: Profile) {
             console.log('Populate with profile: ', profile);
 
             this.profile = profile;
@@ -108,13 +108,7 @@ module Tzork {
 
             var color = p.fgColor || '#9cfff7';
 
-            // Set color of marks
-            //var marks = document.querySelectorAll('.mark');
-            //for (var i = 0; i < marks.length; i++) {
-            //    (<HTMLElement> marks[i]).style.color = color;
-            //}
-
-            // Set color of ring
+            // Set color of ring (and marks and time)
             this.disc.style.borderColor = color;
             this.disc.style.color = color;
         }
