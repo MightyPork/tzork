@@ -182,7 +182,7 @@ module Tzork {
 
             // Group people with similar time
             this.profile.points.forEach(function (obj) {
-                if (!obj._valid) return;
+                if (!obj._valid || !obj.show) return;
 
                 var t = TzResolver.getTimeForPoint(obj);
 

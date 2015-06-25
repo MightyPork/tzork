@@ -689,7 +689,8 @@ var Tzork;
                 {
                     name: '@MightyPork',
                     color: '#FF9A00',
-                    tz: 'Prague'
+                    tz: 'Prague',
+                    show: true
                 }
             ]
         };
@@ -868,7 +869,7 @@ var Tzork;
             var _this = this;
             var resolved = [];
             this.profile.points.forEach(function (obj) {
-                if (!obj._valid)
+                if (!obj._valid || !obj.show)
                     return;
                 var t = TzResolver.getTimeForPoint(obj);
                 obj._t = t;

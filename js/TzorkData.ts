@@ -60,7 +60,8 @@ module Tzork {
                 {
                     name: '@MightyPork',
                     color: '#FF9A00',
-                    tz: 'Prague'
+                    tz: 'Prague',
+                    show: true
                 }
             ]
         };
