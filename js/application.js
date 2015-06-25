@@ -768,17 +768,17 @@ var Tzork;
             this.populate(Tzork.theRepo.profiles[Tzork.theRepo.activeProfile]);
         };
         Clock.prototype.populate = function (profile) {
+            var _this = this;
             console.log('Populate with profile: ', profile);
             this.profile = profile;
             this.applyColorsFromProfile();
             this.updatePoints();
-            var _self = this;
             this.interval_people = setInterval(function () {
-                _self.updatePoints();
+                _this.updatePoints();
             }, 1000 * 10);
             window.onfocus = function () {
-                this.updatePoints();
-                this.updateTime();
+                _this.updatePoints();
+                _this.updateTime();
             };
             var e = document.getElementById('setup_btn');
             e.addEventListener('click', function () {

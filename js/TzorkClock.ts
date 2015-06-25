@@ -42,13 +42,12 @@ module Tzork {
             this.updatePoints();
 
             // refresh the disc every N seconds
-            var _self = this;
-            this.interval_people = setInterval(function () {
-                _self.updatePoints()
+            this.interval_people = setInterval(() => {
+                this.updatePoints()
             }, 1000 * 10);
 
             // force refresh after tab gets focused
-            window.onfocus = function () {
+            window.onfocus = () => {
                 this.updatePoints();
                 this.updateTime();
             };
