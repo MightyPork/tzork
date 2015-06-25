@@ -27,7 +27,6 @@ module Tzork {
 
         public loadActiveProfile() {
             this.clear();
-            //console.log(theRepo);
             this.populate(theRepo.profiles[theRepo.activeProfile])
         }
 
@@ -38,47 +37,15 @@ module Tzork {
 
             this.profile = profile;
 
-            var outer = document.getElementById('tzork-bg');
-            var inner = this.disc;
-
-
-            // Apply bg image
-            if (profile.outerImage != null) {
-                outer.style.backgroundImage = 'url(\"' + profile.outerImage + '\")';
-            } else {
-                outer.style.backgroundImage = 'none';
-            }
-
-            // Apply inner image
-            if (profile.innerImage != null) {
-                inner.style.backgroundImage = 'url(\"' + profile.innerImage + '\")';
-            } else {
-                inner.style.backgroundImage = 'none';
-            }
-
-            // Apply bg color
-            if (profile.outerColor != null) {
-                outer.style.backgroundColor = profile.outerColor;
-            } else {
-                outer.style.backgroundColor = '#07151D';
-            }
-
-            // Apply bg color
-            if (profile.innerColor != null) {
-                inner.style.backgroundColor = profile.innerColor;
-            } else {
-                inner.style.backgroundColor = 'transparent';
-            }
-
-
-            // TODO apply foreground color
-
+            this.applyColorsFromProfile();
 
             this.updatePoints();
 
             // refresh the disc every N seconds
             var _self = this;
-            this.interval_people = setInterval(function(){_self.updatePoints()}, 1000 * 10);
+            this.interval_people = setInterval(function () {
+                _self.updatePoints()
+            }, 1000 * 10);
 
             // force refresh after tab gets focused
             window.onfocus = function () {
@@ -102,6 +69,54 @@ module Tzork {
             }
 
             clearInterval(this.interval_people);
+        }
+
+
+        private applyColorsFromProfile() {
+            var outer = document.getElementById('tzork-bg');
+            var inner = this.disc;
+
+            var p = this.profile;
+
+            // Apply bg image
+            if (p.outerImage != null) {
+                outer.style.backgroundImage = 'url(\"' + p.outerImage + '\")';
+            } else {
+                outer.style.backgroundImage = 'none';
+            }
+
+            // Apply inner image
+            if (p.innerImage != null) {
+                inner.style.backgroundImage = 'url(\"' + p.innerImage + '\")';
+            } else {
+                inner.style.backgroundImage = 'none';
+            }
+
+            // Apply bg color
+            if (p.outerColor != null) {
+                outer.style.backgroundColor = p.outerColor;
+            } else {
+                outer.style.backgroundColor = '#07151D';
+            }
+
+            // Apply bg color
+            if (p.innerColor != null) {
+                inner.style.backgroundColor = p.innerColor;
+            } else {
+                inner.style.backgroundColor = 'transparent';
+            }
+
+            var color = p.fgColor || '#9cfff7';
+
+            // Set color of marks
+            //var marks = document.querySelectorAll('.mark');
+            //for (var i = 0; i < marks.length; i++) {
+            //    (<HTMLElement> marks[i]).style.color = color;
+            //}
+
+            // Set color of ring
+            this.disc.style.borderColor = color;
+            this.disc.style.color = color;
         }
 
 
@@ -198,13 +213,13 @@ module Tzork {
 
             resolved.forEach((x) => {
                 //console.log('Time ' + x.t + ', people #: ' + x.p.length);
-                this.addPeopleAtTime(x.t, x.p);
+                this.addPointsAtTime(x.t, x.p);
             });
         }
 
 
         /** Add a bunch of people at specified time (s) */
-        private addPeopleAtTime(secs: number, people: Point[]) {
+        private addPointsAtTime(secs: number, people: Point[]) {
             var i;
 
             var first = people[0];

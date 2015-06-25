@@ -684,10 +684,14 @@ var Tzork;
     function createDefaultProfile() {
         return {
             title: 'Untitled Profile',
-            innerImage: "images/earth-from-space-small.jpg",
-            outerColor: '#07151D',
-            fgColor: '#9cfff7',
-            points: []
+            innerImage: 'images/earth-from-space-small.jpg',
+            points: [
+                {
+                    name: '@MightyPork',
+                    color: '#FF9A00',
+                    tz: 'Prague'
+                }
+            ]
         };
     }
     var LocalRepository = (function () {
@@ -766,32 +770,7 @@ var Tzork;
         Clock.prototype.populate = function (profile) {
             console.log('Populate with profile: ', profile);
             this.profile = profile;
-            var outer = document.getElementById('tzork-bg');
-            var inner = this.disc;
-            if (profile.outerImage != null) {
-                outer.style.backgroundImage = 'url(\"' + profile.outerImage + '\")';
-            }
-            else {
-                outer.style.backgroundImage = 'none';
-            }
-            if (profile.innerImage != null) {
-                inner.style.backgroundImage = 'url(\"' + profile.innerImage + '\")';
-            }
-            else {
-                inner.style.backgroundImage = 'none';
-            }
-            if (profile.outerColor != null) {
-                outer.style.backgroundColor = profile.outerColor;
-            }
-            else {
-                outer.style.backgroundColor = '#07151D';
-            }
-            if (profile.innerColor != null) {
-                inner.style.backgroundColor = profile.innerColor;
-            }
-            else {
-                inner.style.backgroundColor = 'transparent';
-            }
+            this.applyColorsFromProfile();
             this.updatePoints();
             var _self = this;
             this.interval_people = setInterval(function () {
@@ -811,6 +790,38 @@ var Tzork;
                 old[i].parentNode.removeChild(old[i]);
             }
             clearInterval(this.interval_people);
+        };
+        Clock.prototype.applyColorsFromProfile = function () {
+            var outer = document.getElementById('tzork-bg');
+            var inner = this.disc;
+            var p = this.profile;
+            if (p.outerImage != null) {
+                outer.style.backgroundImage = 'url(\"' + p.outerImage + '\")';
+            }
+            else {
+                outer.style.backgroundImage = 'none';
+            }
+            if (p.innerImage != null) {
+                inner.style.backgroundImage = 'url(\"' + p.innerImage + '\")';
+            }
+            else {
+                inner.style.backgroundImage = 'none';
+            }
+            if (p.outerColor != null) {
+                outer.style.backgroundColor = p.outerColor;
+            }
+            else {
+                outer.style.backgroundColor = '#07151D';
+            }
+            if (p.innerColor != null) {
+                inner.style.backgroundColor = p.innerColor;
+            }
+            else {
+                inner.style.backgroundColor = 'transparent';
+            }
+            var color = p.fgColor || '#9cfff7';
+            this.disc.style.borderColor = color;
+            this.disc.style.color = color;
         };
         Clock.prototype.buildClockMarks = function () {
             for (var i = 0; i < 24; i++) {
@@ -874,10 +885,10 @@ var Tzork;
                 }
             });
             resolved.forEach(function (x) {
-                _this.addPeopleAtTime(x.t, x.p);
+                _this.addPointsAtTime(x.t, x.p);
             });
         };
-        Clock.prototype.addPeopleAtTime = function (secs, people) {
+        Clock.prototype.addPointsAtTime = function (secs, people) {
             var _this = this;
             var i;
             var first = people[0];
@@ -957,7 +968,8 @@ var Tzork;
 })(Tzork || (Tzork = {}));
 function main() {
     var repo = new Tzork.LocalRepository();
-    repo.load();
-    Tzork.init(repo);
+    repo.load(function () {
+        Tzork.init(repo);
+    });
 }
 //# sourceMappingURL=application.js.map

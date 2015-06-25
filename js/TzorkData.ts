@@ -55,10 +55,14 @@ module Tzork {
     function createDefaultProfile(): Profile {
         return <Profile>{
             title: 'Untitled Profile',
-            innerImage: "images/earth-from-space-small.jpg",
-            outerColor: '#07151D',
-            fgColor: '#9cfff7',
-            points: []
+            innerImage: 'images/earth-from-space-small.jpg',
+            points: [
+                {
+                    name: '@MightyPork',
+                    color: '#FF9A00',
+                    tz: 'Prague'
+                }
+            ]
         };
     }
 
