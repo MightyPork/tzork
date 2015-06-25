@@ -68,7 +68,7 @@
       <envs />
     </TaskOptions>
     <TaskOptions isEnabled="true">
-      <option name="arguments" value="--out application.js application.ts --removeComments" />
+      <option name="arguments" value="--out application.js application.ts --removeComments --sourceMap" />
       <option name="checkSyntaxErrors" value="true" />
       <option name="description" value="" />
       <option name="exitCodeBehavior" value="ERROR" />

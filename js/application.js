@@ -600,6 +600,75 @@ var TzResolver;
     }
     TzResolver.getTimeForPoint = getTimeForPoint;
 })(TzResolver || (TzResolver = {}));
+if (!Date.now) {
+    Date.now = function () {
+        return new Date().getTime();
+    };
+}
+var Utils;
+(function (Utils) {
+    function clamp(what, low, high) {
+        return Math.min(low, Math.max(high, what));
+    }
+    Utils.clamp = clamp;
+    function hour2angle(h) {
+        var a = (18 - h) * 15;
+        while (a < 0)
+            a += 360;
+        return a;
+    }
+    Utils.hour2angle = hour2angle;
+    function positionAt(element, angle, distance, octant) {
+        if (octant === void 0) { octant = 0; }
+        var xx = distance * Math.cos((angle / 180) * Math.PI);
+        var yy = distance * Math.sin((angle / 180) * Math.PI);
+        switch (octant) {
+            case 0:
+            case 1:
+            case 7:
+                element.style.left = (50 + xx) + '%';
+                element.style.top = (50 - yy) + '%';
+                break;
+            case 2:
+            case 3:
+            case 4:
+                element.style.right = (50 - xx) + '%';
+                element.style.top = (50 - yy) + '%';
+                break;
+            case 5:
+                element.style.right = (50 - xx) + '%';
+                element.style.bottom = (50 + yy) + '%';
+                break;
+            case 6:
+                element.style.left = (50 + xx) + '%';
+                element.style.bottom = (50 + yy) + '%';
+                break;
+        }
+    }
+    Utils.positionAt = positionAt;
+    function mmtDayCompare(here, there) {
+        var d0 = here.dayOfYear();
+        var y0 = here.year();
+        var d1 = there.dayOfYear();
+        var y1 = there.year();
+        if (y1 < y0) {
+            return -1;
+        }
+        else if (y1 > y0) {
+            return 1;
+        }
+        else {
+            if (d1 < d0) {
+                return -1;
+            }
+            else if (d1 > d0) {
+                return 1;
+            }
+        }
+        return 0;
+    }
+    Utils.mmtDayCompare = mmtDayCompare;
+})(Utils || (Utils = {}));
 var Tzork;
 (function (Tzork) {
     function stripProfile(p) {
@@ -612,19 +681,48 @@ var Tzork;
         });
         return p;
     }
+    function createDefaultProfile() {
+        return {
+            title: 'Untitled Profile',
+            innerImage: "images/earth-from-space-small.jpg",
+            outerColor: '#07151D',
+            fgColor: '#9cfff7',
+            points: []
+        };
+    }
     var LocalRepository = (function () {
         function LocalRepository() {
             this.profiles = [];
+            this.activeProfile = 0;
         }
         LocalRepository.prototype.load = function (onDone) {
             try {
-                this.profiles = JSON.parse(localStorage['profiles']) || [];
+                var s = localStorage['profiles'];
+                if (s != null) {
+                    this.profiles = JSON.parse(s) || [];
+                }
             }
             catch (e) {
                 console.error('Error reading profiles from localStorage', e);
             }
+            try {
+                var s = localStorage['activeProfile'];
+                if (s != null) {
+                    this.activeProfile = parseInt(s);
+                }
+                this.activeProfile = Utils.clamp(this.activeProfile, 0, this.profiles.length);
+            }
+            catch (e) {
+                console.error('Error reading activeProfile from localStorage', e);
+            }
+            if (this.profiles.length == 0) {
+                this.profiles.push(createDefaultProfile());
+            }
             var loading = 0;
             this.profiles.forEach(function (p) {
+                if (typeof p.points == 'undefined') {
+                    p.points = [];
+                }
                 loading++;
                 TzResolver.resolvePointTimezones(p.points, function () {
                     loading--;
@@ -645,14 +743,221 @@ var Tzork;
                 outp.push(stripProfile(pr));
             });
             localStorage['profiles'] = JSON.stringify(outp);
+            localStorage['activeProfile'] = this.activeProfile;
             (typeof onDone == 'function') && onDone();
         };
         return LocalRepository;
     })();
     Tzork.LocalRepository = LocalRepository;
 })(Tzork || (Tzork = {}));
+var Tzork;
+(function (Tzork) {
+    var Clock = (function () {
+        function Clock() {
+            this.disc = document.getElementById('disc');
+            this.buildClockMarks();
+            this.updateTime();
+            this.interval_time = setInterval(this.updateTime, 1000);
+        }
+        Clock.prototype.loadActiveProfile = function () {
+            this.clear();
+            this.populate(Tzork.theRepo.profiles[Tzork.theRepo.activeProfile]);
+        };
+        Clock.prototype.populate = function (profile) {
+            console.log('Populate with profile: ', profile);
+            this.profile = profile;
+            var outer = document.getElementById('tzork-bg');
+            var inner = this.disc;
+            if (profile.outerImage != null) {
+                outer.style.backgroundImage = 'url(\"' + profile.outerImage + '\")';
+            }
+            else {
+                outer.style.backgroundImage = 'none';
+            }
+            if (profile.innerImage != null) {
+                inner.style.backgroundImage = 'url(\"' + profile.innerImage + '\")';
+            }
+            else {
+                inner.style.backgroundImage = 'none';
+            }
+            if (profile.outerColor != null) {
+                outer.style.backgroundColor = profile.outerColor;
+            }
+            else {
+                outer.style.backgroundColor = '#07151D';
+            }
+            if (profile.innerColor != null) {
+                inner.style.backgroundColor = profile.innerColor;
+            }
+            else {
+                inner.style.backgroundColor = 'transparent';
+            }
+            this.updatePoints();
+            var _self = this;
+            this.interval_people = setInterval(function () {
+                _self.updatePoints();
+            }, 1000 * 10);
+            window.onfocus = function () {
+                this.updatePoints();
+                this.updateTime();
+            };
+            var e = document.getElementById('setup_btn');
+            e.addEventListener('click', function () {
+            });
+        };
+        Clock.prototype.clear = function () {
+            var old = document.querySelectorAll('.bullet, .person-label, .people-list');
+            for (var i = 0; i < old.length; i++) {
+                old[i].parentNode.removeChild(old[i]);
+            }
+            clearInterval(this.interval_people);
+        };
+        Clock.prototype.buildClockMarks = function () {
+            for (var i = 0; i < 24; i++) {
+                var mark = document.createElement('div');
+                mark.classList.add('mark');
+                mark.classList.add('hour-' + i);
+                if (i == 0 || i == 6 || i == 12 || i == 18) {
+                    mark.classList.add('sixth');
+                }
+                mark.textContent = '' + i;
+                var angle = Utils.hour2angle(i);
+                Utils.positionAt(mark, angle, 45);
+                this.disc.appendChild(mark);
+            }
+        };
+        Clock.prototype.updateTime = function () {
+            var mmt = moment();
+            var t = mmt.format('H:mm');
+            if (t !== this.last_time) {
+                this.last_time = t;
+                var parts = t.split(':');
+                document.getElementById('localtime').innerHTML = parts[0] + '<span id="loctimecolon">:</span>' + parts[1];
+            }
+            var s = (new Date()).getSeconds() % 2;
+            document.getElementById('loctimecolon').style.visibility = s ? 'visible' : 'hidden';
+        };
+        Clock.prototype.updatePoints = function () {
+            if (this.mouse_on_list) {
+                console.log('Mouse over list, not redrawing.');
+                return;
+            }
+            var x = document.querySelectorAll('.bullet, .person, .people-list');
+            for (var i in x) {
+                if (x.hasOwnProperty(i)) {
+                    var e = x[i];
+                    if (!e || !e.parentNode)
+                        continue;
+                    e.parentNode.removeChild(e);
+                }
+            }
+            this.buildPoints();
+        };
+        Clock.prototype.buildPoints = function () {
+            var _this = this;
+            var resolved = [];
+            this.profile.points.forEach(function (obj) {
+                if (!obj._valid)
+                    return;
+                var t = TzResolver.getTimeForPoint(obj);
+                obj._t = t;
+                var placed;
+                resolved.some(function (v) {
+                    if (Math.abs(v.t - t) < 60) {
+                        v.p.push(obj);
+                        placed = true;
+                        return true;
+                    }
+                });
+                if (!placed) {
+                    resolved.push({ t: t, p: [obj] });
+                }
+            });
+            resolved.forEach(function (x) {
+                _this.addPeopleAtTime(x.t, x.p);
+            });
+        };
+        Clock.prototype.addPeopleAtTime = function (secs, people) {
+            var _this = this;
+            var i;
+            var first = people[0];
+            var t = secs / 3600;
+            var angle = Utils.hour2angle(t);
+            var octant = Math.floor(angle / 45);
+            var quadrant = Math.floor(octant / 2);
+            var is_up = (quadrant < 2);
+            var is_left = (quadrant > 0 && quadrant < 3);
+            var bu = document.createElement('div');
+            bu.className = 'bullet';
+            bu.style.backgroundColor = first.color;
+            Utils.positionAt(bu, angle, 50.2);
+            this.disc.appendChild(bu);
+            var list = document.createElement('div');
+            list.classList.add('people-list');
+            list.classList.add(is_left ? 'left' : 'right');
+            list.classList.add(is_up ? 'up' : 'down');
+            list.classList.add('quad' + quadrant);
+            list.classList.add('oct' + octant);
+            var here = moment();
+            var there = moment().tz(first._tz);
+            i = Utils.mmtDayCompare(here, there);
+            var clz = (i == -1) ? 'day-prev' : (i == 1) ? 'day-next' : null;
+            if (clz !== null) {
+                list.classList.add(clz);
+                bu.classList.add(clz);
+            }
+            if (people.length > 1) {
+                list.classList.add('multiple');
+                list.classList.add('count-' + people.length);
+            }
+            for (i = 0; i < people.length; i++) {
+                var peep = people[i];
+                var child = this.createPointLabel(peep);
+                child.title = there.format('H:mm, MMM Do') + ' — ' + peep._tz;
+                list.appendChild(child);
+            }
+            list.addEventListener('mouseover', function () {
+                _this.mouse_on_list = true;
+            });
+            list.addEventListener('mouseout', function () {
+                _this.mouse_on_list = false;
+            });
+            Utils.positionAt(list, angle, 53.5, octant);
+            this.disc.appendChild(list);
+        };
+        Clock.prototype.createPointLabel = function (obj) {
+            var la;
+            if (obj.name.indexOf('@') === 0) {
+                la = document.createElement('a');
+                la.href = 'https://twitter.com/' + obj.name;
+                la.target = '_blank';
+            }
+            else {
+                la = document.createElement('span');
+            }
+            la.classList.add('person-label');
+            la.style.color = obj.color;
+            la.textContent = obj.name;
+            return la;
+        };
+        return Clock;
+    })();
+    Tzork.Clock = Clock;
+})(Tzork || (Tzork = {}));
+var Tzork;
+(function (Tzork) {
+    Tzork.theClock;
+    Tzork.theRepo;
+    function init(repo) {
+        Tzork.theRepo = repo;
+        Tzork.theClock = new Tzork.Clock();
+        Tzork.theClock.loadActiveProfile();
+    }
+    Tzork.init = init;
+})(Tzork || (Tzork = {}));
 function main() {
     var repo = new Tzork.LocalRepository();
     repo.load();
-    var p = {};
+    Tzork.init(repo);
 }
+//# sourceMappingURL=application.js.map

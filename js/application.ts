@@ -1,10 +1,8 @@
-
 /// <reference path="TzorkData.ts" />
+/// <reference path="TzorkInit.ts" />
 
-
-function main():void {
+function main(): void {
     var repo = new Tzork.LocalRepository();
     repo.load();
-
-    var p = <Tzork.Profile>{};
+    Tzork.init(repo);
 }

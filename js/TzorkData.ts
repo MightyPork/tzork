@@ -1,4 +1,6 @@
 /// <reference path="TzResolver.ts" />
+/// <reference path="Utils.ts" />
+
 
 module Tzork {
 
@@ -49,9 +51,23 @@ module Tzork {
     }
 
 
+    /** Create default profile (if there's none in the repository) */
+    function createDefaultProfile(): Profile {
+        return <Profile>{
+            title: 'Untitled Profile',
+            innerImage: "images/earth-from-space-small.jpg",
+            outerColor: '#07151D',
+            fgColor: '#9cfff7',
+            points: []
+        };
+    }
+
+
     /** A profile & config provider */
     export interface Repository {
         profiles: Profile[];
+
+        activeProfile: number;
 
         /** Load & parse profiles and prepare repository for use */
         load(onDone?: ()=>void): void;
@@ -63,18 +79,47 @@ module Tzork {
 
     /** Repository loaded/saved from/to localStorage */
     export class LocalRepository implements Repository {
-        profiles: Profile[] = [];
+        public profiles: Profile[] = [];
 
-        load(onDone?: ()=>void) {
+        public activeProfile: number = 0;
+
+        public load(onDone?: ()=>void) {
+            // Load profiles array
             try {
-                this.profiles = <Profile[]> JSON.parse(localStorage['profiles']) || [];
+                var s = localStorage['profiles'];
+                if (s != null) {
+                    this.profiles = <Profile[]> JSON.parse(s) || [];
+                }
             } catch (e) {
                 console.error('Error reading profiles from localStorage', e);
             }
 
+
+            // Load active profile nr
+            try {
+                var s = localStorage['activeProfile'];
+                if (s != null) {
+                    this.activeProfile = parseInt(s);
+                }
+
+                this.activeProfile = Utils.clamp(this.activeProfile, 0, this.profiles.length);
+            } catch (e) {
+                console.error('Error reading activeProfile from localStorage', e);
+            }
+
+            if (this.profiles.length == 0) {
+                this.profiles.push(createDefaultProfile());
+            }
+
+
+            // Load with async
             var loading = 0;
 
             this.profiles.forEach((p) => {
+                if (typeof p.points == 'undefined') {
+                    p.points = [];
+                }
+
                 loading++;
                 TzResolver.resolvePointTimezones(p.points, ()=> {
                     loading--;
@@ -91,7 +136,8 @@ module Tzork {
             })();
         }
 
-        store(onDone?: ()=>void) {
+
+        public store(onDone?: ()=>void) {
             // strip profiles one at a time
             var outp = [];
             this.profiles.forEach((pr) => {
@@ -100,6 +146,7 @@ module Tzork {
 
             // store as JSON
             localStorage['profiles'] = JSON.stringify(outp);
+            localStorage['activeProfile'] = this.activeProfile;
 
             (typeof onDone == 'function') && onDone();
         }
