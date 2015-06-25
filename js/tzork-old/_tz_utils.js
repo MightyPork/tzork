@@ -177,7 +177,7 @@
 
 	// Public functions
 	window.loadPeopleArray = loadPeopleArray;
-	window.resolvePeopleTimezones = resolvePeopleTimezones;
+	window.resolvePointTimezones = resolvePeopleTimezones;
 })();
 
 

@@ -1,5 +1,4 @@
 var tz_aliases = {
-
 	// --- single-timezone countries ---
 
 	"Afghanistan": "Asia/Kabul",
