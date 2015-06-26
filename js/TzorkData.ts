@@ -35,7 +35,7 @@ module Tzork {
 
 
     /** Strip a transient stuff from profile */
-    function stripProfile(p: Profile): Profile {
+    export function stripProfile(p: Profile): Profile {
         // clone the data
         p = JSON.parse(JSON.stringify(p));
 
@@ -56,6 +56,10 @@ module Tzork {
         return <Profile>{
             title: 'Untitled Profile',
             innerImage: 'images/earth-from-space-small.jpg',
+            innerColor: '',
+            outerImage: '',
+            outerColor: '',
+            fgColor: '',
             points: [
                 {
                     name: '@MightyPork',
@@ -76,6 +80,9 @@ module Tzork {
 
         /** Load & parse profiles and prepare repository for use */
         load(onDone?: ()=>void): void;
+
+        /** Parse profiles array. Automatically called by load()! */
+        parse(onDone?: ()=>void): void;
 
         /** Persist current state */
         store(onDone?: ()=>void): void;
@@ -106,16 +113,20 @@ module Tzork {
                 if (s != null) {
                     this.activeProfile = parseInt(s);
                 }
-
-                this.activeProfile = Utils.clamp(this.activeProfile, 0, this.profiles.length);
             } catch (e) {
                 console.error('Error reading activeProfile from localStorage', e);
             }
 
+            this.parse(onDone);
+        }
+
+
+        public parse(onDone?: ()=>void) {
             if (this.profiles.length == 0) {
                 this.profiles.push(createDefaultProfile());
             }
 
+            this.activeProfile = Utils.clamp(this.activeProfile, 0, this.profiles.length - 1);
 
             // Load with async
             var loading = 0;

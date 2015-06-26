@@ -681,10 +681,15 @@ var Tzork;
         });
         return p;
     }
+    Tzork.stripProfile = stripProfile;
     function createDefaultProfile() {
         return {
             title: 'Untitled Profile',
             innerImage: 'images/earth-from-space-small.jpg',
+            innerColor: '',
+            outerImage: '',
+            outerColor: '',
+            fgColor: '',
             points: [
                 {
                     name: '@MightyPork',
@@ -715,14 +720,17 @@ var Tzork;
                 if (s != null) {
                     this.activeProfile = parseInt(s);
                 }
-                this.activeProfile = Utils.clamp(this.activeProfile, 0, this.profiles.length);
             }
             catch (e) {
                 console.error('Error reading activeProfile from localStorage', e);
             }
+            this.parse(onDone);
+        };
+        LocalRepository.prototype.parse = function (onDone) {
             if (this.profiles.length == 0) {
                 this.profiles.push(createDefaultProfile());
             }
+            this.activeProfile = Utils.clamp(this.activeProfile, 0, this.profiles.length - 1);
             var loading = 0;
             this.profiles.forEach(function (p) {
                 if (typeof p.points == 'undefined') {
@@ -956,6 +964,62 @@ var Tzork;
     })();
     Tzork.Clock = Clock;
 })(Tzork || (Tzork = {}));
+var TzorkSetup;
+(function (TzorkSetup) {
+    function openSetupDialog() {
+        document.getElementById('people_error').textContent = '';
+        var ta = document.getElementById('people_json');
+        var clones = [];
+        Tzork.theRepo.profiles.forEach(function (p) {
+            clones.push(Tzork.stripProfile(p));
+        });
+        ta.value = JSON.stringify(clones, null, '  ');
+        var modal = document.getElementById('setup_dialog');
+        modal.style.display = 'block';
+        setTimeout(function () {
+            modal.style.opacity = "1";
+        }, 1);
+    }
+    TzorkSetup.openSetupDialog = openSetupDialog;
+    function submitPeopleEdit(action) {
+        switch (action) {
+            case 'close':
+                hideSetupModal();
+                break;
+            case 'save':
+                try {
+                    var ta = document.getElementById('people_json');
+                    var pp = JSON.parse(ta.value);
+                    localStorage['people'] = JSON.stringify(pp);
+                    Tzork.theClock.loadActiveProfile();
+                    hideSetupModal();
+                }
+                catch (e) {
+                    var er = document.getElementById('people_error');
+                    if (e.message.match(/^Unexpected token [,\]}]/g)) {
+                        er.textContent = 'Syntax error: trailing comma ?';
+                    }
+                    else if (e.message.match(/^Unexpected string/g)) {
+                        er.textContent = 'Syntax error: missing comma ?';
+                    }
+                    else {
+                        er.textContent = 'Syntax error: ' + e.message;
+                    }
+                    console.log('Error in user-entered JSON', e);
+                }
+                break;
+        }
+    }
+    TzorkSetup.submitPeopleEdit = submitPeopleEdit;
+    function hideSetupModal() {
+        var modal = document.getElementById('setup_dialog');
+        modal.style.opacity = "0";
+        setTimeout(function () {
+            modal.style.display = 'none';
+        }, 500);
+    }
+    TzorkSetup.hideSetupModal = hideSetupModal;
+})(TzorkSetup || (TzorkSetup = {}));
 var Tzork;
 (function (Tzork) {
     Tzork.theClock;
@@ -964,6 +1028,7 @@ var Tzork;
         Tzork.theRepo = repo;
         Tzork.theClock = new Tzork.Clock();
         Tzork.theClock.loadActiveProfile();
+        document.getElementById('setup_btn').onclick = TzorkSetup.openSetupDialog;
     }
     Tzork.init = init;
 })(Tzork || (Tzork = {}));
