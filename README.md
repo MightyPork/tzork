@@ -17,7 +17,7 @@ The project is open source, contributions are welcome!
 
 - [ ] Option to show 12-hour time
 - [ ] Mark on local time (?)
-- [ ] Cache timezones resolved in `localStorage`, to avoid repeated Google API calls.
+- [ ] Cache resolved timezones in `localStorage`, to avoid repeated Google API calls.
 
 ### User interface
 
