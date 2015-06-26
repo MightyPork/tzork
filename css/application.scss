@@ -20,6 +20,12 @@ html, body {
 	@include basefont();
 }
 
+body {
+	background-size: cover;
+	background-repeat: no-repeat;
+	background-position: center center;
+}
+
 #disc {
 	// centering
 	cursor: default;
