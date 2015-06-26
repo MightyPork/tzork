@@ -31,29 +31,21 @@ module TzResolver {
             }
 
             // add missisng "show" attribute
-            if (typeof(obj.show) == 'undefined') {
-                obj.show = true;
-            }
+            Utils.setIfMissing(obj, 'show', true);
 
             // run async
             people_loading++;
             resolveTimezone(obj);
         });
 
-        function probe() {
-            //console.log('probe');
-
+        (function probe() {
             if (people_loading <= 0) {
-                console.log('LOADING DONE');
                 onDone();
                 return;
             }
 
-            setTimeout(probe, 10);
-        }
-
-        // launch probing
-        probe();
+            setTimeout(probe, 5);
+        })();
     }
 
 
@@ -164,12 +156,6 @@ module TzResolver {
         }
 
         Ajax.get(geoURL, geoOK, ajaxFail);
-    }
-
-
-    /** Get proper timezone name for a person */
-    export function getTimezoneForPoint(obj: Tzork.Point): string {
-        return obj._tz;
     }
 
 

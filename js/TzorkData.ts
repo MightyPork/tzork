@@ -98,25 +98,16 @@ module Tzork {
         public activeProfile: number = 0;
 
         public load(onDone?: ()=>void) {
-            // Load profiles array
+            // Load repository
             try {
-                var s = localStorage['profiles'];
+                var s = localStorage['repository'];
                 if (s != null) {
-                    this.profiles = <Profile[]> JSON.parse(s) || [];
+                    var j = JSON.parse(s);
+                    this.profiles = <Profile[]> j.profiles || [];
+                    this.activeProfile = parseInt(j.active);
                 }
             } catch (e) {
                 console.error('Error reading profiles from localStorage', e);
-            }
-
-
-            // Load active profile nr
-            try {
-                var s = localStorage['activeProfile'];
-                if (s != null) {
-                    this.activeProfile = parseInt(s);
-                }
-            } catch (e) {
-                console.error('Error reading activeProfile from localStorage', e);
             }
 
             this.parse(onDone);
@@ -134,18 +125,17 @@ module Tzork {
             var loading = 0;
 
             this.profiles.forEach((p) => {
-                if (typeof p.points == 'undefined') {
-                    p.points = [];
-                }
-
-                if (typeof p.showTitle == 'undefined') {
-                    p.showTitle = true;
-                }
-
-                // TODO other properties - undefined -> default
+                // Add missing properties to the profile
+                Utils.setIfMissing(p, 'points', []);
+                Utils.setIfMissing(p, 'showTitle', true);
+                Utils.setIfMissing(p, 'innerImage', '');
+                Utils.setIfMissing(p, 'innerColor', '');
+                Utils.setIfMissing(p, 'outerImage', '');
+                Utils.setIfMissing(p, 'outerColor', '');
+                Utils.setIfMissing(p, 'fgColor', '');
 
                 loading++;
-                TzResolver.resolvePointTimezones(p.points, ()=> {
+                TzResolver.resolvePointTimezones(p.points, () => {
                     loading--;
                 });
             });
@@ -168,9 +158,11 @@ module Tzork {
                 outp.push(stripProfile(pr));
             });
 
-            // store as JSON
-            localStorage['profiles'] = JSON.stringify(outp);
-            localStorage['activeProfile'] = this.activeProfile;
+            // store
+            localStorage['repository'] = JSON.stringify({
+                profiles: outp,
+                active: this.activeProfile
+            });
 
             (typeof onDone == 'function') && onDone();
         }

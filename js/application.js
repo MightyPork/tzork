@@ -498,21 +498,17 @@ var TzResolver;
                 obj._valid = false;
                 return;
             }
-            if (typeof (obj.show) == 'undefined') {
-                obj.show = true;
-            }
+            Utils.setIfMissing(obj, 'show', true);
             people_loading++;
             resolveTimezone(obj);
         });
-        function probe() {
+        (function probe() {
             if (people_loading <= 0) {
-                console.log('LOADING DONE');
                 onDone();
                 return;
             }
-            setTimeout(probe, 10);
-        }
-        probe();
+            setTimeout(probe, 5);
+        })();
     }
     TzResolver.resolvePointTimezones = resolvePointTimezones;
     function resolveTimezone(obj) {
@@ -592,10 +588,6 @@ var TzResolver;
         }
         Ajax.get(geoURL, geoOK, ajaxFail);
     }
-    function getTimezoneForPoint(obj) {
-        return obj._tz;
-    }
-    TzResolver.getTimezoneForPoint = getTimezoneForPoint;
     function getTimeForPoint(obj) {
         var mmt = moment().tz(obj._tz);
         return mmt.hour() * 3600 + mmt.minute() * 60 + mmt.second();
@@ -682,6 +674,12 @@ var Utils;
         return document.querySelector(query);
     }
     Utils.queryOne = queryOne;
+    function setIfMissing(obj, key, value) {
+        if (typeof (obj[key]) == 'undefined') {
+            obj[key] = value;
+        }
+    }
+    Utils.setIfMissing = setIfMissing;
 })(Utils || (Utils = {}));
 var Tzork;
 (function (Tzork) {
@@ -723,22 +721,15 @@ var Tzork;
         }
         LocalRepository.prototype.load = function (onDone) {
             try {
-                var s = localStorage['profiles'];
+                var s = localStorage['repository'];
                 if (s != null) {
-                    this.profiles = JSON.parse(s) || [];
+                    var j = JSON.parse(s);
+                    this.profiles = j.profiles || [];
+                    this.activeProfile = parseInt(j.active);
                 }
             }
             catch (e) {
                 console.error('Error reading profiles from localStorage', e);
-            }
-            try {
-                var s = localStorage['activeProfile'];
-                if (s != null) {
-                    this.activeProfile = parseInt(s);
-                }
-            }
-            catch (e) {
-                console.error('Error reading activeProfile from localStorage', e);
             }
             this.parse(onDone);
         };
@@ -749,12 +740,13 @@ var Tzork;
             this.activeProfile = Utils.clamp(this.activeProfile, 0, this.profiles.length - 1);
             var loading = 0;
             this.profiles.forEach(function (p) {
-                if (typeof p.points == 'undefined') {
-                    p.points = [];
-                }
-                if (typeof p.showTitle == 'undefined') {
-                    p.showTitle = true;
-                }
+                Utils.setIfMissing(p, 'points', []);
+                Utils.setIfMissing(p, 'showTitle', true);
+                Utils.setIfMissing(p, 'innerImage', '');
+                Utils.setIfMissing(p, 'innerColor', '');
+                Utils.setIfMissing(p, 'outerImage', '');
+                Utils.setIfMissing(p, 'outerColor', '');
+                Utils.setIfMissing(p, 'fgColor', '');
                 loading++;
                 TzResolver.resolvePointTimezones(p.points, function () {
                     loading--;
@@ -774,8 +766,10 @@ var Tzork;
             this.profiles.forEach(function (pr) {
                 outp.push(stripProfile(pr));
             });
-            localStorage['profiles'] = JSON.stringify(outp);
-            localStorage['activeProfile'] = this.activeProfile;
+            localStorage['repository'] = JSON.stringify({
+                profiles: outp,
+                active: this.activeProfile
+            });
             (typeof onDone == 'function') && onDone();
         };
         return LocalRepository;

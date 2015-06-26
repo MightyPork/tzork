@@ -100,7 +100,7 @@ module Utils {
     }
 
 
-    export function iterateQuery(query: string, func: (HTMLNode)=>void):void {
+    export function iterateQuery(query: string, func: (HTMLNode)=>void): void {
         var outers = document.querySelectorAll(query);
         for (var i = 0; i < outers.length; i++) {
             var e = <HTMLElement> outers[i];
@@ -110,5 +110,11 @@ module Utils {
 
     export function queryOne(query: string): HTMLElement {
         return <HTMLElement> document.querySelector(query);
+    }
+
+    export function setIfMissing(obj: Object, key: string, value: any) {
+        if (typeof(obj[key]) == 'undefined') {
+            obj[key] = value;
+        }
     }
 }
