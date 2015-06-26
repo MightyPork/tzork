@@ -1,5 +1,6 @@
 /// <reference path="TzResolver.ts" />
 /// <reference path="Utils.ts" />
+/// <reference path="data_default_profile.ts" />
 
 
 module Tzork {
@@ -52,25 +53,23 @@ module Tzork {
     }
 
 
-    /** Create default profile (if there's none in the repository) */
+    /** Create empty profile */
     export function createEmptyProfile(): Profile {
         return <Profile>{
             title: 'Untitled Profile',
-            showTitle: true,
-            innerImage: 'images/bg-earth.jpg',
+            showTitle: false,
+            innerImage: '',
             innerColor: '',
             outerImage: '',
             outerColor: '',
             fgColor: '',
-            points: [
-                {
-                    name: '@MightyPork',
-                    color: '#FF9A00',
-                    tz: 'Prague',
-                    show: true
-                }
-            ]
+            points: []
         };
+    }
+
+    /** Create default profile */
+    export function createDefaultProfile(): Profile {
+        return JSON.parse(JSON.stringify(tz_def_profile));
     }
 
 
@@ -113,9 +112,24 @@ module Tzork {
         }
 
 
-        parse(onDone?: ()=>void) {
+        parse(onDone?: () => void) {
+
+            var must_save = false;
+
             if (this.profiles.length == 0) {
-                this.profiles.push(createEmptyProfile());
+
+                // Migration
+                if (Utils.keyExists(localStorage, 'people')) {
+                    var p = createDefaultProfile();
+                    p.points = JSON.parse(localStorage['people']);
+                    this.profiles.push(p);
+                    delete localStorage['people'];
+                } else {
+                    // default new profile
+                    this.profiles.push(createDefaultProfile());
+                }
+
+                must_save = true;
             }
 
             this.activeProfile = Utils.clamp(this.activeProfile, 0, this.profiles.length - 1);
@@ -139,9 +153,16 @@ module Tzork {
                 });
             });
 
+            var self = this;
+
             // wait till all is done
             (function probe() {
                 if (loading == 0) {
+                    // save if changed while loading (was empty etc)
+                    if (must_save) {
+                        self.store();
+                    }
+
                     (typeof onDone == 'function') && onDone();
                 } else {
                     setTimeout(probe, 5);

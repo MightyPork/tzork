@@ -722,6 +722,137 @@ var Utils;
     }
     Utils.objGet = objGet;
 })(Utils || (Utils = {}));
+var tz_def_profile = {
+    "title": "My Tzork",
+    "showTitle": true,
+    "innerImage": "images/bg-earth.jpg",
+    "innerColor": "",
+    "outerImage": "",
+    "outerColor": "",
+    "fgColor": "",
+    "points": [
+        {
+            "name": "@MightyPork",
+            "tz": "Czech Republic",
+            "color": "#FFAD00",
+            "show": true
+        },
+        {
+            "name": "@AntonvonRaumer",
+            "tz": "Germany",
+            "color": "#FF8585",
+            "show": true
+        },
+        {
+            "name": "@ciba43",
+            "tz": "Latvia",
+            "color": "#FE2F77",
+            "show": true
+        },
+        {
+            "name": "@coolsquid_",
+            "tz": "Norway",
+            "color": "#079DE9",
+            "show": true
+        },
+        {
+            "name": "@Creeper32605",
+            "tz": "Denmark",
+            "color": "#C8F080",
+            "show": true
+        },
+        {
+            "name": "@Deli731234",
+            "tz": "USA, Pacific Time",
+            "color": "#A659E2",
+            "show": true
+        },
+        {
+            "name": "@eevblog",
+            "tz": "Australia, Sydney",
+            "color": "#E63E3F",
+            "show": true
+        },
+        {
+            "name": "@elakdawalla",
+            "tz": "USA, Pacific Time",
+            "color": "#C49B6D",
+            "show": true
+        },
+        {
+            "name": "@iamSethD",
+            "tz": "USA, Eastern Time",
+            "color": "#ED2222",
+            "show": true
+        },
+        {
+            "name": "@ImReble548",
+            "tz": "USA, Mountain Time",
+            "color": "#69E79E",
+            "show": true
+        },
+        {
+            "name": "@Jaredlll08",
+            "tz": "South Africa",
+            "color": "#F86752",
+            "show": true
+        },
+        {
+            "name": "@JesperJacoben",
+            "tz": "Denmark",
+            "color": "skyblue",
+            "show": true
+        },
+        {
+            "name": "@lastofavari",
+            "tz": "Belarus",
+            "color": "#05CDC0",
+            "show": true
+        },
+        {
+            "name": "@ljfa2",
+            "tz": "Germany",
+            "color": "#78FCFF",
+            "show": true
+        },
+        {
+            "name": "@Locercus",
+            "tz": "Denmark",
+            "color": "#32CD32",
+            "show": true
+        },
+        {
+            "name": "@Lunatrius",
+            "tz": "Slovenia",
+            "color": "#00CCFF",
+            "show": true
+        },
+        {
+            "name": "@Rafmaninoff",
+            "tz": "Spain",
+            "color": "#00CC00",
+            "show": true
+        },
+        {
+            "name": "@TheBadFame",
+            "tz": "Mexico",
+            "color": "#329AFF",
+            "show": true
+        },
+        {
+            "name": "@Vangoule273",
+            "tz": "United Kingdom",
+            "color": "#00FF2C",
+            "show": true
+        },
+        {
+            "name": "@xTordX",
+            "tz": "Romania",
+            "color": "#AE1AF7",
+            "show": true
+        }
+    ]
+};
 var Tzork;
 (function (Tzork) {
     function stripProfile(p) {
@@ -738,23 +869,20 @@ var Tzork;
     function createEmptyProfile() {
         return {
             title: 'Untitled Profile',
-            showTitle: true,
-            innerImage: 'images/bg-earth.jpg',
+            showTitle: false,
+            innerImage: '',
             innerColor: '',
             outerImage: '',
             outerColor: '',
             fgColor: '',
-            points: [
-                {
-                    name: '@MightyPork',
-                    color: '#FF9A00',
-                    tz: 'Prague',
-                    show: true
-                }
-            ]
+            points: []
         };
     }
     Tzork.createEmptyProfile = createEmptyProfile;
+    function createDefaultProfile() {
+        return JSON.parse(JSON.stringify(tz_def_profile));
+    }
+    Tzork.createDefaultProfile = createDefaultProfile;
     var LocalRepository = (function () {
         function LocalRepository() {
             this.profiles = [];
@@ -775,8 +903,18 @@ var Tzork;
             this.parse(onDone);
         };
         LocalRepository.prototype.parse = function (onDone) {
+            var must_save = false;
             if (this.profiles.length == 0) {
-                this.profiles.push(createEmptyProfile());
+                if (Utils.keyExists(localStorage, 'people')) {
+                    var p = createDefaultProfile();
+                    p.points = JSON.parse(localStorage['people']);
+                    this.profiles.push(p);
+                    delete localStorage['people'];
+                }
+                else {
+                    this.profiles.push(createDefaultProfile());
+                }
+                must_save = true;
             }
             this.activeProfile = Utils.clamp(this.activeProfile, 0, this.profiles.length - 1);
             var loading = 0;
@@ -793,8 +931,12 @@ var Tzork;
                     loading--;
                 });
             });
+            var self = this;
             (function probe() {
                 if (loading == 0) {
+                    if (must_save) {
+                        self.store();
+                    }
                     (typeof onDone == 'function') && onDone();
                 }
                 else {
