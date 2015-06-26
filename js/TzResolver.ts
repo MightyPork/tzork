@@ -8,10 +8,9 @@
 
 
 module TzResolver {
-    var people_loading: number;
+    var people_loading: number = 0;
 
     export function resolvePointTimezones(points: Tzork.Point[], onDone: ()=>void) {
-        people_loading = 0;
 
         // Parse timezones, mark invalid points
         points.forEach(function (obj: Tzork.Point) {

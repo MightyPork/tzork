@@ -11,7 +11,7 @@ module Utils {
 
     /** Clamp an int */
     export function clamp(what: number, low: number, high: number) {
-        return Math.min(low, Math.max(high, what));
+        return Math.max(low, Math.min(high, what));
     }
 
 

@@ -483,9 +483,8 @@ var Ajax;
 })(Ajax || (Ajax = {}));
 var TzResolver;
 (function (TzResolver) {
-    var people_loading;
+    var people_loading = 0;
     function resolvePointTimezones(points, onDone) {
-        people_loading = 0;
         points.forEach(function (obj) {
             obj._valid = true;
             var bad = false;
@@ -608,7 +607,7 @@ if (!Date.now) {
 var Utils;
 (function (Utils) {
     function clamp(what, low, high) {
-        return Math.min(low, Math.max(high, what));
+        return Math.max(low, Math.min(high, what));
     }
     Utils.clamp = clamp;
     function hour2angle(h) {
@@ -1039,6 +1038,7 @@ var Tzork;
 function main() {
     var repo = new Tzork.LocalRepository();
     repo.load(function () {
+        console.log('REPO LOADED');
         Tzork.init(repo);
     });
 }
