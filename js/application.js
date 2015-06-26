@@ -461,6 +461,7 @@ var Ajax;
     function get(url, success, failure) {
         var xhr = new XMLHttpRequest();
         xhr.open('GET', url, true);
+        xhr.timeout = 3000;
         xhr.onreadystatechange = function () {
             if (xhr.readyState == 4) {
                 if (xhr.status >= 200 && xhr.status < 400) {
@@ -484,6 +485,35 @@ var Ajax;
 var TzResolver;
 (function (TzResolver) {
     var people_loading = 0;
+    var _tzcache = null;
+    function getTzFromCache(tz) {
+        if (_tzcache == null) {
+            var hit = localStorage['tz_cache'];
+            if (hit) {
+                try {
+                    _tzcache = JSON.parse(hit);
+                    if (_tzcache === null) {
+                        _tzcache = {};
+                    }
+                }
+                catch (e) {
+                    _tzcache = {};
+                }
+            }
+            else {
+                _tzcache = {};
+            }
+        }
+        if (typeof (_tzcache[tz]) != 'undefined') {
+            console.log('TZ resolved from cache: ' + tz + ' -> ' + _tzcache[tz]);
+            return _tzcache[tz];
+        }
+        return null;
+    }
+    function addTzToCache(tz, _tz) {
+        _tzcache[tz] = _tz;
+        localStorage['tz_cache'] = JSON.stringify(_tzcache);
+    }
     function resolvePointTimezones(points, onDone) {
         points.forEach(function (obj) {
             obj._valid = true;
@@ -516,6 +546,10 @@ var TzResolver;
         if (obj.tz in tz_aliases) {
             obj._tz = tz_aliases[obj.tz];
             console.log('TZ "' + obj.tz + '" resolved as "' + obj._tz + '"');
+        }
+        var fromcache = getTzFromCache(obj.tz);
+        if (fromcache) {
+            obj._tz = fromcache;
         }
         if (moment.tz.zone(obj._tz)) {
             people_loading--;
@@ -578,6 +612,7 @@ var TzResolver;
                 }
                 console.log('Resolved TZ as ' + rj.timeZoneId);
                 obj._tz = rj.timeZoneId;
+                addTzToCache(obj.tz, obj._tz);
                 people_loading--;
             }
             catch (e) {

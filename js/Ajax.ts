@@ -3,6 +3,7 @@ module Ajax {
     export function get(url:string, success?:(string)=>void, failure?:(number)=>void): void {
         var xhr = new XMLHttpRequest();
         xhr.open('GET', url, true);
+        xhr.timeout = 3000;
 
         xhr.onreadystatechange = function () {
             if (xhr.readyState == 4) {

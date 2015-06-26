@@ -17,7 +17,8 @@ The project is open source, contributions are welcome!
 
 - [ ] Option to show 12-hour time
 - [ ] Mark on local time (?)
-- [ ] Cache resolved timezones in `localStorage`, to avoid repeated Google API calls.
+- [x] Cache resolved timezones in `localStorage`, to avoid repeated Google API calls.
+- [ ] Option to disable shadows? (for black on white theme)
 
 ### User interface
 

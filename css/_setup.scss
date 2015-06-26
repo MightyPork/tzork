@@ -1,10 +1,11 @@
 #setup_btn {
+	@include no-select();
+
 	position: absolute;
 	right: 0;
 	top: 0;
 	font-size: 1.2em;
 	padding: .5em;
-	color: $fg;
 
 	opacity: .3;
 

@@ -10,6 +10,44 @@
 module TzResolver {
     var people_loading: number = 0;
 
+    var _tzcache: Object = null;
+
+
+    /** Get timezone from tz cache */
+    function getTzFromCache(tz: string): string {
+        // Try to load tz cache from localStorage
+        if (_tzcache == null) {
+            var hit = localStorage['tz_cache'];
+            if (hit) {
+                try {
+                    _tzcache = JSON.parse(hit);
+                    if (_tzcache === null) {
+                        _tzcache = {};
+                    }
+                } catch (e) {
+                    _tzcache = {};
+                }
+            } else {
+                _tzcache = {};
+            }
+        }
+
+        if (typeof(_tzcache[tz]) != 'undefined') {
+            console.log('TZ resolved from cache: ' + tz + ' -> ' + _tzcache[tz]);
+            return _tzcache[tz];
+        }
+
+        return null;
+    }
+
+
+    /** Add a value to timezone cache & save the cache */
+    function addTzToCache(tz: string, _tz: string) {
+        _tzcache[tz] = _tz;
+        localStorage['tz_cache'] = JSON.stringify(_tzcache);
+    }
+
+    /** Process points and find timezones. Marks nvalid points with _valid = false */
     export function resolvePointTimezones(points: Tzork.Point[], onDone: ()=>void) {
 
         // Parse timezones, mark invalid points
@@ -59,11 +97,18 @@ module TzResolver {
             console.log('TZ "' + obj.tz + '" resolved as "' + obj._tz + '"');
         }
 
+        var fromcache = getTzFromCache(obj.tz);
+        if (fromcache) {
+            obj._tz = fromcache;
+        }
+
         // Check if it's valid for Moment.js
         if (moment.tz.zone(obj._tz)) {
             people_loading--; // valid
             return;
         }
+
+        // Check if it's on cache
 
         // Ask Google what it is
         scheduleGoogleReq(obj);
@@ -146,6 +191,7 @@ module TzResolver {
 
                 console.log('Resolved TZ as ' + rj.timeZoneId);
                 obj._tz = rj.timeZoneId;
+                addTzToCache(obj.tz, obj._tz);
                 people_loading--; // end
 
             } catch (e) {
