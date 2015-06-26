@@ -1,23 +1,15 @@
 // --- mixins ---
 
 @mixin no-select() {
-	-webkit-user-select: none;
-	-moz-user-select: none;
-	-ms-user-select: none;
-	user-select: none;
+	@include user-select(none);
 }
 
 @mixin fix-weird-chrome-flicker() {
-	-webkit-backface-visibility: hidden;
-	-moz-backface-visibility: hidden;
-	backface-visibility: hidden;
+	@include backface-visibility(hidden);
 }
 
 @mixin can-select() {
-	-webkit-user-select: initial;
-	-moz-user-select: initial;
-	-ms-user-select: initial;
-	user-select: initial;
+	@include user-select(initial);
 }
 
 @mixin tab-size($ts) {
@@ -52,10 +44,7 @@
 }
 
 @mixin translate($x, $y) {
-	transform: translate($x, $y);
-	-webkit-transform: translate($x, $y);
-	-moz-transform: translate($x, $y);
-	-o-transform: translate($x, $y);
+	@include transform(translate($x, $y));
 }
 
 $break-tiny: 320px;
