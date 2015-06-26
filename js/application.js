@@ -721,6 +721,21 @@ var Utils;
         return obj[key];
     }
     Utils.objGet = objGet;
+    function fixTextareaTabKey() {
+        var textareas = document.getElementsByTagName('textarea');
+        var count = textareas.length;
+        for (var i = 0; i < count; i++) {
+            textareas[i].onkeydown = function (e) {
+                if (e.keyCode == 9 || e.which == 9) {
+                    e.preventDefault();
+                    var s = this.selectionStart;
+                    this.value = this.value.substring(0, this.selectionStart) + "\t" + this.value.substring(this.selectionEnd);
+                    this.selectionEnd = s + 1;
+                }
+            };
+        }
+    }
+    Utils.fixTextareaTabKey = fixTextareaTabKey;
 })(Utils || (Utils = {}));
 var tz_def_profile = {
     "title": "My Tzork",
@@ -1221,7 +1236,7 @@ var TzorkSetup;
         Tzork.theRepo.profiles.forEach(function (p) {
             clones.push(Tzork.stripProfile(p));
         });
-        ta.value = JSON.stringify(clones, null, '  ');
+        ta.value = JSON.stringify(clones, null, '\t');
         var modal = document.getElementById('setup_dialog');
         modal.style.display = 'block';
         setTimeout(function () {
@@ -1282,6 +1297,7 @@ var Tzork;
         Tzork.theClock = new Tzork.Clock();
         Tzork.theClock.loadActiveProfile();
         document.getElementById('setup_btn').onclick = TzorkSetup.openSetupDialog;
+        Utils.fixTextareaTabKey();
     }
     Tzork.init = init;
 })(Tzork || (Tzork = {}));

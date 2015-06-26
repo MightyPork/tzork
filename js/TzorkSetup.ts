@@ -13,7 +13,7 @@ module TzorkSetup {
             clones.push(Tzork.stripProfile(p));
         });
 
-        ta.value = JSON.stringify(clones, null, '  ');
+        ta.value = JSON.stringify(clones, null, '\t');
 
         var modal = document.getElementById('setup_dialog');
         modal.style.display = 'block';

@@ -1,6 +1,8 @@
 /// <reference path="TzorkData.ts" />
 /// <reference path="TzorkClock.ts" />
 /// <reference path="TzorkSetup.ts" />
+/// <reference path="Utils.ts" />
+
 
 module Tzork {
     export var theClock: Clock;
@@ -15,5 +17,7 @@ module Tzork {
         theClock.loadActiveProfile();
 
         document.getElementById('setup_btn').onclick = TzorkSetup.openSetupDialog;
+
+        Utils.fixTextareaTabKey();
     }
 }
