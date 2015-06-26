@@ -9,12 +9,11 @@
 
 module TzResolver {
     var people_loading: number = 0;
-
     var _tzcache: Object = null;
 
 
     /** Get timezone from tz cache */
-    function getTzFromCache(tz: string): string {
+    function _getTzFromCache(tz: string): string {
         // Try to load tz cache from localStorage
         if (_tzcache == null) {
             var hit = localStorage['tz_cache'];
@@ -37,7 +36,7 @@ module TzResolver {
 
 
     /** Add a value to timezone cache & save the cache */
-    function addTzToCache(tz: string, _tz: string) {
+    function _addTzToCache(tz: string, _tz: string) {
         _tzcache[tz] = _tz;
         localStorage['tz_cache'] = JSON.stringify(_tzcache);
     }
@@ -68,7 +67,7 @@ module TzResolver {
 
             // run async
             people_loading++;
-            resolveTimezone(obj);
+            _resolveTimezone(obj);
         });
 
         (function probe() {
@@ -83,7 +82,7 @@ module TzResolver {
 
 
     /** Work out timezone from a name (country name, timezone name etc) */
-    function resolveTimezone(obj: Tzork.Point) {
+    function _resolveTimezone(obj: Tzork.Point) {
         obj._tz = obj.tz;
 
         // Resolve, if it's alias
@@ -92,7 +91,7 @@ module TzResolver {
             console.log('TZ "' + obj.tz + '" resolved as "' + obj._tz + '"');
         }
 
-        var fromcache = getTzFromCache(obj.tz);
+        var fromcache = _getTzFromCache(obj.tz);
         if (fromcache) {
             obj._tz = fromcache;
         }
@@ -106,30 +105,30 @@ module TzResolver {
         // Check if it's on cache
 
         // Ask Google what it is
-        scheduleGoogleReq(obj);
+        _scheduleGoogleReq(obj);
     }
 
 
     var last_google_call_timestamp: number = 0;
 
     /** Schedule google request, limiting to max allowed request rate */
-    function scheduleGoogleReq(obj: Tzork.Point) {
+    function _scheduleGoogleReq(obj: Tzork.Point) {
         var elapsed = (Date.now() - last_google_call_timestamp);
         var t = Math.max(0, (105 - elapsed)); // max 10/s
 
         if (t == 0) {
             last_google_call_timestamp = Date.now();
-            getTimezoneFromGoogleAPIs(obj);
+            _getTimezoneFromGoogleAPIs(obj);
             return;
         }
 
         setTimeout(function () {
-            scheduleGoogleReq(obj);
+            _scheduleGoogleReq(obj);
         }, t);
     }
 
 
-    function getTimezoneFromGoogleAPIs(obj: Tzork.Point) {
+    function _getTimezoneFromGoogleAPIs(obj: Tzork.Point) {
         var geoURL = "https://maps.googleapis.com/maps/api/geocode/json?sensor=false&address=" + encodeURIComponent(obj.tz);
 
         /** Bad result from ajax call */
@@ -186,7 +185,7 @@ module TzResolver {
 
                 console.log('Resolved TZ as ' + rj.timeZoneId);
                 obj._tz = rj.timeZoneId;
-                addTzToCache(obj.tz, obj._tz);
+                _addTzToCache(obj.tz, obj._tz);
                 people_loading--; // end
 
             } catch (e) {

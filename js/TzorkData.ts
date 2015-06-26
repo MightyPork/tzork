@@ -93,11 +93,10 @@ module Tzork {
 
     /** Repository loaded/saved from/to localStorage */
     export class LocalRepository implements Repository {
-        public profiles: Profile[] = [];
+        profiles: Profile[] = [];
+        activeProfile: number = 0;
 
-        public activeProfile: number = 0;
-
-        public load(onDone?: ()=>void) {
+        load(onDone?: ()=>void) {
             // Load repository
             try {
                 var s = localStorage['repository'];
@@ -114,7 +113,7 @@ module Tzork {
         }
 
 
-        public parse(onDone?: ()=>void) {
+        parse(onDone?: ()=>void) {
             if (this.profiles.length == 0) {
                 this.profiles.push(createEmptyProfile());
             }
@@ -151,7 +150,7 @@ module Tzork {
         }
 
 
-        public store(onDone?: ()=>void) {
+        store(onDone?: ()=>void) {
             // strip profiles one at a time
             var outp = [];
             this.profiles.forEach((pr) => {
@@ -173,6 +172,7 @@ module Tzork {
     export interface ConfigProvider {
         get(key: string, defval: any):any;
         set(key: string, value: any);
+        setIfMissing(key: string, value: any);
     }
 
 
@@ -193,18 +193,24 @@ module Tzork {
             }
         }
 
-        public get(key: string, defval: any): any {
+        get(key: string, defval: any): any {
             this._read();
 
             return Utils.objGet(this.local, key, defval);
         }
 
-        public set(key: string, value: any) {
+        set(key: string, value: any) {
             this._read();
             this.local[key] = value;
 
             // Save
             localStorage['config'] = JSON.stringify(this.local);
+        }
+
+        setIfMissing(key: string, value: any) {
+            if (!Utils.keyExists(this.local, key)) {
+                this.set(key, value);
+            }
         }
     }
 }

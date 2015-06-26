@@ -15,52 +15,47 @@ module Tzork {
         /** Flag that mouse is hovering a list */
         private mouse_on_list: boolean;
 
-        public constructor() {
+        constructor() {
             // init
             this.disc = document.getElementById('disc');
-            this.buildClockMarks();
+            this._buildClockMarks();
 
-            this.updateTime();
-            this.interval_time = setInterval(this.updateTime, 1000);
+            this._updateTime();
+            this.interval_time = setInterval(this._updateTime, 1000);
         }
 
 
-        public loadActiveProfile() {
+        loadActiveProfile() {
             this.clear();
-            this.populate(theRepo.profiles[theRepo.activeProfile])
+            this._populate(theRepo.profiles[theRepo.activeProfile])
         }
 
 
         /** Populate with a profile */
-        private populate(profile: Profile) {
+        private _populate(profile: Profile) {
             console.log('Populate with profile: ', profile);
 
             this.profile = profile;
 
-            this.applyColorsFromProfile();
+            this._applyColorsFromProfile();
 
             var lbl = Utils.queryOne('#profile-label');
             lbl.textContent = profile.title;
             lbl.style.display = profile.showTitle ? 'block' : 'none';
 
 
-            this.updatePoints();
+            this._updatePoints();
 
             // refresh the disc every N seconds
             this.interval_people = setInterval(() => {
-                this.updatePoints()
+                this._updatePoints()
             }, 1000 * 10);
 
             // force refresh after tab gets focused
             window.onfocus = () => {
-                this.updatePoints();
-                this.updateTime();
+                this._updatePoints();
+                this._updateTime();
             };
-
-            var e = document.getElementById('setup_btn');
-            e.addEventListener('click', () => {
-                // this.openSetupDialog(); TODO
-            });
         }
 
 
@@ -76,7 +71,7 @@ module Tzork {
         }
 
 
-        private applyColorsFromProfile() {
+        private _applyColorsFromProfile() {
             var p = this.profile;
 
             var out_i, out_c;
@@ -130,7 +125,11 @@ module Tzork {
 
 
         /** Build the hour numbers */
-        private buildClockMarks() {
+        private _buildClockMarks() {
+
+            // 12h time
+            var twelve = <boolean> theConfig.get('twelve', false);
+
             // The clock marks
             for (var i = 0; i < 24; i++) {
                 // mark div
@@ -142,7 +141,14 @@ module Tzork {
                     mark.classList.add('sixth');
                 }
 
-                mark.textContent = '' + i;
+                // 12h mode
+                if (twelve) {
+                    var j = i;
+                    if (j > 12) j-= 12;
+                    mark.textContent = '' + j;
+                } else {
+                    mark.textContent = '' + i;
+                }
 
                 var angle = Utils.hour2angle(i);
                 Utils.positionAt(mark, angle, 45);
@@ -152,7 +158,7 @@ module Tzork {
 
 
         /** Update the local time display */
-        private updateTime() {
+        private _updateTime() {
             // redraw time, wrap colon in span
             var mmt = moment();
 
@@ -170,7 +176,7 @@ module Tzork {
 
 
         /** Redraw people (actually deletes and re-adds them) */
-        private updatePoints() {
+        private _updatePoints() {
             if (this.mouse_on_list) {
                 console.log('Mouse over list, not redrawing.');
                 return;
@@ -188,12 +194,12 @@ module Tzork {
             }
 
             // Rebuild
-            this.buildPoints();
+            this._buildPoints();
         }
 
 
         /** Build all people labels */
-        private buildPoints() {
+        private _buildPoints() {
             var resolved = [];
 
             // Group people with similar time
@@ -222,13 +228,13 @@ module Tzork {
 
             resolved.forEach((x) => {
                 //console.log('Time ' + x.t + ', people #: ' + x.p.length);
-                this.addPointsAtTime(x.t, x.p);
+                this._addPointsAtTime(x.t, x.p);
             });
         }
 
 
         /** Add a bunch of people at specified time (s) */
-        private addPointsAtTime(secs: number, people: Point[]) {
+        private _addPointsAtTime(secs: number, people: Point[]) {
             var i;
 
             var first = people[0];
@@ -287,7 +293,7 @@ module Tzork {
             // add the people
             for (i = 0; i < people.length; i++) {
                 var peep = people[i];
-                var child = this.createPointLabel(peep);
+                var child = this._createPointLabel(peep);
                 child.title = there.format('H:mm, MMM Do') + ' — ' + peep._tz;
                 list.appendChild(child);
             }
@@ -310,7 +316,7 @@ module Tzork {
 
 
         /** Create person (point) label */
-        private createPointLabel(obj: Point): HTMLElement {
+        private _createPointLabel(obj: Point): HTMLElement {
             var la;
 
             if (obj.name.indexOf('@') === 0) {

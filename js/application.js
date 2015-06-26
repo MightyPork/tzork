@@ -486,7 +486,7 @@ var TzResolver;
 (function (TzResolver) {
     var people_loading = 0;
     var _tzcache = null;
-    function getTzFromCache(tz) {
+    function _getTzFromCache(tz) {
         if (_tzcache == null) {
             var hit = localStorage['tz_cache'];
             if (hit) {
@@ -506,7 +506,7 @@ var TzResolver;
         }
         return Utils.objGet(_tzcache, tz, null);
     }
-    function addTzToCache(tz, _tz) {
+    function _addTzToCache(tz, _tz) {
         _tzcache[tz] = _tz;
         localStorage['tz_cache'] = JSON.stringify(_tzcache);
     }
@@ -526,7 +526,7 @@ var TzResolver;
             }
             Utils.setIfMissing(obj, 'show', true);
             people_loading++;
-            resolveTimezone(obj);
+            _resolveTimezone(obj);
         });
         (function probe() {
             if (people_loading <= 0) {
@@ -537,13 +537,13 @@ var TzResolver;
         })();
     }
     TzResolver.resolvePointTimezones = resolvePointTimezones;
-    function resolveTimezone(obj) {
+    function _resolveTimezone(obj) {
         obj._tz = obj.tz;
         if (obj.tz in tz_aliases) {
             obj._tz = tz_aliases[obj.tz];
             console.log('TZ "' + obj.tz + '" resolved as "' + obj._tz + '"');
         }
-        var fromcache = getTzFromCache(obj.tz);
+        var fromcache = _getTzFromCache(obj.tz);
         if (fromcache) {
             obj._tz = fromcache;
         }
@@ -551,22 +551,22 @@ var TzResolver;
             people_loading--;
             return;
         }
-        scheduleGoogleReq(obj);
+        _scheduleGoogleReq(obj);
     }
     var last_google_call_timestamp = 0;
-    function scheduleGoogleReq(obj) {
+    function _scheduleGoogleReq(obj) {
         var elapsed = (Date.now() - last_google_call_timestamp);
         var t = Math.max(0, (105 - elapsed));
         if (t == 0) {
             last_google_call_timestamp = Date.now();
-            getTimezoneFromGoogleAPIs(obj);
+            _getTimezoneFromGoogleAPIs(obj);
             return;
         }
         setTimeout(function () {
-            scheduleGoogleReq(obj);
+            _scheduleGoogleReq(obj);
         }, t);
     }
-    function getTimezoneFromGoogleAPIs(obj) {
+    function _getTimezoneFromGoogleAPIs(obj) {
         var geoURL = "https://maps.googleapis.com/maps/api/geocode/json?sensor=false&address=" + encodeURIComponent(obj.tz);
         function ajaxFail(resp) {
             console.log('FAIL: code ' + resp);
@@ -608,7 +608,7 @@ var TzResolver;
                 }
                 console.log('Resolved TZ as ' + rj.timeZoneId);
                 obj._tz = rj.timeZoneId;
-                addTzToCache(obj.tz, obj._tz);
+                _addTzToCache(obj.tz, obj._tz);
                 people_loading--;
             }
             catch (e) {
@@ -841,6 +841,11 @@ var Tzork;
             this.local[key] = value;
             localStorage['config'] = JSON.stringify(this.local);
         };
+        LocalConfigProvider.prototype.setIfMissing = function (key, value) {
+            if (!Utils.keyExists(this.local, key)) {
+                this.set(key, value);
+            }
+        };
         return LocalConfigProvider;
     })();
     Tzork.LocalConfigProvider = LocalConfigProvider;
@@ -850,33 +855,30 @@ var Tzork;
     var Clock = (function () {
         function Clock() {
             this.disc = document.getElementById('disc');
-            this.buildClockMarks();
-            this.updateTime();
-            this.interval_time = setInterval(this.updateTime, 1000);
+            this._buildClockMarks();
+            this._updateTime();
+            this.interval_time = setInterval(this._updateTime, 1000);
         }
         Clock.prototype.loadActiveProfile = function () {
             this.clear();
-            this.populate(Tzork.theRepo.profiles[Tzork.theRepo.activeProfile]);
+            this._populate(Tzork.theRepo.profiles[Tzork.theRepo.activeProfile]);
         };
-        Clock.prototype.populate = function (profile) {
+        Clock.prototype._populate = function (profile) {
             var _this = this;
             console.log('Populate with profile: ', profile);
             this.profile = profile;
-            this.applyColorsFromProfile();
+            this._applyColorsFromProfile();
             var lbl = Utils.queryOne('#profile-label');
             lbl.textContent = profile.title;
             lbl.style.display = profile.showTitle ? 'block' : 'none';
-            this.updatePoints();
+            this._updatePoints();
             this.interval_people = setInterval(function () {
-                _this.updatePoints();
+                _this._updatePoints();
             }, 1000 * 10);
             window.onfocus = function () {
-                _this.updatePoints();
-                _this.updateTime();
+                _this._updatePoints();
+                _this._updateTime();
             };
-            var e = document.getElementById('setup_btn');
-            e.addEventListener('click', function () {
-            });
         };
         Clock.prototype.clear = function () {
             var old = document.querySelectorAll('.bullet, .person-label, .people-list');
@@ -885,7 +887,7 @@ var Tzork;
             }
             clearInterval(this.interval_people);
         };
-        Clock.prototype.applyColorsFromProfile = function () {
+        Clock.prototype._applyColorsFromProfile = function () {
             var p = this.profile;
             var out_i, out_c;
             if (p.outerImage != null) {
@@ -927,7 +929,8 @@ var Tzork;
                 e.style.borderColor = color;
             });
         };
-        Clock.prototype.buildClockMarks = function () {
+        Clock.prototype._buildClockMarks = function () {
+            var twelve = Tzork.theConfig.get('twelve', false);
             for (var i = 0; i < 24; i++) {
                 var mark = document.createElement('div');
                 mark.classList.add('mark');
@@ -935,13 +938,21 @@ var Tzork;
                 if (i == 0 || i == 6 || i == 12 || i == 18) {
                     mark.classList.add('sixth');
                 }
-                mark.textContent = '' + i;
+                if (twelve) {
+                    var j = i;
+                    if (j > 12)
+                        j -= 12;
+                    mark.textContent = '' + j;
+                }
+                else {
+                    mark.textContent = '' + i;
+                }
                 var angle = Utils.hour2angle(i);
                 Utils.positionAt(mark, angle, 45);
                 this.disc.appendChild(mark);
             }
         };
-        Clock.prototype.updateTime = function () {
+        Clock.prototype._updateTime = function () {
             var mmt = moment();
             var t = mmt.format('H:mm');
             if (t !== this.last_time) {
@@ -952,7 +963,7 @@ var Tzork;
             var s = (new Date()).getSeconds() % 2;
             document.getElementById('local-time-colon').style.visibility = s ? 'visible' : 'hidden';
         };
-        Clock.prototype.updatePoints = function () {
+        Clock.prototype._updatePoints = function () {
             if (this.mouse_on_list) {
                 console.log('Mouse over list, not redrawing.');
                 return;
@@ -966,9 +977,9 @@ var Tzork;
                     e.parentNode.removeChild(e);
                 }
             }
-            this.buildPoints();
+            this._buildPoints();
         };
-        Clock.prototype.buildPoints = function () {
+        Clock.prototype._buildPoints = function () {
             var _this = this;
             var resolved = [];
             this.profile.points.forEach(function (obj) {
@@ -989,10 +1000,10 @@ var Tzork;
                 }
             });
             resolved.forEach(function (x) {
-                _this.addPointsAtTime(x.t, x.p);
+                _this._addPointsAtTime(x.t, x.p);
             });
         };
-        Clock.prototype.addPointsAtTime = function (secs, people) {
+        Clock.prototype._addPointsAtTime = function (secs, people) {
             var _this = this;
             var i;
             var first = people[0];
@@ -1027,7 +1038,7 @@ var Tzork;
             }
             for (i = 0; i < people.length; i++) {
                 var peep = people[i];
-                var child = this.createPointLabel(peep);
+                var child = this._createPointLabel(peep);
                 child.title = there.format('H:mm, MMM Do') + ' — ' + peep._tz;
                 list.appendChild(child);
             }
@@ -1040,7 +1051,7 @@ var Tzork;
             Utils.positionAt(list, angle, 53.5, octant);
             this.disc.appendChild(list);
         };
-        Clock.prototype.createPointLabel = function (obj) {
+        Clock.prototype._createPointLabel = function (obj) {
             var la;
             if (obj.name.indexOf('@') === 0) {
                 la = document.createElement('a');
