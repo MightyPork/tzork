@@ -8,6 +8,7 @@ $fg: #9cfff7;
 *, *:before, *:after {
 	box-sizing: border-box;
 	font-size: inherit;
+	color: inherit;
 }
 
 html, body {
@@ -29,8 +30,9 @@ html, body {
 	height: 0;
 	padding-bottom: 45%;
 	border-radius: 50%;
-	border: 3px solid $fg;
-	color: $fg;
+	border-width: 3px;
+	border-style: solid; // $fg;
+	//color: $fg;
 
 	box-shadow: 0 0 3px 1px black, inset 0 0 3px 1px black;
 

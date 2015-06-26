@@ -667,6 +667,18 @@ var Utils;
         return 0;
     }
     Utils.mmtDayCompare = mmtDayCompare;
+    function iterateQuery(query, func) {
+        var outers = document.querySelectorAll(query);
+        for (var i = 0; i < outers.length; i++) {
+            var e = outers[i];
+            func(e);
+        }
+    }
+    Utils.iterateQuery = iterateQuery;
+    function queryOne(query) {
+        return document.querySelector(query);
+    }
+    Utils.queryOne = queryOne;
 })(Utils || (Utils = {}));
 var Tzork;
 (function (Tzork) {
@@ -801,36 +813,46 @@ var Tzork;
             clearInterval(this.interval_people);
         };
         Clock.prototype.applyColorsFromProfile = function () {
-            var outer = document.getElementById('tzork-bg');
-            var inner = this.disc;
             var p = this.profile;
+            var out_i, out_c;
             if (p.outerImage != null) {
-                outer.style.backgroundImage = 'url(\"' + p.outerImage + '\")';
+                out_i = 'url(\"' + p.outerImage + '\")';
             }
             else {
-                outer.style.backgroundImage = 'none';
-            }
-            if (p.innerImage != null) {
-                inner.style.backgroundImage = 'url(\"' + p.innerImage + '\")';
-            }
-            else {
-                inner.style.backgroundImage = 'none';
+                out_i = 'none';
             }
             if (p.outerColor != null) {
-                outer.style.backgroundColor = p.outerColor;
+                out_c = p.outerColor;
             }
             else {
-                outer.style.backgroundColor = '#07151D';
+                out_c = '#07151D';
+            }
+            Utils.iterateQuery('.theme-outer', function (e) {
+                e.style.backgroundColor = out_c;
+                e.style.backgroundImage = out_i;
+            });
+            var in_c, in_i;
+            if (p.innerImage != null) {
+                in_i = 'url(\"' + p.innerImage + '\")';
+            }
+            else {
+                in_i = 'none';
             }
             if (p.innerColor != null) {
-                inner.style.backgroundColor = p.innerColor;
+                in_c = p.innerColor;
             }
             else {
-                inner.style.backgroundColor = 'transparent';
+                in_c = 'transparent';
             }
+            Utils.iterateQuery('.theme-inner', function (e) {
+                e.style.backgroundColor = in_c;
+                e.style.backgroundImage = in_i;
+            });
             var color = p.fgColor || '#9cfff7';
-            this.disc.style.borderColor = color;
-            this.disc.style.color = color;
+            Utils.iterateQuery('.theme-fg', function (e) {
+                e.style.color = color;
+                e.style.borderColor = color;
+            });
         };
         Clock.prototype.buildClockMarks = function () {
             for (var i = 0; i < 24; i++) {

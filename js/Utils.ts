@@ -98,4 +98,17 @@ module Utils {
 
         return 0;
     }
+
+
+    export function iterateQuery(query: string, func: (HTMLNode)=>void):void {
+        var outers = document.querySelectorAll(query);
+        for (var i = 0; i < outers.length; i++) {
+            var e = <HTMLElement> outers[i];
+            func(e);
+        }
+    }
+
+    export function queryOne(query: string): HTMLElement {
+        return <HTMLElement> document.querySelector(query);
+    }
 }

@@ -72,44 +72,55 @@ module Tzork {
 
 
         private applyColorsFromProfile() {
-            var outer = document.getElementById('tzork-bg');
-            var inner = this.disc;
-
             var p = this.profile;
 
-            // Apply bg image
+            var out_i, out_c;
+
             if (p.outerImage != null) {
-                outer.style.backgroundImage = 'url(\"' + p.outerImage + '\")';
+                out_i = 'url(\"' + p.outerImage + '\")';
             } else {
-                outer.style.backgroundImage = 'none';
+                out_i = 'none';
             }
+
+            if (p.outerColor != null) {
+                out_c = p.outerColor;
+            } else {
+                out_c = '#07151D';
+            }
+
+            Utils.iterateQuery('.theme-outer', (e) => {
+                e.style.backgroundColor = out_c;
+                e.style.backgroundImage = out_i;
+            });
+
+            var in_c, in_i;
 
             // Apply inner image
             if (p.innerImage != null) {
-                inner.style.backgroundImage = 'url(\"' + p.innerImage + '\")';
+                in_i = 'url(\"' + p.innerImage + '\")';
             } else {
-                inner.style.backgroundImage = 'none';
-            }
-
-            // Apply bg color
-            if (p.outerColor != null) {
-                outer.style.backgroundColor = p.outerColor;
-            } else {
-                outer.style.backgroundColor = '#07151D';
+                in_i = 'none';
             }
 
             // Apply bg color
             if (p.innerColor != null) {
-                inner.style.backgroundColor = p.innerColor;
+                in_c = p.innerColor;
             } else {
-                inner.style.backgroundColor = 'transparent';
+                in_c = 'transparent';
             }
 
+            Utils.iterateQuery('.theme-inner', (e) => {
+                e.style.backgroundColor = in_c;
+                e.style.backgroundImage = in_i;
+            });
+
+            // text color, border color
             var color = p.fgColor || '#9cfff7';
 
-            // Set color of ring (and marks and time)
-            this.disc.style.borderColor = color;
-            this.disc.style.color = color;
+            Utils.iterateQuery('.theme-fg', (e) => {
+                e.style.color = color;
+                e.style.borderColor = color;
+            });
         }
 
 
