@@ -42,7 +42,7 @@ module TzorkSetup {
                     var ta = <HTMLTextAreaElement> document.getElementById('people_json');
                     var pp = JSON.parse(ta.value);
 
-                    // FIXME
+                    // TODO check validity...
 
                     //pp.forEach(function (obj) {
                     //    if (typeof obj.name == 'undefined') {
@@ -58,10 +58,12 @@ module TzorkSetup {
                     //    }
                     //});
 
-
-                    localStorage['people'] = JSON.stringify(pp);
-                    Tzork.theClock.loadActiveProfile();
-                    hideSetupModal();
+                    Tzork.theRepo.profiles = pp;
+                    Tzork.theRepo.parse(()=>{
+                        Tzork.theClock.loadActiveProfile();
+                        Tzork.theRepo.store();
+                        hideSetupModal();
+                    });
                 } catch (e) {
                     var er = document.getElementById('people_error');
 

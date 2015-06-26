@@ -682,10 +682,10 @@ var Tzork;
         return p;
     }
     Tzork.stripProfile = stripProfile;
-    function createDefaultProfile() {
+    function createEmptyProfile() {
         return {
             title: 'Untitled Profile',
-            innerImage: 'images/earth-from-space-small.jpg',
+            innerImage: 'images/bg-earth.jpg',
             innerColor: '',
             outerImage: '',
             outerColor: '',
@@ -700,6 +700,7 @@ var Tzork;
             ]
         };
     }
+    Tzork.createEmptyProfile = createEmptyProfile;
     var LocalRepository = (function () {
         function LocalRepository() {
             this.profiles = [];
@@ -728,7 +729,7 @@ var Tzork;
         };
         LocalRepository.prototype.parse = function (onDone) {
             if (this.profiles.length == 0) {
-                this.profiles.push(createDefaultProfile());
+                this.profiles.push(createEmptyProfile());
             }
             this.activeProfile = Utils.clamp(this.activeProfile, 0, this.profiles.length - 1);
             var loading = 0;
@@ -990,9 +991,12 @@ var TzorkSetup;
                 try {
                     var ta = document.getElementById('people_json');
                     var pp = JSON.parse(ta.value);
-                    localStorage['people'] = JSON.stringify(pp);
-                    Tzork.theClock.loadActiveProfile();
-                    hideSetupModal();
+                    Tzork.theRepo.profiles = pp;
+                    Tzork.theRepo.parse(function () {
+                        Tzork.theClock.loadActiveProfile();
+                        Tzork.theRepo.store();
+                        hideSetupModal();
+                    });
                 }
                 catch (e) {
                     var er = document.getElementById('people_error');

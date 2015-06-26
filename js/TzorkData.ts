@@ -52,10 +52,10 @@ module Tzork {
 
 
     /** Create default profile (if there's none in the repository) */
-    function createDefaultProfile(): Profile {
+    export function createEmptyProfile(): Profile {
         return <Profile>{
             title: 'Untitled Profile',
-            innerImage: 'images/earth-from-space-small.jpg',
+            innerImage: 'images/bg-earth.jpg',
             innerColor: '',
             outerImage: '',
             outerColor: '',
@@ -123,7 +123,7 @@ module Tzork {
 
         public parse(onDone?: ()=>void) {
             if (this.profiles.length == 0) {
-                this.profiles.push(createDefaultProfile());
+                this.profiles.push(createEmptyProfile());
             }
 
             this.activeProfile = Utils.clamp(this.activeProfile, 0, this.profiles.length - 1);
