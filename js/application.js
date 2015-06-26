@@ -498,6 +498,9 @@ var TzResolver;
                 obj._valid = false;
                 return;
             }
+            if (typeof (obj.show) == 'undefined') {
+                obj.show = true;
+            }
             people_loading++;
             resolveTimezone(obj);
         });
@@ -696,6 +699,7 @@ var Tzork;
     function createEmptyProfile() {
         return {
             title: 'Untitled Profile',
+            showTitle: true,
             innerImage: 'images/bg-earth.jpg',
             innerColor: '',
             outerImage: '',
@@ -748,6 +752,9 @@ var Tzork;
                 if (typeof p.points == 'undefined') {
                     p.points = [];
                 }
+                if (typeof p.showTitle == 'undefined') {
+                    p.showTitle = true;
+                }
                 loading++;
                 TzResolver.resolvePointTimezones(p.points, function () {
                     loading--;
@@ -793,6 +800,9 @@ var Tzork;
             console.log('Populate with profile: ', profile);
             this.profile = profile;
             this.applyColorsFromProfile();
+            var lbl = Utils.queryOne('#profile-label');
+            lbl.textContent = profile.title;
+            lbl.style.display = profile.showTitle ? 'block' : 'none';
             this.updatePoints();
             this.interval_people = setInterval(function () {
                 _this.updatePoints();
@@ -874,10 +884,10 @@ var Tzork;
             if (t !== this.last_time) {
                 this.last_time = t;
                 var parts = t.split(':');
-                document.getElementById('localtime').innerHTML = parts[0] + '<span id="loctimecolon">:</span>' + parts[1];
+                document.getElementById('local-time').innerHTML = parts[0] + '<span id="local-time-colon">:</span>' + parts[1];
             }
             var s = (new Date()).getSeconds() % 2;
-            document.getElementById('loctimecolon').style.visibility = s ? 'visible' : 'hidden';
+            document.getElementById('local-time-colon').style.visibility = s ? 'visible' : 'hidden';
         };
         Clock.prototype.updatePoints = function () {
             if (this.mouse_on_list) {

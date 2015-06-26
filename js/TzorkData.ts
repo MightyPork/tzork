@@ -19,6 +19,7 @@ module Tzork {
     /** Tzork profile - settings and geo points */
     export interface Profile {
         title:string;
+        showTitle:boolean;
 
         innerColor:string;
         innerImage:string;
@@ -55,6 +56,7 @@ module Tzork {
     export function createEmptyProfile(): Profile {
         return <Profile>{
             title: 'Untitled Profile',
+            showTitle: true,
             innerImage: 'images/bg-earth.jpg',
             innerColor: '',
             outerImage: '',
@@ -135,6 +137,12 @@ module Tzork {
                 if (typeof p.points == 'undefined') {
                     p.points = [];
                 }
+
+                if (typeof p.showTitle == 'undefined') {
+                    p.showTitle = true;
+                }
+
+                // TODO other properties - undefined -> default
 
                 loading++;
                 TzResolver.resolvePointTimezones(p.points, ()=> {

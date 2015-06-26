@@ -30,6 +30,11 @@ module TzResolver {
                 return;
             }
 
+            // add missisng "show" attribute
+            if (typeof(obj.show) == 'undefined') {
+                obj.show = true;
+            }
+
             // run async
             people_loading++;
             resolveTimezone(obj);

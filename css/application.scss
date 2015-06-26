@@ -77,10 +77,10 @@ html, body {
 	}
 
 	@include respond-to(small) {
-		font-size: 0.7em;
+		font-size: 1.2em;
 
 		&.sixth {
-			font-size: 0.9em;
+			font-size: 1.4em;
 		}
 	}
 
@@ -234,7 +234,9 @@ html, body {
 	}
 }
 
-#localtime {
+// ------ TEXT INSIDE THE CLOCK ------
+
+#time-box {
 	@include naked();
 
 	cursor: default;
@@ -242,19 +244,41 @@ html, body {
 	position: absolute;
 	left: 50%; top: 50%;
 	transform: translate(-50%, -50%);
+
 	text-align: center;
+}
+
+#profile-label {
+	font-size: 1.6em;
+	text-shadow: 0 0 8px black, 0 0 4px black;
+
+	@include respond-to(tiny) {
+		font-size: .6em;
+	}
+
+	@include respond-to(small) {
+		font-size: 1.1em;
+	}
+
+	@include respond-to(medium) {
+		font-size: 1.5em;
+	}
+}
+
+#local-time {
 	font-size: 6em;
+	line-height: 1;
 
 	@include respond-to(tiny) {
 		font-size: 1.2em;
 	}
 
 	@include respond-to(small) {
-		font-size: 2em;
+		font-size: 3em;
 	}
 
 	@include respond-to(medium) {
-		font-size: 3.5em;
+		font-size: 5em;
 	}
 
 	text-shadow: 0 0 8px black, 0 0 4px black;

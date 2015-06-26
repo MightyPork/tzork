@@ -39,6 +39,11 @@ module Tzork {
 
             this.applyColorsFromProfile();
 
+            var lbl = Utils.queryOne('#profile-label');
+            lbl.textContent = profile.title;
+            lbl.style.display = profile.showTitle ? 'block' : 'none';
+
+
             this.updatePoints();
 
             // refresh the disc every N seconds
@@ -156,11 +161,11 @@ module Tzork {
                 this.last_time = t;
                 // need zero-padded minutes!
                 var parts = t.split(':');
-                document.getElementById('localtime').innerHTML = parts[0] + '<span id="loctimecolon">:</span>' + parts[1];
+                document.getElementById('local-time').innerHTML = parts[0] + '<span id="local-time-colon">:</span>' + parts[1];
             }
 
             var s = (new Date()).getSeconds() % 2;
-            document.getElementById('loctimecolon').style.visibility = s ? 'visible' : 'hidden';
+            document.getElementById('local-time-colon').style.visibility = s ? 'visible' : 'hidden';
         }
 
 

@@ -37,6 +37,7 @@
 		<div>
 			<div class="Title">Your Tzork configuration</div>
 			<textarea id="people_json" spellcheck="false"></textarea>
+
 			<div class="Error" id="people_error"></div>
 			<div class="Buttons">
 				<a href="#" class="button red" onClick="TzorkSetup.submitPeopleEdit('close'); return false;">Discard Changes</a><!--
@@ -49,7 +50,10 @@
 <div id="setup_btn">Configure</div>
 
 <div id="disc" class="theme-inner">
-	<div id="localtime"></div>
+	<div id="time-box">
+		<div id="local-time"></div>
+		<div id="profile-label">Tzork</div>
+	</div>
 </div>
 
 </body>
