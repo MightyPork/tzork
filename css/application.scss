@@ -1,6 +1,6 @@
 @import "mixins";
 
-$bg: #07151D; //#0a2223
+$bg: #07151D;
 $fg: #9cfff7;
 
 // --- reset ---
@@ -16,7 +16,6 @@ html, body {
 	margin: 0; padding: 0;
 	width: 100%; height: 100%;
 	font-size: 1em;
-
 	@include basefont();
 }
 
@@ -25,7 +24,7 @@ html, body {
 	cursor: default;
 	position: absolute;
 	left: 50%; top: 50%;
-	transform: translate(-50%, -50%);
+	@include translate(-50%, -50%);
 	width: 45%;
 	height: 0;
 	padding-bottom: 45%;
@@ -33,12 +32,10 @@ html, body {
 	border-width: 3px;
 	border-style: solid; // $fg;
 	//color: $fg;
-
 	box-shadow: 0 0 3px 1px black, inset 0 0 3px 1px black;
 
 	//background-image: url("../images/earth-from-space-small.jpg");
 	background-size: cover;
-
 
 	@include respond-to(tiny) {
 		border-width: 1px;
@@ -57,11 +54,10 @@ html, body {
 
 .mark {
 	position: absolute;
-	transform: translate(-50%, -50%);
+	@include translate(-50%, -50%);
 	font-family: monospace;
 	font-size: 2em;
-
-	text-shadow: 0 0 3px black,0 0 4px black,0 0 6px black;
+	text-shadow: 0 0 3px black, 0 0 4px black, 0 0 6px black;
 
 	&.sixth {
 		font-weight: bold;
@@ -96,13 +92,9 @@ html, body {
 // Offsets for people lists, so they look aligned with the dots
 @mixin plist-em-offset($lineheight) {
 	font-size: $lineheight;
-
 	$lh: $lineheight*1.4;
-
 	line-height: $lh;
-
 	$padding_ratio: 0.2;
-
 	height: $lh;
 	padding: 0 $lh * $padding_ratio;
 	border-radius: 5px;
@@ -131,31 +123,30 @@ html, body {
 
 	&.oct1,
 	&.oct2 {
-		transform: translate(0, -0.8*$lh);
+		@include translate(0, -0.8*$lh);
 	}
 
 	&.oct7 {
-		transform: translate(0, -0.5*$lh);
+		@include translate(0, -0.5*$lh);
 	}
 
 	&.oct0 {
-		transform: translate(0, -0.5*$lh);
+		@include translate(0, -0.5*$lh);
 	}
 
 	&.oct3 {
-		transform: translate(0, -0.5*$lh);
+		@include translate(0, -0.5*$lh);
 	}
 
 	&.oct4 {
-		transform: translate(0, -0.5*$lh);
+		@include translate(0, -0.5*$lh);
 	}
 
 	&.oct5,
 	&.oct6 {
-		transform: translate(0, 0.8*$lh);
+		@include translate(0, 0.8*$lh);
 	}
 }
-
 
 .person-label {
 	display: block;
@@ -170,19 +161,15 @@ html, body {
 	}
 }
 
-
 .people-list {
 	@include nowrap();
 	@include can-select();
 	@include basefont();
-
 	display: block;
 	position: absolute;
 	text-decoration: none;
-
 	@include plist-em-offset(1.2em);
 	overflow: hidden;
-
 	text-shadow: 0 0 2px black, 0 0 3px black;
 
 	@include respond-to(tiny) {
@@ -201,7 +188,6 @@ html, body {
 .bullet {
 	position: absolute;
 	cursor: default;
-
 	$w: 1em;
 	width: $w;
 	height: $w;
@@ -222,7 +208,7 @@ html, body {
 	}
 
 	border-radius: 50%;
-	transform: translate(-50%, -50%);
+	@include translate(-50%, -50%);
 	border: 1px solid black;
 
 	&.day-prev {
@@ -238,13 +224,10 @@ html, body {
 
 #time-box {
 	@include naked();
-
 	cursor: default;
-
 	position: absolute;
 	left: 50%; top: 50%;
-	transform: translate(-50%, -50%);
-
+	@include translate(-50%, -50%);
 	text-align: center;
 }
 
