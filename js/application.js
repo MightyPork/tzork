@@ -504,11 +504,7 @@ var TzResolver;
                 _tzcache = {};
             }
         }
-        if (typeof (_tzcache[tz]) != 'undefined') {
-            console.log('TZ resolved from cache: ' + tz + ' -> ' + _tzcache[tz]);
-            return _tzcache[tz];
-        }
-        return null;
+        return Utils.objGet(_tzcache, tz, null);
     }
     function addTzToCache(tz, _tz) {
         _tzcache[tz] = _tz;
@@ -519,7 +515,7 @@ var TzResolver;
             obj._valid = true;
             var bad = false;
             ['name', 'color', 'tz'].forEach(function (e) {
-                if (typeof (obj[e]) == 'undefined') {
+                if (!Utils.keyExists(obj, e)) {
                     console.error('Missing "' + e + '" field in point object', obj);
                     bad = true;
                 }
@@ -710,11 +706,21 @@ var Utils;
     }
     Utils.queryOne = queryOne;
     function setIfMissing(obj, key, value) {
-        if (typeof (obj[key]) == 'undefined') {
+        if (!keyExists(obj, key)) {
             obj[key] = value;
         }
     }
     Utils.setIfMissing = setIfMissing;
+    function keyExists(x, key) {
+        return typeof (x[key]) != 'undefined';
+    }
+    Utils.keyExists = keyExists;
+    function objGet(obj, key, def) {
+        if (!keyExists(obj, key))
+            return def;
+        return obj[key];
+    }
+    Utils.objGet = objGet;
 })(Utils || (Utils = {}));
 var Tzork;
 (function (Tzork) {
@@ -810,6 +816,34 @@ var Tzork;
         return LocalRepository;
     })();
     Tzork.LocalRepository = LocalRepository;
+    var LocalConfigProvider = (function () {
+        function LocalConfigProvider() {
+            this.local = null;
+        }
+        LocalConfigProvider.prototype._read = function () {
+            if (!this.local) {
+                try {
+                    var t = localStorage['config'];
+                    var j = JSON.parse(t);
+                    this.local = j || {};
+                }
+                catch (e) {
+                    this.local = {};
+                }
+            }
+        };
+        LocalConfigProvider.prototype.get = function (key, defval) {
+            this._read();
+            return Utils.objGet(this.local, key, defval);
+        };
+        LocalConfigProvider.prototype.set = function (key, value) {
+            this._read();
+            this.local[key] = value;
+            localStorage['config'] = JSON.stringify(this.local);
+        };
+        return LocalConfigProvider;
+    })();
+    Tzork.LocalConfigProvider = LocalConfigProvider;
 })(Tzork || (Tzork = {}));
 var Tzork;
 (function (Tzork) {
@@ -1088,8 +1122,10 @@ var Tzork;
 (function (Tzork) {
     Tzork.theClock;
     Tzork.theRepo;
-    function init(repo) {
+    Tzork.theConfig;
+    function init(repo, conf) {
         Tzork.theRepo = repo;
+        Tzork.theConfig = conf;
         Tzork.theClock = new Tzork.Clock();
         Tzork.theClock.loadActiveProfile();
         document.getElementById('setup_btn').onclick = TzorkSetup.openSetupDialog;
@@ -1098,9 +1134,9 @@ var Tzork;
 })(Tzork || (Tzork = {}));
 function main() {
     var repo = new Tzork.LocalRepository();
+    var conf = new Tzork.LocalConfigProvider();
     repo.load(function () {
-        console.log('REPO LOADED');
-        Tzork.init(repo);
+        Tzork.init(repo, conf);
     });
 }
 //# sourceMappingURL=application.js.map

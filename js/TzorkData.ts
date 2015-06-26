@@ -81,13 +81,13 @@ module Tzork {
         activeProfile: number;
 
         /** Load & parse profiles and prepare repository for use */
-        load(onDone?: ()=>void): void;
+        load(onDone?: () => void): void;
 
         /** Parse profiles array. Automatically called by load()! */
-        parse(onDone?: ()=>void): void;
+        parse(onDone?: () => void): void;
 
         /** Persist current state */
-        store(onDone?: ()=>void): void;
+        store(onDone?: () => void): void;
     }
 
 
@@ -165,6 +165,46 @@ module Tzork {
             });
 
             (typeof onDone == 'function') && onDone();
+        }
+    }
+
+
+    /** Config store */
+    export interface ConfigProvider {
+        get(key: string, defval: any):any;
+        set(key: string, value: any);
+    }
+
+
+    /** Config provider from localStorage */
+    export class LocalConfigProvider implements ConfigProvider {
+
+        private local: Object = null;
+
+        private _read() {
+            if (!this.local) {
+                try {
+                    var t = localStorage['config'];
+                    var j = JSON.parse(t);
+                    this.local = j || {};
+                } catch (e) {
+                    this.local = {};
+                }
+            }
+        }
+
+        public get(key: string, defval: any): any {
+            this._read();
+
+            return Utils.objGet(this.local, key, defval);
+        }
+
+        public set(key: string, value: any) {
+            this._read();
+            this.local[key] = value;
+
+            // Save
+            localStorage['config'] = JSON.stringify(this.local);
         }
     }
 }

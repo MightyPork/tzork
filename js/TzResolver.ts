@@ -32,12 +32,7 @@ module TzResolver {
             }
         }
 
-        if (typeof(_tzcache[tz]) != 'undefined') {
-            console.log('TZ resolved from cache: ' + tz + ' -> ' + _tzcache[tz]);
-            return _tzcache[tz];
-        }
-
-        return null;
+        return Utils.objGet(_tzcache, tz, null);
     }
 
 
@@ -57,7 +52,7 @@ module TzResolver {
             // check if all required fields are present
             var bad = false;
             ['name', 'color', 'tz'].forEach(function (e) {
-                if (typeof(obj[e]) == 'undefined') {
+                if (!Utils.keyExists(obj, e)) {
                     console.error('Missing "' + e + '" field in point object', obj);
                     bad = true;
                 }

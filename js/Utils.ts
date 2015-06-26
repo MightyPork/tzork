@@ -113,8 +113,17 @@ module Utils {
     }
 
     export function setIfMissing(obj: Object, key: string, value: any) {
-        if (typeof(obj[key]) == 'undefined') {
+        if (!keyExists(obj, key)) {
             obj[key] = value;
         }
+    }
+
+    export function keyExists(x: Object, key: string) {
+        return typeof(x[key]) != 'undefined';
+    }
+
+    export function objGet(obj: Object, key: string, def: any) {
+        if (!keyExists(obj, key)) return def;
+        return obj[key];
     }
 }
