@@ -1305,8 +1305,18 @@ var Tzork;
         var resizeClock = function () {
             var w = window.innerWidth;
             var h = window.innerHeight;
-            w -= 180 * 2;
-            h -= 60 * 2;
+            if (w < 450) {
+                w -= 135 * 2;
+                h -= 30 * 2;
+            }
+            else if (w < 750) {
+                w -= 160 * 2;
+                h -= 40 * 2;
+            }
+            else {
+                w -= 180 * 2;
+                h -= 60 * 2;
+            }
             var s = Math.min(w, h);
             Tzork.theClock.setDiskSize(s);
         };
