@@ -30,15 +30,20 @@ body {
 	// centering
 	cursor: default;
 	position: absolute;
+
 	left: 50%; top: 50%;
 	@include translate(-50%, -50%);
-	width: 45%;
-	height: 0;
-	padding-bottom: 45%;
+
+	//width: 45%;
+	//height: 0;
+	//padding-bottom: 45%;
+
 	border-radius: 50%;
 	border-width: 3px;
 	border-style: solid; // $fg;
+
 	//color: $fg;
+
 	box-shadow: 0 0 3px 1px black, inset 0 0 3px 1px black;
 
 	//background-image: url("../images/earth-from-space-small.jpg");

@@ -1016,6 +1016,10 @@ var Tzork;
             this._updateTime();
             this.interval_time = setInterval(this._updateTime, 1000);
         }
+        Clock.prototype.setDiskSize = function (size) {
+            this.disc.style.width = size + "px";
+            this.disc.style.height = size + "px";
+        };
         Clock.prototype.loadActiveProfile = function () {
             this.clear();
             this._populate(Tzork.theRepo.profiles[Tzork.theRepo.activeProfile]);
@@ -1298,6 +1302,16 @@ var Tzork;
         Tzork.theClock.loadActiveProfile();
         document.getElementById('setup_btn').onclick = TzorkSetup.openSetupDialog;
         Utils.fixTextareaTabKey();
+        var resizeClock = function () {
+            var w = window.innerWidth;
+            var h = window.innerHeight;
+            w -= 180 * 2;
+            h -= 60 * 2;
+            var s = Math.min(w, h);
+            Tzork.theClock.setDiskSize(s);
+        };
+        window.onresize = resizeClock;
+        resizeClock();
     }
     Tzork.init = init;
 })(Tzork || (Tzork = {}));

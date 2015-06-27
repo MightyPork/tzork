@@ -25,6 +25,12 @@ module Tzork {
         }
 
 
+        setDiskSize(size: number) {
+            this.disc.style.width = size+"px";
+            this.disc.style.height = size+"px";
+        }
+
+
         loadActiveProfile() {
             this.clear();
             this._populate(theRepo.profiles[theRepo.activeProfile])

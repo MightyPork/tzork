@@ -19,5 +19,22 @@ module Tzork {
         document.getElementById('setup_btn').onclick = TzorkSetup.openSetupDialog;
 
         Utils.fixTextareaTabKey();
+
+        var resizeClock = function () {
+
+            var w = window.innerWidth;
+            var h = window.innerHeight;
+
+            // subtract expected size of labels (?) a guess
+            w -= 180*2;
+            h -= 60*2;
+
+            var s = Math.min(w,h);
+            Tzork.theClock.setDiskSize(s);
+        };
+
+        window.onresize = resizeClock;
+
+        resizeClock();
     }
 }
