@@ -18,6 +18,28 @@ module Tzork {
 		});
 
 		TzorkSetup.buildProfilesMenu();
+
+		var b = document.getElementById('btn-new-profile');
+		b.addEventListener('click', (e) => {
+			var name = prompt('New profile name?', 'New Profile');
+
+			if (name == null) {
+				// Canceled
+				return;
+			}
+
+			var prof = createEmptyProfile();
+			prof.title = name;
+
+			Tzork.theRepo.profiles.push(prof);
+
+			Tzork.theRepo.parse(()=> {
+				Tzork.theRepo.activeProfile = Tzork.theRepo.profiles.length-1;
+				Tzork.theClock.loadActiveProfile();
+				Tzork.theRepo.store();
+				TzorkSetup.buildProfilesMenu();
+			})
+		});
 	}
 
 

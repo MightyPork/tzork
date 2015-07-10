@@ -43,8 +43,9 @@
 
 			<div class="Error" id="people_error"></div>
 			<div class="Buttons">
-				<a href="#" class="button red" onClick="TzorkSetup.submitPeopleEdit('close'); return false;">Discard Changes</a><!--
-				--><a href="#" class="button green" onClick="TzorkSetup.submitPeopleEdit('save'); return false;">Apply & Save</a>
+				<a href="#" class="button red icon-profile-delete" onClick="TzorkSetup.submitPeopleEdit('delete'); return false;">Destroy</a>
+				<a href="#" class="button orange icon-cancel" onClick="TzorkSetup.submitPeopleEdit('close'); return false;">Cancel Edit</a><!--
+				--><a href="#" class="button green icon-save" onClick="TzorkSetup.submitPeopleEdit('save'); return false;">Apply & Save</a>
 			</div>
 		</div>
 	</div>
@@ -52,12 +53,11 @@
 
 <nav id="menubar">
 	<a id="menu-btn-edit" class="icon-edit"></a>
-	<a id="menu-btn-profile-delete" class="icon-profile-delete"></a>
 	<a id="menu-btn-profiles" class="icon-profile"></a>
 	<div id="profiles-dropdown" class="profiles-menu gone">
 		<div id="profiles-dropdown-proflist">
 		</div>
-		<a class="icon-profile-add">New profile</a>
+		<a class="icon-profile-add" id="btn-new-profile">New profile</a>
 	</div>
 </nav>
 

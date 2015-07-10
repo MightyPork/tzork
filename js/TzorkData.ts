@@ -4,7 +4,6 @@
 
 
 module Tzork {
-
     /** Geo point */
     export interface Point {
         name:string;
@@ -29,6 +28,9 @@ module Tzork {
         outerImage:string;
 
         fgColor:string;
+
+		labelShadows?:boolean;
+		labelHoverBg?:string;
 
         points:Point[];
 
@@ -56,14 +58,23 @@ module Tzork {
     /** Create empty profile */
     export function createEmptyProfile(): Profile {
         return <Profile>{
-            title: 'Untitled Profile',
-            showTitle: false,
-            innerImage: '',
+            title: 'Tzork Profile',
+            showTitle: true,
+            innerImage: 'images/bg-earth.jpg',
             innerColor: '',
             outerImage: '',
-            outerColor: '',
+            outerColor: '#0B1A2E',
             fgColor: '',
-            points: []
+			labelShadows: true,
+			labelHoverBg: null, // nothing -> use default
+            points: [
+				{
+					name: '@MightyPork',
+					tz: 'Europe/Prague',
+					color: 'orange',
+					show: true
+				}
+			]
         };
     }
 
@@ -152,6 +163,8 @@ module Tzork {
                 Utils.setIfMissing(p, 'outerImage', '');
                 Utils.setIfMissing(p, 'outerColor', '');
                 Utils.setIfMissing(p, 'fgColor', '');
+				Utils.setIfMissing(p, 'labelShadows', true);
+				Utils.setIfMissing(p, 'labelHoverBg', '');
 
                 loading++;
                 TzResolver.resolvePointTimezones(p.points, () => {

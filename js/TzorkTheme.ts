@@ -11,24 +11,32 @@ module Tzork {
 
 		var css = '';
 
-		var p = theRepo.profiles[theRepo.activeProfile];
+		var prof = theRepo.profiles[theRepo.activeProfile];
 
 		var out_i, out_c;
-		out_i = p.outerImage ? 'url(\"' + p.outerImage + '\")' : 'none';
-		out_c = p.outerColor || '#07151D';
+		out_i = prof.outerImage ? 'url(\"' + prof.outerImage + '\")' : 'none';
+		out_c = prof.outerColor || '#07151D';
 
 		css += '.theme-outer {background-color: ' + out_c + '; background-image: ' + out_i + '}';
 
 		var in_c, in_i;
-		in_i = p.innerImage ? 'url(\"' + p.innerImage + '\")' : 'none';
-		in_c = p.innerColor || 'transparent';
+		in_i = prof.innerImage ? 'url(\"' + prof.innerImage + '\")' : 'none';
+		in_c = prof.innerColor || 'transparent';
 
 		css += '.theme-inner {background-color: ' + in_c + '; background-image: ' + in_i + '}';
 
 		// text color, border color
-		var color = p.fgColor || '#9cfff7';
+		var color = prof.fgColor || '#9cfff7';
 
 		css += '.theme-fg {color: ' + color + '}';
+
+		if (!prof.labelShadows) {
+			css += '.person-label {text-shadow: none}';
+		}
+
+		if (prof.labelHoverBg) {
+			css += '.people-list:hover {background-color:' + prof.labelHoverBg + '}';
+		}
 
 		// BACKGROUND OF THE PROFILES MENU
 

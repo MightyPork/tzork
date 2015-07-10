@@ -968,14 +968,23 @@ var Tzork;
     Tzork.stripProfile = stripProfile;
     function createEmptyProfile() {
         return {
-            title: 'Untitled Profile',
-            showTitle: false,
-            innerImage: '',
+            title: 'Tzork Profile',
+            showTitle: true,
+            innerImage: 'images/bg-earth.jpg',
             innerColor: '',
             outerImage: '',
-            outerColor: '',
+            outerColor: '#0B1A2E',
             fgColor: '',
-            points: []
+            labelShadows: true,
+            labelHoverBg: null,
+            points: [
+                {
+                    name: '@MightyPork',
+                    tz: 'Europe/Prague',
+                    color: 'orange',
+                    show: true
+                }
+            ]
         };
     }
     Tzork.createEmptyProfile = createEmptyProfile;
@@ -1029,6 +1038,8 @@ var Tzork;
                 Utils.setIfMissing(p, 'outerImage', '');
                 Utils.setIfMissing(p, 'outerColor', '');
                 Utils.setIfMissing(p, 'fgColor', '');
+                Utils.setIfMissing(p, 'labelShadows', true);
+                Utils.setIfMissing(p, 'labelHoverBg', '');
                 loading++;
                 TzResolver.resolvePointTimezones(p.points, function () {
                     loading--;
@@ -1327,17 +1338,23 @@ var Tzork;
             oldstyle.parentElement.removeChild(oldstyle);
         }
         var css = '';
-        var p = Tzork.theRepo.profiles[Tzork.theRepo.activeProfile];
+        var prof = Tzork.theRepo.profiles[Tzork.theRepo.activeProfile];
         var out_i, out_c;
-        out_i = p.outerImage ? 'url(\"' + p.outerImage + '\")' : 'none';
-        out_c = p.outerColor || '#07151D';
+        out_i = prof.outerImage ? 'url(\"' + prof.outerImage + '\")' : 'none';
+        out_c = prof.outerColor || '#07151D';
         css += '.theme-outer {background-color: ' + out_c + '; background-image: ' + out_i + '}';
         var in_c, in_i;
-        in_i = p.innerImage ? 'url(\"' + p.innerImage + '\")' : 'none';
-        in_c = p.innerColor || 'transparent';
+        in_i = prof.innerImage ? 'url(\"' + prof.innerImage + '\")' : 'none';
+        in_c = prof.innerColor || 'transparent';
         css += '.theme-inner {background-color: ' + in_c + '; background-image: ' + in_i + '}';
-        var color = p.fgColor || '#9cfff7';
+        var color = prof.fgColor || '#9cfff7';
         css += '.theme-fg {color: ' + color + '}';
+        if (!prof.labelShadows) {
+            css += '.person-label {text-shadow: none}';
+        }
+        if (prof.labelHoverBg) {
+            css += '.people-list:hover {background-color:' + prof.labelHoverBg + '}';
+        }
         var rc = new RGBColor(color);
         css += '.profiles-menu a {background-color: ' + rc.toRGBA(.1) + ';}';
         css += '.profiles-menu a:hover {background-color: ' + rc.toRGBA(.2) + ';}';
@@ -1370,15 +1387,15 @@ var Tzork;
                 var h = window.innerHeight;
                 if (w < 450) {
                     w -= 135 * 2;
-                    h -= 30 * 2;
+                    h -= 40 * 2;
                 }
                 else if (w < 750) {
                     w -= 160 * 2;
-                    h -= 40 * 2;
+                    h -= 60 * 2;
                 }
                 else {
                     w -= 180 * 2;
-                    h -= 60 * 2;
+                    h -= 80 * 2;
                 }
                 var s = Math.min(w, h);
                 _this.setDiskSize(s);
@@ -1584,11 +1601,7 @@ var TzorkSetup;
     function openSetupDialog() {
         document.getElementById('people_error').textContent = '';
         var ta = document.getElementById('people_json');
-        var clones = [];
-        Tzork.theRepo.profiles.forEach(function (p) {
-            clones.push(Tzork.stripProfile(p));
-        });
-        ta.value = JSON.stringify(clones, null, '\t');
+        ta.value = JSON.stringify(Tzork.stripProfile(Tzork.theRepo.getActiveProfile()), null, '\t');
         var modal = document.getElementById('setup_dialog');
         modal.style.display = 'block';
         setTimeout(function () {
@@ -1596,8 +1609,23 @@ var TzorkSetup;
         }, 1);
     }
     TzorkSetup.openSetupDialog = openSetupDialog;
+    function applyRepoChangesAndCloseModal() {
+        Tzork.theRepo.parse(function () {
+            Tzork.theClock.loadActiveProfile();
+            Tzork.theRepo.store();
+            buildProfilesMenu();
+            hideSetupModal();
+        });
+    }
+    TzorkSetup.applyRepoChangesAndCloseModal = applyRepoChangesAndCloseModal;
     function submitPeopleEdit(action) {
         switch (action) {
+            case 'delete':
+                if (confirm('Delete current profile?')) {
+                    Tzork.theRepo.profiles.splice(Tzork.theRepo.activeProfile, 1);
+                    applyRepoChangesAndCloseModal();
+                }
+                break;
             case 'close':
                 hideSetupModal();
                 break;
@@ -1605,13 +1633,8 @@ var TzorkSetup;
                 try {
                     var ta = document.getElementById('people_json');
                     var pp = JSON.parse(ta.value);
-                    Tzork.theRepo.profiles = pp;
-                    Tzork.theRepo.parse(function () {
-                        Tzork.theClock.loadActiveProfile();
-                        Tzork.theRepo.store();
-                        buildProfilesMenu();
-                        hideSetupModal();
-                    });
+                    Tzork.theRepo.profiles[Tzork.theRepo.activeProfile] = pp;
+                    applyRepoChangesAndCloseModal();
                 }
                 catch (e) {
                     var er = document.getElementById('people_error');
@@ -1641,10 +1664,17 @@ var TzorkSetup;
     function buildProfilesMenu() {
         var pl = document.getElementById('profiles-dropdown-proflist');
         pl.innerHTML = '';
+        var entries = [];
         _.each(Tzork.theRepo.profiles, function (profile, key) {
+            entries.push({ k: key, n: profile.title });
+        });
+        entries.sort(function (a, b) {
+            return a.n.localeCompare(b.n);
+        });
+        _.each(entries, function (e) {
             var el = document.createElement('a');
-            el.textContent = profile.title;
-            el.dataset['index'] = key;
+            el.textContent = e.n;
+            el.dataset['index'] = e.k;
             el.classList.add('icon-profile');
             el.addEventListener('click', function () {
                 Tzork.theRepo.activeProfile = this.dataset['index'];
@@ -1667,6 +1697,22 @@ var Tzork;
             TzorkSetup.openSetupDialog();
         });
         TzorkSetup.buildProfilesMenu();
+        var b = document.getElementById('btn-new-profile');
+        b.addEventListener('click', function (e) {
+            var name = prompt('New profile name?', 'New Profile');
+            if (name == null) {
+                return;
+            }
+            var prof = Tzork.createEmptyProfile();
+            prof.title = name;
+            Tzork.theRepo.profiles.push(prof);
+            Tzork.theRepo.parse(function () {
+                Tzork.theRepo.activeProfile = Tzork.theRepo.profiles.length - 1;
+                Tzork.theClock.loadActiveProfile();
+                Tzork.theRepo.store();
+                TzorkSetup.buildProfilesMenu();
+            });
+        });
     }
     function _initClock() {
         Tzork.theClock = new Tzork.Clock();

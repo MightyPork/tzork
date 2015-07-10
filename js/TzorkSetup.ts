@@ -3,6 +3,7 @@
 
 
 module TzorkSetup {
+
 	export function openSetupDialog() {
 		// Clear error text
 		document.getElementById('people_error').textContent = '';
@@ -10,12 +11,7 @@ module TzorkSetup {
 		// Populate the textarea
 		var ta = <HTMLTextAreaElement> document.getElementById('people_json');
 
-		var clones = [];
-		Tzork.theRepo.profiles.forEach((p) => {
-			clones.push(Tzork.stripProfile(p));
-		});
-
-		ta.value = JSON.stringify(clones, null, '\t');
+		ta.value = JSON.stringify(Tzork.stripProfile(Tzork.theRepo.getActiveProfile()), null, '\t');
 
 		var modal = document.getElementById('setup_dialog');
 		modal.style.display = 'block';
@@ -25,15 +21,25 @@ module TzorkSetup {
 		}, 1);
 	}
 
+	export function applyRepoChangesAndCloseModal() {
+		Tzork.theRepo.parse(()=> {
+			Tzork.theClock.loadActiveProfile();
+			Tzork.theRepo.store();
+			buildProfilesMenu();
+			hideSetupModal();
+		})
+	}
+
 
 	/** called from "onClick" */
 	export function submitPeopleEdit(action) {
 		switch (action) {
-			//case 'defaults':
-			//    localStorage['people'] = JSON.stringify(people_orig);
-			//    init();
-			//    hideSetupModal();
-			//    break;
+			case 'delete':
+				if (confirm('Delete current profile?')) {
+					Tzork.theRepo.profiles.splice(Tzork.theRepo.activeProfile, 1);
+					applyRepoChangesAndCloseModal();
+				}
+			    break;
 
 			case 'close':
 				hideSetupModal();
@@ -60,13 +66,9 @@ module TzorkSetup {
 					//    }
 					//});
 
-					Tzork.theRepo.profiles = pp;
-					Tzork.theRepo.parse(()=> {
-						Tzork.theClock.loadActiveProfile();
-						Tzork.theRepo.store();
-						buildProfilesMenu();
-						hideSetupModal();
-					});
+					Tzork.theRepo.profiles[Tzork.theRepo.activeProfile] = pp;
+
+					applyRepoChangesAndCloseModal();
 				} catch (e) {
 					var er = document.getElementById('people_error');
 
@@ -102,10 +104,19 @@ module TzorkSetup {
 		var pl = document.getElementById('profiles-dropdown-proflist');
 		pl.innerHTML = ''; // empty
 
+		var entries = [];
 		_.each(Tzork.theRepo.profiles, (profile: Tzork.Profile, key: number) => {
+			entries.push({k: key, n: profile.title});
+		});
+
+		entries.sort((a, b)=>{
+			return a.n.localeCompare(b.n);
+		});
+
+		_.each(entries, (e) => {
 			var el = document.createElement('a');
-			el.textContent = profile.title;
-			el.dataset['index'] = key;
+			el.textContent = e.n;
+			el.dataset['index'] = e.k;
 			el.classList.add('icon-profile');
 
 			el.addEventListener('click', function () {
