@@ -1,0 +1,154 @@
+// Offsets for people lists, so they look aligned with the dots
+@mixin plist-em-offset($lineheight) {
+	font-size: $lineheight;
+	$lh: $lineheight*1.4;
+	line-height: $lh;
+	$padding_ratio: 0.2;
+	height: $lh;
+	padding: 0 ($lh * $padding_ratio);
+	margin: 0 -.5em;
+	//border-radius: 5px;
+
+	border-width:0;
+	border-style: solid;
+	border-color: transparent;
+
+	&:not(:hover) {
+		border-color: transparent !important;
+	}
+
+	&.quad0, &.quad3 {
+		border-left-width: 2px;
+	}
+
+	&.quad1, &.quad2 {
+		border-right-width: 2px;
+	}
+
+	&:hover {
+		background-color: rgba(black, .7);
+
+		// really thick black shadow
+		//text-shadow: 0 0 6px black, 0 0 6px black, 0 0 6px black, 0 0 6px black, 0 0 6px black;
+		z-index: 1000;
+	}
+
+	&.multiple:hover {
+
+		@for $i from 2 through 15 {
+			&.count-#{$i} {
+				transition: height .07s * $i/2;
+				height: $lh * $i;
+			}
+		}
+
+		.person-label:after {
+			opacity: 0;
+		}
+	}
+
+	&.oct1,
+	&.oct2 {
+		@include translate(0, -0.5*$lh);
+	}
+
+	&.oct7 {
+		@include translate(0, -0.5*$lh);
+	}
+
+	&.oct0 {
+		@include translate(0, -0.5*$lh);
+	}
+
+	&.oct3 {
+		@include translate(0, -0.5*$lh);
+	}
+
+	&.oct4 {
+		@include translate(0, -0.5*$lh);
+	}
+
+	&.oct5,
+	&.oct6 {
+		@include translate(0, 0.5*$lh);
+	}
+
+	// in higher octant but still forced to grow up.
+	&.forceGrowUp {
+		@include translate(0, 0.5*$lh);
+	}
+}
+
+.person-label {
+	display: block;
+	cursor: initial;
+	@include naked();
+
+	text-shadow: 0 0 2px black, 0 0 4px black, 0 0 6px black;
+
+	@for $i from 2 through 15 {
+		.count-#{$i} &:first-child:after {
+			transition: opacity .1s linear;
+			content: ' + #{$i - 1}';
+		}
+	}
+}
+
+.people-list {
+	@include nowrap();
+	@include can-select();
+	@include basefont();
+	display: block;
+	position: absolute;
+	text-decoration: none;
+	@include plist-em-offset(1.2em);
+	overflow: hidden;
+
+	@include respond-to(tiny) {
+		@include plist-em-offset(0.8em);
+	}
+
+	@include respond-to(small) {
+		@include plist-em-offset(0.9em);
+	}
+
+	@include respond-to(medium) {
+		@include plist-em-offset(1em);
+	}
+}
+
+.bullet {
+	position: absolute;
+	cursor: default;
+	$w: 1em;
+	width: $w;
+	height: $w;
+
+	@include respond-to(tiny) {
+		width: $w*0.3;
+		height: $w*0.3;
+	}
+
+	@include respond-to(small) {
+		width: $w*0.5;
+		height: $w*0.5;
+	}
+
+	@include respond-to(medium) {
+		width: $w*0.7;
+		height: $w*0.7;
+	}
+
+	border-radius: 50%;
+	border: 1px solid black;
+	box-shadow: 0 0 4px black;
+	@include translate(-50%, -50%);
+
+	&.day-prev {
+		box-shadow: 0 0 0.25em 0.1em #ff151b;
+	}
+
+	&.day-next {
+		box-shadow: 0 0 0.25em 0.1em yellow;
+	}
+}
