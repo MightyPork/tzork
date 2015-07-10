@@ -17,11 +17,11 @@ The project is open source, contributions are welcome!
 
 - [x] Option to show 12-hour time
 - [x] Cache resolved timezones in `localStorage`, to avoid repeated Google API calls.
-- [ ] Option to disable shadows? (for black on white theme)
+- [x] <s>Option to disable shadows? (for black on white theme)</s> instead use correct shadow colors
 
 ### User interface
 
-- [ ] Menu to select active profile
+- [x] Menu to select active profile
 - [ ] About page of some sort, explaining Tzork and linking to GitHub
 - [ ] More user friendly config GUI
 
