@@ -645,8 +645,8 @@ var Utils;
     Utils.hour2angle = hour2angle;
     function positionAt(element, angle, distance, octant) {
         if (octant === void 0) { octant = 0; }
-        var xx = distance * Math.cos((angle / 180) * Math.PI);
-        var yy = distance * Math.sin((angle / 180) * Math.PI);
+        var xx = (distance * Math.cos((angle / 180) * Math.PI));
+        var yy = (distance * Math.sin((angle / 180) * Math.PI));
         switch (octant) {
             case 0:
             case 1:
@@ -671,6 +671,34 @@ var Utils;
         }
     }
     Utils.positionAt = positionAt;
+    function positionAtPx(element, angle, distance, fullw, offs, octant) {
+        if (octant === void 0) { octant = 0; }
+        var xx = (distance * Math.cos((angle / 180) * Math.PI));
+        var yy = (distance * Math.sin((angle / 180) * Math.PI));
+        switch (octant) {
+            case 0:
+            case 1:
+            case 7:
+                element.style.left = Math.round(fullw / 2 + xx + offs) + 'px';
+                element.style.top = Math.round(fullw / 2 - yy + offs) + 'px';
+                break;
+            case 2:
+            case 3:
+            case 4:
+                element.style.right = Math.round(fullw / 2 - xx + offs) + 'px';
+                element.style.top = Math.round(fullw / 2 - yy + offs) + 'px';
+                break;
+            case 5:
+                element.style.right = Math.round(fullw / 2 - xx + offs) + 'px';
+                element.style.bottom = Math.round(fullw / 2 + yy + offs) + 'px';
+                break;
+            case 6:
+                element.style.left = Math.round(fullw / 2 + xx + offs) + 'px';
+                element.style.bottom = Math.round(fullw / 2 + yy + offs) + 'px';
+                break;
+        }
+    }
+    Utils.positionAtPx = positionAtPx;
     function mmtDayCompare(here, there) {
         var d0 = here.dayOfYear();
         var y0 = here.year();
@@ -736,6 +764,63 @@ var Utils;
         }
     }
     Utils.fixTextareaTabKey = fixTextareaTabKey;
+    function hoverMenu(button, menu) {
+        var menuopen = false;
+        var closemenutimeout;
+        $(button).on('mouseover', function () {
+            $(menu).removeClass('gone');
+            menuopen = true;
+            clearTimeout(closemenutimeout);
+        });
+        $(menu).on('mouseover', function () {
+            clearTimeout(closemenutimeout);
+        });
+        function outhandler() {
+            closemenutimeout = setTimeout(function () {
+                $(menu).addClass('gone');
+                menuopen = false;
+            }, 10);
+        }
+        $(menu).on('mouseout', outhandler);
+        $(button).on('mouseout', outhandler);
+    }
+    Utils.hoverMenu = hoverMenu;
+    function rgb2hsb(r, g, b) {
+        r /= 255;
+        g /= 255;
+        b /= 255;
+        var minVal = Math.min(r, g, b), maxVal = Math.max(r, g, b), delta = maxVal - minVal, HSB = { h: 0, s: 0, b: maxVal }, del_R, del_G, del_B;
+        if (delta !== 0) {
+            HSB.s = delta / maxVal;
+            del_R = (((maxVal - r) / 6) + (delta / 2)) / delta;
+            del_G = (((maxVal - g) / 6) + (delta / 2)) / delta;
+            del_B = (((maxVal - b) / 6) + (delta / 2)) / delta;
+            if (r === maxVal) {
+                HSB.h = del_B - del_G;
+            }
+            else if (g === maxVal) {
+                HSB.h = (1 / 3) + del_R - del_B;
+            }
+            else if (b === maxVal) {
+                HSB.h = (2 / 3) + del_G - del_R;
+            }
+            if (HSB.h < 0) {
+                HSB.h += 1;
+            }
+            if (HSB.h > 1) {
+                HSB.h -= 1;
+            }
+        }
+        HSB.h *= 360;
+        HSB.s *= 100;
+        HSB.b *= 100;
+        return HSB;
+    }
+    Utils.rgb2hsb = rgb2hsb;
+    function isColorDark(r, g, b) {
+        return (((r * 299) + (g * 587) + (b * 114)) / 1000) < 128;
+    }
+    Utils.isColorDark = isColorDark;
 })(Utils || (Utils = {}));
 var tz_def_profile = {
     "title": "My Tzork",
@@ -903,6 +988,9 @@ var Tzork;
             this.profiles = [];
             this.activeProfile = 0;
         }
+        LocalRepository.prototype.getActiveProfile = function () {
+            return this.profiles[this.activeProfile];
+        };
         LocalRepository.prototype.load = function (onDone) {
             try {
                 var s = localStorage['repository'];
@@ -1007,37 +1095,301 @@ var Tzork;
     })();
     Tzork.LocalConfigProvider = LocalConfigProvider;
 })(Tzork || (Tzork = {}));
+var RGBColor = (function () {
+    function RGBColor(color_string) {
+        this.ok = false;
+        if (color_string.charAt(0) == '#') {
+            color_string = color_string.substr(1, 6);
+        }
+        color_string = color_string.replace(/ /g, '');
+        color_string = color_string.toLowerCase();
+        if (RGBColor.simple_colors.hasOwnProperty(color_string)) {
+            color_string = RGBColor.simple_colors[color_string];
+        }
+        var color_defs = [
+            {
+                re: /^(\w{2})(\w{2})(\w{2})$/,
+                process: function (bits) {
+                    return [
+                        parseInt(bits[1], 16),
+                        parseInt(bits[2], 16),
+                        parseInt(bits[3], 16)
+                    ];
+                }
+            },
+            {
+                re: /^rgb\((\d{1,3}),\s*(\d{1,3}),\s*(\d{1,3})\)$/,
+                process: function (bits) {
+                    return [
+                        parseInt(bits[1]),
+                        parseInt(bits[2]),
+                        parseInt(bits[3])
+                    ];
+                }
+            },
+            {
+                re: /^(\w{1})(\w{1})(\w{1})$/,
+                process: function (bits) {
+                    return [
+                        parseInt(bits[1] + bits[1], 16),
+                        parseInt(bits[2] + bits[2], 16),
+                        parseInt(bits[3] + bits[3], 16)
+                    ];
+                }
+            }
+        ];
+        for (var i = 0; i < color_defs.length; i++) {
+            var re = color_defs[i].re;
+            var processor = color_defs[i].process;
+            var bits = re.exec(color_string);
+            if (bits) {
+                var channels = processor(bits);
+                this.r = channels[0];
+                this.g = channels[1];
+                this.b = channels[2];
+                this.ok = true;
+            }
+        }
+        this.r = (this.r < 0 || isNaN(this.r)) ? 0 : ((this.r > 255) ? 255 : this.r);
+        this.g = (this.g < 0 || isNaN(this.g)) ? 0 : ((this.g > 255) ? 255 : this.g);
+        this.b = (this.b < 0 || isNaN(this.b)) ? 0 : ((this.b > 255) ? 255 : this.b);
+    }
+    RGBColor.prototype.toRGB = function () {
+        return 'rgb(' + this.r + ',' + this.g + ',' + this.b + ')';
+    };
+    RGBColor.prototype.toRGBA = function (a) {
+        return 'rgba(' + this.r + ',' + this.g + ',' + this.b + ',' + a + ')';
+    };
+    RGBColor.prototype.toHex = function () {
+        var r = this.r.toString(16);
+        var g = this.g.toString(16);
+        var b = this.b.toString(16);
+        if (r.length == 1)
+            r = '0' + r;
+        if (g.length == 1)
+            g = '0' + g;
+        if (b.length == 1)
+            b = '0' + b;
+        return '#' + r + g + b;
+    };
+    RGBColor.simple_colors = {
+        aliceblue: 'f0f8ff',
+        antiquewhite: 'faebd7',
+        aqua: '00ffff',
+        aquamarine: '7fffd4',
+        azure: 'f0ffff',
+        beige: 'f5f5dc',
+        bisque: 'ffe4c4',
+        black: '000000',
+        blanchedalmond: 'ffebcd',
+        blue: '0000ff',
+        blueviolet: '8a2be2',
+        brown: 'a52a2a',
+        burlywood: 'deb887',
+        cadetblue: '5f9ea0',
+        chartreuse: '7fff00',
+        chocolate: 'd2691e',
+        coral: 'ff7f50',
+        cornflowerblue: '6495ed',
+        cornsilk: 'fff8dc',
+        crimson: 'dc143c',
+        cyan: '00ffff',
+        darkblue: '00008b',
+        darkcyan: '008b8b',
+        darkgoldenrod: 'b8860b',
+        darkgray: 'a9a9a9',
+        darkgreen: '006400',
+        darkkhaki: 'bdb76b',
+        darkmagenta: '8b008b',
+        darkolivegreen: '556b2f',
+        darkorange: 'ff8c00',
+        darkorchid: '9932cc',
+        darkred: '8b0000',
+        darksalmon: 'e9967a',
+        darkseagreen: '8fbc8f',
+        darkslateblue: '483d8b',
+        darkslategray: '2f4f4f',
+        darkturquoise: '00ced1',
+        darkviolet: '9400d3',
+        deeppink: 'ff1493',
+        deepskyblue: '00bfff',
+        dimgray: '696969',
+        dodgerblue: '1e90ff',
+        feldspar: 'd19275',
+        firebrick: 'b22222',
+        floralwhite: 'fffaf0',
+        forestgreen: '228b22',
+        fuchsia: 'ff00ff',
+        gainsboro: 'dcdcdc',
+        ghostwhite: 'f8f8ff',
+        gold: 'ffd700',
+        goldenrod: 'daa520',
+        gray: '808080',
+        green: '008000',
+        greenyellow: 'adff2f',
+        honeydew: 'f0fff0',
+        hotpink: 'ff69b4',
+        indianred: 'cd5c5c',
+        indigo: '4b0082',
+        ivory: 'fffff0',
+        khaki: 'f0e68c',
+        lavender: 'e6e6fa',
+        lavenderblush: 'fff0f5',
+        lawngreen: '7cfc00',
+        lemonchiffon: 'fffacd',
+        lightblue: 'add8e6',
+        lightcoral: 'f08080',
+        lightcyan: 'e0ffff',
+        lightgoldenrodyellow: 'fafad2',
+        lightgrey: 'd3d3d3',
+        lightgreen: '90ee90',
+        lightpink: 'ffb6c1',
+        lightsalmon: 'ffa07a',
+        lightseagreen: '20b2aa',
+        lightskyblue: '87cefa',
+        lightslateblue: '8470ff',
+        lightslategray: '778899',
+        lightsteelblue: 'b0c4de',
+        lightyellow: 'ffffe0',
+        lime: '00ff00',
+        limegreen: '32cd32',
+        linen: 'faf0e6',
+        magenta: 'ff00ff',
+        maroon: '800000',
+        mediumaquamarine: '66cdaa',
+        mediumblue: '0000cd',
+        mediumorchid: 'ba55d3',
+        mediumpurple: '9370d8',
+        mediumseagreen: '3cb371',
+        mediumslateblue: '7b68ee',
+        mediumspringgreen: '00fa9a',
+        mediumturquoise: '48d1cc',
+        mediumvioletred: 'c71585',
+        midnightblue: '191970',
+        mintcream: 'f5fffa',
+        mistyrose: 'ffe4e1',
+        moccasin: 'ffe4b5',
+        navajowhite: 'ffdead',
+        navy: '000080',
+        oldlace: 'fdf5e6',
+        olive: '808000',
+        olivedrab: '6b8e23',
+        orange: 'ffa500',
+        orangered: 'ff4500',
+        orchid: 'da70d6',
+        palegoldenrod: 'eee8aa',
+        palegreen: '98fb98',
+        paleturquoise: 'afeeee',
+        palevioletred: 'd87093',
+        papayawhip: 'ffefd5',
+        peachpuff: 'ffdab9',
+        peru: 'cd853f',
+        pink: 'ffc0cb',
+        plum: 'dda0dd',
+        powderblue: 'b0e0e6',
+        purple: '800080',
+        red: 'ff0000',
+        rosybrown: 'bc8f8f',
+        royalblue: '4169e1',
+        saddlebrown: '8b4513',
+        salmon: 'fa8072',
+        sandybrown: 'f4a460',
+        seagreen: '2e8b57',
+        seashell: 'fff5ee',
+        sienna: 'a0522d',
+        silver: 'c0c0c0',
+        skyblue: '87ceeb',
+        slateblue: '6a5acd',
+        slategray: '708090',
+        snow: 'fffafa',
+        springgreen: '00ff7f',
+        steelblue: '4682b4',
+        tan: 'd2b48c',
+        teal: '008080',
+        thistle: 'd8bfd8',
+        tomato: 'ff6347',
+        turquoise: '40e0d0',
+        violet: 'ee82ee',
+        violetred: 'd02090',
+        wheat: 'f5deb3',
+        white: 'ffffff',
+        whitesmoke: 'f5f5f5',
+        yellow: 'ffff00',
+        yellowgreen: '9acd32'
+    };
+    return RGBColor;
+})();
+var Tzork;
+(function (Tzork) {
+    function applyThemeFromProfile() {
+        var oldstyle = document.getElementById('theme-styles');
+        if (oldstyle) {
+            oldstyle.parentElement.removeChild(oldstyle);
+        }
+        var css = '';
+        var p = Tzork.theRepo.profiles[Tzork.theRepo.activeProfile];
+        var out_i, out_c;
+        out_i = p.outerImage ? 'url(\"' + p.outerImage + '\")' : 'none';
+        out_c = p.outerColor || '#07151D';
+        css += '.theme-outer {background-color: ' + out_c + '; background-image: ' + out_i + '}';
+        var in_c, in_i;
+        in_i = p.innerImage ? 'url(\"' + p.innerImage + '\")' : 'none';
+        in_c = p.innerColor || 'transparent';
+        css += '.theme-inner {background-color: ' + in_c + '; background-image: ' + in_i + '}';
+        var color = p.fgColor || '#9cfff7';
+        css += '.theme-fg {color: ' + color + '}';
+        var rc = new RGBColor(color);
+        css += '.profiles-menu a {background-color: ' + rc.toRGBA(.1) + ';}';
+        css += '.profiles-menu a:hover {background-color: ' + rc.toRGBA(.2) + ';}';
+        var isFgDark = Utils.isColorDark(rc.r, rc.g, rc.b);
+        if (isFgDark) {
+            css += '#disc {box-shadow: 0 0 3px 1px white, inset 0 0 3px 1px white}';
+            css += '.mark {text-shadow: 0 0 3px white, 0 0 6px white}';
+            css += '.bullet {box-shadow: 0 0 4px white;}';
+            css += '#profile-label {text-shadow: 0 0 8px white, 0 0 4px white;}';
+            css += '#local-time {text-shadow: 0 0 8px white, 0 0 4px white;}';
+        }
+        var sty = document.createElement('style');
+        sty.type = 'text/css';
+        sty.innerHTML = css;
+        sty.id = 'theme-styles';
+        document.head.appendChild(sty);
+    }
+    Tzork.applyThemeFromProfile = applyThemeFromProfile;
+})(Tzork || (Tzork = {}));
 var Tzork;
 (function (Tzork) {
     var Clock = (function () {
         function Clock() {
             this.disc = document.getElementById('disc');
-            this._buildClockMarks();
             this._updateTime();
             this.interval_time = setInterval(this._updateTime, 1000);
         }
         Clock.prototype.setDiskSize = function (size) {
             this.disc.style.width = size + "px";
             this.disc.style.height = size + "px";
+            this.discSize = size;
+            this.updatePoints();
+            this._buildClockMarks();
         };
         Clock.prototype.loadActiveProfile = function () {
             this.clear();
-            this._populate(Tzork.theRepo.profiles[Tzork.theRepo.activeProfile]);
+            this._populate();
         };
-        Clock.prototype._populate = function (profile) {
+        Clock.prototype._populate = function () {
             var _this = this;
+            var profile = Tzork.theRepo.getActiveProfile();
             console.log('Populate with profile: ', profile);
-            this.profile = profile;
-            this._applyColorsFromProfile();
+            Tzork.applyThemeFromProfile();
             var lbl = Utils.queryOne('#profile-label');
             lbl.textContent = profile.title;
             lbl.style.display = profile.showTitle ? 'block' : 'none';
-            this._updatePoints();
+            this.updatePoints();
             this.interval_people = setInterval(function () {
-                _this._updatePoints();
+                _this.updatePoints();
             }, 1000 * 10);
             window.onfocus = function () {
-                _this._updatePoints();
+                _this.updatePoints();
                 _this._updateTime();
             };
         };
@@ -1048,50 +1400,13 @@ var Tzork;
             }
             clearInterval(this.interval_people);
         };
-        Clock.prototype._applyColorsFromProfile = function () {
-            var p = this.profile;
-            var out_i, out_c;
-            if (p.outerImage != null) {
-                out_i = 'url(\"' + p.outerImage + '\")';
-            }
-            else {
-                out_i = 'none';
-            }
-            if (p.outerColor != null) {
-                out_c = p.outerColor;
-            }
-            else {
-                out_c = '#07151D';
-            }
-            Utils.iterateQuery('.theme-outer', function (e) {
-                e.style.backgroundColor = out_c;
-                e.style.backgroundImage = out_i;
-            });
-            var in_c, in_i;
-            if (p.innerImage != null) {
-                in_i = 'url(\"' + p.innerImage + '\")';
-            }
-            else {
-                in_i = 'none';
-            }
-            if (p.innerColor != null) {
-                in_c = p.innerColor;
-            }
-            else {
-                in_c = 'transparent';
-            }
-            Utils.iterateQuery('.theme-inner', function (e) {
-                e.style.backgroundColor = in_c;
-                e.style.backgroundImage = in_i;
-            });
-            var color = p.fgColor || '#9cfff7';
-            Utils.iterateQuery('.theme-fg', function (e) {
-                e.style.color = color;
-                e.style.borderColor = color;
-            });
-        };
         Clock.prototype._buildClockMarks = function () {
+            var old = document.querySelectorAll('.mark');
+            for (var i = 0; i < old.length; i++) {
+                old[i].parentNode.removeChild(old[i]);
+            }
             var twelve = Tzork.theConfig.get('twelve', false);
+            var bdrW = parseInt(window.getComputedStyle(this.disc).borderWidth.replace('px', ''));
             for (var i = 0; i < 24; i++) {
                 var mark = document.createElement('div');
                 mark.classList.add('mark');
@@ -1109,7 +1424,7 @@ var Tzork;
                     mark.textContent = '' + i;
                 }
                 var angle = Utils.hour2angle(i);
-                Utils.positionAt(mark, angle, 45);
+                Utils.positionAtPx(mark, angle, (this.discSize / 2) * 0.88, this.discSize, -bdrW);
                 this.disc.appendChild(mark);
             }
         };
@@ -1124,7 +1439,7 @@ var Tzork;
             var s = (new Date()).getSeconds() % 2;
             document.getElementById('local-time-colon').style.visibility = s ? 'visible' : 'hidden';
         };
-        Clock.prototype._updatePoints = function () {
+        Clock.prototype.updatePoints = function () {
             if (this.mouse_on_list) {
                 console.log('Mouse over list, not redrawing.');
                 return;
@@ -1143,7 +1458,8 @@ var Tzork;
         Clock.prototype._buildPoints = function () {
             var _this = this;
             var resolved = [];
-            this.profile.points.forEach(function (obj) {
+            var p = Tzork.theRepo.getActiveProfile();
+            p.points.forEach(function (obj) {
                 if (!obj._valid || !obj.show)
                     return;
                 var t = TzResolver.getTimeForPoint(obj);
@@ -1174,10 +1490,11 @@ var Tzork;
             var quadrant = Math.floor(octant / 2);
             var is_up = (quadrant < 2);
             var is_left = (quadrant > 0 && quadrant < 3);
+            var bdrW = parseInt(window.getComputedStyle(this.disc).borderWidth.replace('px', ''));
             var bu = document.createElement('div');
             bu.className = 'bullet';
             bu.style.backgroundColor = first.color;
-            Utils.positionAt(bu, angle, 50.2);
+            Utils.positionAtPx(bu, angle, this.discSize / 2 - 1, this.discSize, -bdrW, 0);
             this.disc.appendChild(bu);
             var list = document.createElement('div');
             list.classList.add('people-list');
@@ -1197,19 +1514,28 @@ var Tzork;
                 list.classList.add('multiple');
                 list.classList.add('count-' + people.length);
             }
+            var clr;
             for (i = 0; i < people.length; i++) {
                 var peep = people[i];
                 var child = this._createPointLabel(peep);
                 child.title = there.format('H:mm, MMM Do') + ' — ' + peep._tz;
                 list.appendChild(child);
+                if (i == 0)
+                    clr = child.style.color;
             }
+            if (people.length > 5 && octant >= 5) {
+                list.classList.add('forceGrowUp');
+                octant = 6;
+            }
+            list.style.borderColor = clr;
             list.addEventListener('mouseover', function () {
                 _this.mouse_on_list = true;
             });
             list.addEventListener('mouseout', function () {
                 _this.mouse_on_list = false;
             });
-            Utils.positionAt(list, angle, 53.5, octant);
+            var xtra = (this.discSize / 150) * 5;
+            Utils.positionAtPx(list, angle, this.discSize / 2 + xtra, this.discSize, -bdrW, octant);
             this.disc.appendChild(list);
         };
         Clock.prototype._createPointLabel = function (obj) {
@@ -1261,6 +1587,7 @@ var TzorkSetup;
                     Tzork.theRepo.parse(function () {
                         Tzork.theClock.loadActiveProfile();
                         Tzork.theRepo.store();
+                        buildProfilesMenu();
                         hideSetupModal();
                     });
                 }
@@ -1289,19 +1616,38 @@ var TzorkSetup;
         }, 500);
     }
     TzorkSetup.hideSetupModal = hideSetupModal;
+    function buildProfilesMenu() {
+        var pl = document.getElementById('profiles-dropdown-proflist');
+        pl.innerHTML = '';
+        _.each(Tzork.theRepo.profiles, function (profile, key) {
+            var el = document.createElement('a');
+            el.textContent = profile.title;
+            el.dataset['index'] = key;
+            el.classList.add('icon-profile');
+            el.addEventListener('click', function () {
+                Tzork.theRepo.activeProfile = this.dataset['index'];
+                Tzork.theRepo.store();
+                Tzork.theClock.loadActiveProfile();
+            });
+            pl.appendChild(el);
+        });
+    }
+    TzorkSetup.buildProfilesMenu = buildProfilesMenu;
 })(TzorkSetup || (TzorkSetup = {}));
 var Tzork;
 (function (Tzork) {
     Tzork.theClock;
     Tzork.theRepo;
     Tzork.theConfig;
-    function init(repo, conf) {
-        Tzork.theRepo = repo;
-        Tzork.theConfig = conf;
+    function _initMenu() {
+        Utils.hoverMenu('#menu-btn-profiles', '#profiles-dropdown');
+        document.getElementById('menu-btn-edit').addEventListener('click', function () {
+            TzorkSetup.openSetupDialog();
+        });
+        TzorkSetup.buildProfilesMenu();
+    }
+    function _initClock() {
         Tzork.theClock = new Tzork.Clock();
-        Tzork.theClock.loadActiveProfile();
-        document.getElementById('setup_btn').onclick = TzorkSetup.openSetupDialog;
-        Utils.fixTextareaTabKey();
         var resizeClock = function () {
             var w = window.innerWidth;
             var h = window.innerHeight;
@@ -1322,6 +1668,14 @@ var Tzork;
         };
         window.onresize = resizeClock;
         resizeClock();
+        Tzork.theClock.loadActiveProfile();
+    }
+    function init(repo, conf) {
+        Tzork.theRepo = repo;
+        Tzork.theConfig = conf;
+        _initMenu();
+        _initClock();
+        Utils.fixTextareaTabKey();
     }
     Tzork.init = init;
 })(Tzork || (Tzork = {}));

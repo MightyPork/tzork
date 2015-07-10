@@ -1,0 +1,58 @@
+nav#menubar {
+	display: block;
+	position: absolute;
+	right: 15px;
+	top: 8px;
+
+	//color: white;
+
+	opacity: .5;
+	&:hover {
+		opacity: 1;
+	}
+
+	@include transition(opacity .2s ease-out);//???
+
+	& > a {
+		display: inline-block;
+		font-size: 140%;
+		padding: 5px;
+		float: left;
+		cursor: pointer;
+
+		@include clickbutton();
+
+		// strip the icon
+		&::before {
+			padding: 0; margin: 0;
+		}
+
+		&:hover {
+			text-shadow: 0 0 8px rgba(white, .7);
+		}
+	}
+}
+
+.profiles-menu {
+	position: absolute;
+	top: 100%;
+	right: 0;
+	z-index: 999;
+
+	a {
+		cursor: pointer;
+		font-size: 120%;
+		padding: 5px;
+		display: block;
+		@include nowrap();
+
+		&::before {
+			margin-right: .3em;
+		}
+
+		background-color: rgba(white, .2);
+		&:hover {
+			background-color: rgba(white, .3);
+		}
+	}
+}

@@ -19,6 +19,16 @@
 	-khtml-tab-size: $ts;
 }
 
+@mixin clickbutton() {
+	@include no-select();
+	position: relative;
+
+	&:active {
+		left:1px;
+		top:1px;
+	}
+}
+
 // Add a highlight for debugging
 @mixin highlight($color) {
 	outline: 1px solid $color;
@@ -47,7 +57,7 @@
 	@include transform(translate($x, $y));
 }
 
-$break-tiny: 320px;
+$break-tiny: 450px;
 $break-small: 640px;
 $break-large: 1024px;
 

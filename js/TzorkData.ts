@@ -87,6 +87,8 @@ module Tzork {
 
         /** Persist current state */
         store(onDone?: () => void): void;
+
+		getActiveProfile(): Profile;
     }
 
 
@@ -94,6 +96,10 @@ module Tzork {
     export class LocalRepository implements Repository {
         profiles: Profile[] = [];
         activeProfile: number = 0;
+
+		getActiveProfile(): Profile {
+			return this.profiles[this.activeProfile];
+		}
 
         load(onDone?: ()=>void) {
             // Load repository

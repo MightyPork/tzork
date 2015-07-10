@@ -20,15 +20,18 @@
 	<!-- Stylesheets -->
 	<link href='http://fonts.googleapis.com/css?family=Droid+Sans:400,700' rel='stylesheet' type='text/css'>
 	<link rel="stylesheet" href="css/application.css">
+	<link rel="stylesheet" href="css/fontello.css">
 
 	<!-- Page sizing -->
 	<meta name="viewport" content="user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
 	<meta name="theme-color" content="#0a2223">
 
 	<!-- JS -->
-	<script src="js/lib/moment.min.js"></script>
-	<script src="js/lib/moment-timezone-with-data.min.js"></script>
-	<!--<script src="js/application.min.js"></script>-->
+	<script src="js/lib/jquery.js"></script>
+	<script src="js/lib/underscore.js"></script>
+	<script src="js/lib/moment.js"></script>
+	<script src="js/lib/moment-timezone-with-data.js"></script>
+	<script src="js/lib/Sortable.js"></script>
 	<script src="js/application.js"></script>
 </head>
 <body onload="main()" id="tzork-bg" class="theme-outer theme-fg">
@@ -47,7 +50,15 @@
 	</div>
 </div>
 
-<div id="setup_btn">Configure</div>
+<nav id="menubar">
+	<a id="menu-btn-edit" class="icon-edit"></a>
+	<a id="menu-btn-profiles" class="icon-profile"></a>
+	<div id="profiles-dropdown" class="profiles-menu gone">
+		<div id="profiles-dropdown-proflist">
+		</div>
+		<a class="icon-profile-add">New profile</a>
+	</div>
+</nav>
 
 <div id="disc" class="theme-inner">
 	<div id="time-box">
