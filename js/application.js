@@ -830,6 +830,8 @@ var tz_def_profile = {
     "outerImage": "",
     "outerColor": "",
     "fgColor": "",
+    "labelShadows": true,
+    "labelHoverBg": null,
     "points": [
         {
             "name": "@MightyPork",
