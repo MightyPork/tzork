@@ -42,6 +42,9 @@ module Tzork {
 			}
 
 			var s = Math.min(w, h);
+
+			console.log('size = '+s);
+
 			Tzork.theClock.setDiskSize(s);
 		};
 

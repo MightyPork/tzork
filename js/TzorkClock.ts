@@ -95,7 +95,7 @@ module Tzork {
 			var twelve = <boolean> theConfig.get('twelve', false);
 
 			// disc border width (needed for precise positioning)
-			var bdrW = parseInt(window.getComputedStyle(this.disc).borderWidth.replace('px',''));
+			var bdrW = parseInt(window.getComputedStyle(this.disc).borderRightWidth.replace('px',''));
 
 			// The clock marks
 			for (var i = 0; i < 24; i++) {
@@ -222,7 +222,7 @@ module Tzork {
 			var is_left = (quadrant > 0 && quadrant < 3);
 
 			// disc border width (needed for precise positioning)
-			var bdrW = parseInt(window.getComputedStyle(this.disc).borderWidth.replace('px',''));
+			var bdrW = parseInt(window.getComputedStyle(this.disc).borderRightWidth.replace('px',''));
 
 
 			// --- Create & place a bullet ---

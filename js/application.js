@@ -1406,7 +1406,7 @@ var Tzork;
                 old[i].parentNode.removeChild(old[i]);
             }
             var twelve = Tzork.theConfig.get('twelve', false);
-            var bdrW = parseInt(window.getComputedStyle(this.disc).borderWidth.replace('px', ''));
+            var bdrW = parseInt(window.getComputedStyle(this.disc).borderRightWidth.replace('px', ''));
             for (var i = 0; i < 24; i++) {
                 var mark = document.createElement('div');
                 mark.classList.add('mark');
@@ -1490,7 +1490,7 @@ var Tzork;
             var quadrant = Math.floor(octant / 2);
             var is_up = (quadrant < 2);
             var is_left = (quadrant > 0 && quadrant < 3);
-            var bdrW = parseInt(window.getComputedStyle(this.disc).borderWidth.replace('px', ''));
+            var bdrW = parseInt(window.getComputedStyle(this.disc).borderRightWidth.replace('px', ''));
             var bu = document.createElement('div');
             bu.className = 'bullet';
             bu.style.backgroundColor = first.color;
@@ -1664,6 +1664,7 @@ var Tzork;
                 h -= 60 * 2;
             }
             var s = Math.min(w, h);
+            console.log('size = ' + s);
             Tzork.theClock.setDiskSize(s);
         };
         window.onresize = resizeClock;

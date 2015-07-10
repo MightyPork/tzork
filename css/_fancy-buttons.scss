@@ -42,6 +42,8 @@ a.button {
 	@include fancy-btn-base();
 	line-height: 1.8em;
 	font-size: 110%;
+	outline:0 none!important;
+	border: 0 none;
 
 	&.blue {
 		@include fancy-btn-colors(#CFF1FF, #2398c8, #15b3e1);
