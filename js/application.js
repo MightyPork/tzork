@@ -1361,9 +1361,31 @@ var Tzork;
 (function (Tzork) {
     var Clock = (function () {
         function Clock() {
+            var _this = this;
             this.disc = document.getElementById('disc');
             this._updateTime();
             this.interval_time = setInterval(this._updateTime, 1000);
+            var resizeClock = function () {
+                var w = window.innerWidth;
+                var h = window.innerHeight;
+                if (w < 450) {
+                    w -= 135 * 2;
+                    h -= 30 * 2;
+                }
+                else if (w < 750) {
+                    w -= 160 * 2;
+                    h -= 40 * 2;
+                }
+                else {
+                    w -= 180 * 2;
+                    h -= 60 * 2;
+                }
+                var s = Math.min(w, h);
+                _this.setDiskSize(s);
+            };
+            window.onresize = resizeClock;
+            resizeClock();
+            this.loadActiveProfile();
         }
         Clock.prototype.setDiskSize = function (size) {
             this.disc.style.width = size + "px";
@@ -1648,28 +1670,6 @@ var Tzork;
     }
     function _initClock() {
         Tzork.theClock = new Tzork.Clock();
-        var resizeClock = function () {
-            var w = window.innerWidth;
-            var h = window.innerHeight;
-            if (w < 450) {
-                w -= 135 * 2;
-                h -= 30 * 2;
-            }
-            else if (w < 750) {
-                w -= 160 * 2;
-                h -= 40 * 2;
-            }
-            else {
-                w -= 180 * 2;
-                h -= 60 * 2;
-            }
-            var s = Math.min(w, h);
-            console.log('size = ' + s);
-            Tzork.theClock.setDiskSize(s);
-        };
-        window.onresize = resizeClock;
-        resizeClock();
-        Tzork.theClock.loadActiveProfile();
     }
     function init(repo, conf) {
         Tzork.theRepo = repo;

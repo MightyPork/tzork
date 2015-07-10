@@ -23,35 +23,6 @@ module Tzork {
 
 	function _initClock() {
 		theClock = new Clock();
-
-		var resizeClock = function () {
-			var w = window.innerWidth;
-			var h = window.innerHeight;
-
-			// subtract expected size of labels (?) (a guess)
-
-			if (w < 450) {
-				w -= 135 * 2;
-				h -= 30 * 2;
-			} else if (w < 750) {
-				w -= 160 * 2;
-				h -= 40 * 2;
-			} else {
-				w -= 180 * 2;
-				h -= 60 * 2;
-			}
-
-			var s = Math.min(w, h);
-
-			console.log('size = '+s);
-
-			Tzork.theClock.setDiskSize(s);
-		};
-
-		window.onresize = resizeClock;
-		resizeClock();
-
-		theClock.loadActiveProfile();
 	}
 
 

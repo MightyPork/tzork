@@ -97,6 +97,11 @@
 	}
 }
 
+.multiple a.person-label:hover {
+	position: relative;
+	left: 1px;
+}
+
 .people-list {
 	@include nowrap();
 	@include can-select();

@@ -26,6 +26,10 @@ body {
 	background-position: center center;
 }
 
+a {
+	cursor: pointer;
+}
+
 .hidden { visibility: hidden !important; }
 
 .gone { display: none !important; }

@@ -21,6 +21,33 @@ module Tzork {
 			this.disc = document.getElementById('disc');
 			this._updateTime();
 			this.interval_time = setInterval(this._updateTime, 1000);
+
+			var resizeClock = () => {
+				var w = window.innerWidth;
+				var h = window.innerHeight;
+
+				// subtract expected size of labels (?) (a guess)
+
+				if (w < 450) {
+					w -= 135 * 2;
+					h -= 30 * 2;
+				} else if (w < 750) {
+					w -= 160 * 2;
+					h -= 40 * 2;
+				} else {
+					w -= 180 * 2;
+					h -= 60 * 2;
+				}
+
+				var s = Math.min(w, h);
+
+				this.setDiskSize(s);
+			};
+
+			window.onresize = resizeClock;
+			resizeClock();
+
+			this.loadActiveProfile();
 		}
 
 
