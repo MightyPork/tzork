@@ -29,8 +29,9 @@ module Tzork {
 
         fgColor:string;
 
-		labelShadows?:boolean;
-		labelHoverBg?:string;
+		labelShadows:boolean;
+		labelHoverBg:string;
+		menuColor:string;
 
         points:Point[];
 
@@ -66,7 +67,8 @@ module Tzork {
             outerColor: '#0B1A2E',
             fgColor: '',
 			labelShadows: true,
-			labelHoverBg: null, // nothing -> use default
+			labelHoverBg: '', // nothing -> use default
+			menuColor: '',
             points: [
 				{
 					name: '@MightyPork',
@@ -165,6 +167,7 @@ module Tzork {
                 Utils.setIfMissing(p, 'fgColor', '');
 				Utils.setIfMissing(p, 'labelShadows', true);
 				Utils.setIfMissing(p, 'labelHoverBg', '');
+				Utils.setIfMissing(p, 'menuColor', '');
 
                 loading++;
                 TzResolver.resolvePointTimezones(p.points, () => {

@@ -8,7 +8,8 @@ var tz_def_profile =
     "outerColor": "",
     "fgColor": "",
 	"labelShadows": true,
-	"labelHoverBg": null,
+	"labelHoverBg": '',
+	"menuColor": '',
     "points": [
         {
             "name": "@MightyPork",

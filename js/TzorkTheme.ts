@@ -38,22 +38,27 @@ module Tzork {
 			css += '.people-list:hover {background-color:' + prof.labelHoverBg + '}';
 		}
 
-		// BACKGROUND OF THE PROFILES MENU
-
+		// dark -shadows
 		var rc = new RGBColor(color);
-
-		css += '.profiles-menu a {background-color: ' + rc.toRGBA(.1) + ';}';
-		css += '.profiles-menu a:hover {background-color: ' + rc.toRGBA(.2) + ';}';
-
 		var isFgDark = Utils.isColorDark(rc.r, rc.g, rc.b);
-
 		if (isFgDark) {
 			css += '#disc {box-shadow: 0 0 3px 1px white, inset 0 0 3px 1px white}';
 			css += '.mark {text-shadow: 0 0 3px white, 0 0 6px white}';
-			css += '.bullet {box-shadow: 0 0 4px white;}';
-			css += '#profile-label {text-shadow: 0 0 8px white, 0 0 4px white;}';
-			css += '#local-time {text-shadow: 0 0 8px white, 0 0 4px white;}';
+			css += '.bullet {box-shadow: 0 0 4px white}';
+			css += '#profile-label {text-shadow: 0 0 8px white, 0 0 4px white}';
+			css += '#local-time {text-shadow: 0 0 8px white, 0 0 4px white}';
 		}
+
+		// PROFILES MENU
+
+		if (prof.menuColor) {
+			color = prof.menuColor;
+		}
+
+		rc = new RGBColor(color);
+		css += '#menubar {color: ' + color + '}';
+		css += '.profiles-menu a {background-color: ' + rc.toRGBA(.1) + '}';
+		css += '.profiles-menu a:hover {background-color: ' + rc.toRGBA(.2) + '}';
 
 		var sty: HTMLStyleElement = document.createElement('style');
 		sty.type = 'text/css';
