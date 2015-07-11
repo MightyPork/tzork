@@ -6,7 +6,6 @@
     <file url="file://$PROJECT_DIR$/js/lib/moment-timezone-with-data.min.js" />
     <file url="file://$PROJECT_DIR$/js/lib/moment.min.js" />
     <file url="file://$PROJECT_DIR$/js/lib/Sortable.min.js" />
-    <file url="file://$PROJECT_DIR$/js/lib/underscore-min.js" />
   </component>
   <component name="ProjectRootManager" version="2" />
 </project>

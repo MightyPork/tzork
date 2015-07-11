@@ -85,7 +85,14 @@
 .person-label {
 	display: block;
 	cursor: initial;
+	position:relative;
 	@include naked();
+
+	max-width: 10em;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	word-wrap: normal;
 
 	text-shadow: 0 0 2px black, 0 0 4px black, 0 0 6px black;
 
@@ -93,13 +100,17 @@
 		.count-#{$i} &:first-child:after {
 			transition: opacity .1s linear;
 			content: ' + #{$i - 1}';
+			//position:absolute;right:0;
 		}
 	}
 }
 
-.multiple a.person-label:hover {
-	position: relative;
-	left: 1px;
+a.person-label {
+	cursor: pointer;
+}
+
+a.person-label:hover {
+	text-decoration: underline;
 }
 
 .people-list {
@@ -110,7 +121,7 @@
 	position: absolute;
 	text-decoration: none;
 	@include plist-em-offset(1.2em);
-	overflow: hidden;
+	overflow-y: hidden;
 
 	border-radius: 5px;
 

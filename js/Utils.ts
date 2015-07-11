@@ -68,7 +68,6 @@ module Utils {
 		}
 	}
 
-
 	export function positionAtPx(element: HTMLElement, angle: number, distance: number, fullw: number, offs: number, octant: number = 0): void {
 		var xx = (distance * Math.cos((angle / 180) * Math.PI));
 		var yy = (distance * Math.sin((angle / 180) * Math.PI));
