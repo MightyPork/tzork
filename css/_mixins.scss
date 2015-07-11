@@ -72,3 +72,8 @@ $break-large: 1024px;
 		@media only screen and (min-width: $break-large) { @content; }
 	}
 }
+
+/** Seems to fix random rendering glitches for no reason */
+@mixin chrome-fairy-dust() {
+	-webkit-transform: translate3d(0,0,0);
+}

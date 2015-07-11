@@ -1399,7 +1399,9 @@ var Tzork;
                     w -= 180 * 2;
                     h -= 80 * 2;
                 }
-                var s = Math.min(w, h);
+                var s = Math.round(Math.min(w, h));
+                if (s % 2)
+                    s++;
                 _this.setDiskSize(s);
             };
             window.onresize = resizeClock;

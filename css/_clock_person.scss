@@ -83,6 +83,7 @@
 }
 
 .person-label {
+	@include chrome-fairy-dust();
 	display: block;
 	cursor: initial;
 	position:relative;
@@ -114,6 +115,7 @@ a.person-label:hover {
 }
 
 .people-list {
+	@include chrome-fairy-dust();
 	@include nowrap();
 	@include can-select();
 	@include basefont();
@@ -139,6 +141,7 @@ a.person-label:hover {
 }
 
 .bullet {
+	@include chrome-fairy-dust();
 	position: absolute;
 	cursor: default;
 	$w: 1em;

@@ -39,7 +39,8 @@ module Tzork {
 					h -= 80 * 2;
 				}
 
-				var s = Math.min(w, h);
+				var s = Math.round(Math.min(w, h));
+				if(s%2) s++;// round to even (chrome render blur glitch)
 
 				this.setDiskSize(s);
 			};
