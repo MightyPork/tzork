@@ -1156,7 +1156,7 @@ var RGBColor = (function () {
                 }
             },
             {
-                re: /^rgba\((\d{1,3}),\s*(\d{1,3}),\s*(\d{1,3}),\s*(\d{1,3})\)$/,
+                re: /^rgba\((\d{1,3}),\s*(\d{1,3}),\s*(\d{1,3}),\s*(?:[\d.]+)\)$/,
                 process: function (bits) {
                     return [
                         parseInt(bits[1]),

@@ -206,7 +206,7 @@ class RGBColor {
 				}
 			},
 			{
-				re: /^rgba\((\d{1,3}),\s*(\d{1,3}),\s*(\d{1,3}),\s*(\d{1,3})\)$/,
+				re: /^rgba\((\d{1,3}),\s*(\d{1,3}),\s*(\d{1,3}),\s*(?:[\d.]+)\)$/,
 				//example: ['rgb(123, 234, 45)', 'rgb(255,234,245)'],
 				process: function (bits) {
 					return [
