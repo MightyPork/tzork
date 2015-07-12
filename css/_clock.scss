@@ -1,39 +1,19 @@
 #disc {
-	// centering
 	cursor: default;
 	position: absolute;
 
 	left: 50%; top: 50%;
 	@include translate(-50%, -50%);
 
-	//width: 45%;
-	//height: 0;
-	//padding-bottom: 45%;
-
 	border-radius: 50%;
 	border-width: .2em;
-	border-style: solid; // $fg;
-
-	//color: $fg;
+	border-style: solid;
 
 	box-shadow: 0 0 3px 1px black, inset 0 0 3px 1px black;
 
-	//background-image: url("../images/earth-from-space-small.jpg");
 	background-size: cover;
 	background-position: center center;
 	background-repeat: no-repeat;
-
-//	@include respond-to(tiny) {
-//		border-width: 1px;
-//	}
-//
-//	@include respond-to(small) {
-//		border-width: 1px;
-//	}
-//
-//	@include respond-to(medium) {
-//		border-width: 2px;
-//	}
 
 	@include no-select();
 }
@@ -49,30 +29,6 @@
 		font-weight: bold;
 		font-size: 3.2em;
 	}
-
-//	@include respond-to(tiny) {
-//		font-size: 0.8em;
-//
-//		&.sixth {
-//			font-size: 1em;
-//		}
-//	}
-//
-//	@include respond-to(small) {
-//		font-size: 1.1em;
-//
-//		&.sixth {
-//			font-size: 1.3em;
-//		}
-//	}
-//
-//	@include respond-to(medium) {
-//		font-size: 1.8em;
-//
-//		&.sixth {
-//			font-size: 2.2em;
-//		}
-//	}
 }
 
 @import "clock_person";

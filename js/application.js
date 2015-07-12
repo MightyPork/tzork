@@ -1370,12 +1370,26 @@ var Tzork;
         }
         var rc = new RGBColor(color);
         var isFgDark = Utils.isColorDark(rc.r, rc.g, rc.b);
+        var rc = new RGBColor(in_c);
+        var isInBgDark = Utils.isColorDark(rc.r, rc.g, rc.b);
+        var rc = new RGBColor(out_c);
+        var isOutBgDark = Utils.isColorDark(rc.r, rc.g, rc.b);
         if (isFgDark) {
-            css += '#disc {box-shadow: 0 0 3px 1px white, inset 0 0 3px 1px white}';
-            css += '.mark {text-shadow: 0 0 3px white, 0 0 6px white}';
+            if (in_i == 'none' && out_i == 'none' && (in_c != 'transparent' && !isInBgDark) && (!isOutBgDark)) {
+                css += '#disc {box-shadow: none}';
+            }
+            else {
+                css += '#disc {box-shadow: 0 0 3px 1px white, inset 0 0 3px 1px white}';
+            }
             css += '.bullet {box-shadow: 0 0 4px white}';
-            css += '#profile-label {text-shadow: 0 0 8px white, 0 0 4px white}';
-            css += '#local-time {text-shadow: 0 0 8px white, 0 0 4px white}';
+            if (in_i == 'none' && ((in_c != 'transparent' && !isInBgDark) || (in_c == 'transparent' && (out_i == 'none' && !isOutBgDark)))) {
+                css += '.mark {text-shadow: none}';
+                css += '#time-box {text-shadow: none}';
+            }
+            else {
+                css += '.mark {text-shadow: 0 0 3px white, 0 0 6px white}';
+                css += '#time-box {text-shadow: 0 0 8px white, 0 0 4px white}';
+            }
         }
         if (prof.menuColor) {
             color = prof.menuColor;

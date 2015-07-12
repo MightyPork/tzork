@@ -27,9 +27,6 @@
 
 	&:hover {
 		background-color: rgba(black, .7);
-
-		// really thick black shadow
-		//text-shadow: 0 0 6px black, 0 0 6px black, 0 0 6px black, 0 0 6px black, 0 0 6px black;
 		z-index: 1000;
 
 		-webkit-backdrop-filter: blur(5px);
@@ -126,18 +123,6 @@ a.person-label:hover {
 	overflow-y: hidden;
 
 	border-radius: 5px;
-
-//	@include respond-to(tiny) {
-//		@include plist-em-offset(0.8em);
-//	}
-//
-//	@include respond-to(small) {
-//		@include plist-em-offset(0.9em);
-//	}
-//
-//	@include respond-to(medium) {
-//		@include plist-em-offset(1em);
-//	}
 }
 
 .bullet {
@@ -147,21 +132,6 @@ a.person-label:hover {
 	$w: 1em;
 	width: $w;
 	height: $w;
-
-//	@include respond-to(tiny) {
-//		width: $w*0.3;
-//		height: $w*0.3;
-//	}
-//
-//	@include respond-to(small) {
-//		width: $w*0.5;
-//		height: $w*0.5;
-//	}
-//
-//	@include respond-to(medium) {
-//		width: $w*0.7;
-//		height: $w*0.7;
-//	}
 
 	border-radius: 50%;
 	border: 1px solid black;
