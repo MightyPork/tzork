@@ -75,7 +75,6 @@ module Tzork {
 
 			console.log('Populate with profile: ', profile);
 
-			//this._applyColorsFromProfile();
 			Tzork.applyThemeFromProfile();
 
 			var lbl = Utils.queryOne('#profile-label');

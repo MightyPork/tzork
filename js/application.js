@@ -821,6 +821,18 @@ var Utils;
         return (((r * 299) + (g * 587) + (b * 114)) / 1000) < 128;
     }
     Utils.isColorDark = isColorDark;
+    function applyStylesheet(id, css) {
+        var oldstyle = document.getElementById(id);
+        if (oldstyle) {
+            oldstyle.parentElement.removeChild(oldstyle);
+        }
+        var sty = document.createElement('style');
+        sty.type = 'text/css';
+        sty.innerHTML = css;
+        sty.id = id;
+        document.head.appendChild(sty);
+    }
+    Utils.applyStylesheet = applyStylesheet;
 })(Utils || (Utils = {}));
 var tz_def_profile = {
     "title": "My Tzork",
@@ -1338,10 +1350,6 @@ var RGBColor = (function () {
 var Tzork;
 (function (Tzork) {
     function applyThemeFromProfile() {
-        var oldstyle = document.getElementById('theme-styles');
-        if (oldstyle) {
-            oldstyle.parentElement.removeChild(oldstyle);
-        }
         var css = '';
         var prof = Tzork.theRepo.profiles[Tzork.theRepo.activeProfile];
         var out_i, out_c;
@@ -1376,11 +1384,7 @@ var Tzork;
         css += '#menubar {color: ' + color + '}';
         css += '.profiles-menu a {background-color: ' + rc.toRGBA(.1) + '}';
         css += '.profiles-menu a:hover {background-color: ' + rc.toRGBA(.2) + '}';
-        var sty = document.createElement('style');
-        sty.type = 'text/css';
-        sty.innerHTML = css;
-        sty.id = 'theme-styles';
-        document.head.appendChild(sty);
+        Utils.applyStylesheet('theme-styles', css);
     }
     Tzork.applyThemeFromProfile = applyThemeFromProfile;
 })(Tzork || (Tzork = {}));

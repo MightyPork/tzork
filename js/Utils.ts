@@ -140,9 +140,11 @@ module Utils {
 		}
 	}
 
+
 	export function queryOne(query: string): HTMLElement {
 		return <HTMLElement> document.querySelector(query);
 	}
+
 
 	export function setIfMissing(obj: Object, key: string, value: any) {
 		if (!keyExists(obj, key)) {
@@ -150,14 +152,17 @@ module Utils {
 		}
 	}
 
+
 	export function keyExists(x: Object, key: string) {
 		return typeof(x[key]) != 'undefined';
 	}
+
 
 	export function objGet(obj: Object, key: string, def: any) {
 		if (!keyExists(obj, key)) return def;
 		return obj[key];
 	}
+
 
 	/** Make <tab> key work properly in textareas */
 	export function fixTextareaTabKey() {
@@ -174,6 +179,7 @@ module Utils {
 			}
 		}
 	}
+
 
 	export function hoverMenu(button, menu) {
 		var menuopen = false;
@@ -199,6 +205,7 @@ module Utils {
 		$(menu).on('mouseout', outhandler);
 		$(button).on('mouseout', outhandler);
 	}
+
 
 	export function rgb2hsb(r, g, b) {
 		r /= 255;
@@ -241,7 +248,23 @@ module Utils {
 		return HSB;
 	}
 
+
 	export function isColorDark(r: number, g: number, b: number) : boolean {
 		return (((r * 299) + (g * 587) + (b * 114)) / 1000) < 128;
+	}
+
+
+	export function applyStylesheet(id, css) {
+		// Nuke old style element
+		var oldstyle = document.getElementById(id);
+		if (oldstyle) {
+			oldstyle.parentElement.removeChild(oldstyle);
+		}
+		var sty: HTMLStyleElement = document.createElement('style');
+		sty.type = 'text/css';
+		sty.innerHTML = css;
+		sty.id = id;
+
+		document.head.appendChild(sty);
 	}
 }

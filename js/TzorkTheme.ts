@@ -3,12 +3,6 @@
 
 module Tzork {
 	export function applyThemeFromProfile() {
-		// Nuke old style element
-		var oldstyle = document.getElementById('theme-styles');
-		if (oldstyle) {
-			oldstyle.parentElement.removeChild(oldstyle);
-		}
-
 		var css = '';
 
 		var prof = theRepo.profiles[theRepo.activeProfile];
@@ -60,11 +54,6 @@ module Tzork {
 		css += '.profiles-menu a {background-color: ' + rc.toRGBA(.1) + '}';
 		css += '.profiles-menu a:hover {background-color: ' + rc.toRGBA(.2) + '}';
 
-		var sty: HTMLStyleElement = document.createElement('style');
-		sty.type = 'text/css';
-		sty.innerHTML = css;
-		sty.id = 'theme-styles';
-
-		document.head.appendChild(sty);
+		Utils.applyStylesheet('theme-styles', css);
 	}
 }
