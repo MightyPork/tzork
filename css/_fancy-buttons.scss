@@ -44,8 +44,6 @@ a.button {
 	font-size: 110%;
 	outline:0 none!important;
 
-	@include chrome-fairy-dust();
-
 	// FA icon
 	&::before {
 		margin-left:0;
