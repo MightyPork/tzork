@@ -1399,22 +1399,23 @@ var Tzork;
             var resizeClock = function () {
                 var w = window.innerWidth;
                 var h = window.innerHeight;
-                if (w < 450) {
-                    w -= 135 * 2;
-                    h -= 40 * 2;
-                }
-                else if (w < 750) {
-                    w -= 160 * 2;
-                    h -= 60 * 2;
-                }
-                else {
-                    w -= 180 * 2;
-                    h -= 80 * 2;
-                }
+                var s_full = Math.round(Math.min(w, h)) * 1.2;
+                var fs_full = Math.round(s_full * 0.02);
+                w -= fs_full * 19;
+                h -= fs_full * 8;
                 var s = Math.round(Math.min(w, h));
                 if (s % 2)
                     s++;
                 _this.setDiskSize(s);
+                var fs = Math.round(s * 0.019);
+                if (fs < 8)
+                    fs = 8;
+                var css = '#disc {font-size:' + fs + 'px}';
+                if (s < 250) {
+                    css += '.mark {font-size:1.4em}.mark.sixth{font-size:1.8em}';
+                    css += '#time-box {font-size: .6em;}';
+                }
+                Utils.applyStylesheet('size-style', css);
             };
             window.onresize = resizeClock;
             resizeClock();

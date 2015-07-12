@@ -1,9 +1,9 @@
 // Offsets for people lists, so they look aligned with the dots
 @mixin plist-em-offset($lineheight) {
 	font-size: $lineheight;
-	$lh: $lineheight*1.4;
+	$lh: $lineheight*1.2;
 	line-height: $lh;
-	$padding_ratio: 0.2;
+	$padding_ratio: 0.15;
 	height: $lh;
 	padding: 0 ($lh * $padding_ratio);
 	margin: 0 -.5em;
@@ -122,22 +122,22 @@ a.person-label:hover {
 	display: block;
 	position: absolute;
 	text-decoration: none;
-	@include plist-em-offset(1.2em);
+	@include plist-em-offset(1.3em);
 	overflow-y: hidden;
 
 	border-radius: 5px;
 
-	@include respond-to(tiny) {
-		@include plist-em-offset(0.8em);
-	}
-
-	@include respond-to(small) {
-		@include plist-em-offset(0.9em);
-	}
-
-	@include respond-to(medium) {
-		@include plist-em-offset(1em);
-	}
+//	@include respond-to(tiny) {
+//		@include plist-em-offset(0.8em);
+//	}
+//
+//	@include respond-to(small) {
+//		@include plist-em-offset(0.9em);
+//	}
+//
+//	@include respond-to(medium) {
+//		@include plist-em-offset(1em);
+//	}
 }
 
 .bullet {
@@ -148,20 +148,20 @@ a.person-label:hover {
 	width: $w;
 	height: $w;
 
-	@include respond-to(tiny) {
-		width: $w*0.3;
-		height: $w*0.3;
-	}
-
-	@include respond-to(small) {
-		width: $w*0.5;
-		height: $w*0.5;
-	}
-
-	@include respond-to(medium) {
-		width: $w*0.7;
-		height: $w*0.7;
-	}
+//	@include respond-to(tiny) {
+//		width: $w*0.3;
+//		height: $w*0.3;
+//	}
+//
+//	@include respond-to(small) {
+//		width: $w*0.5;
+//		height: $w*0.5;
+//	}
+//
+//	@include respond-to(medium) {
+//		width: $w*0.7;
+//		height: $w*0.7;
+//	}
 
 	border-radius: 50%;
 	border: 1px solid black;
