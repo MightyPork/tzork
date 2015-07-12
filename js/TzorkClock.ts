@@ -29,7 +29,7 @@ module Tzork {
 				// subtract expected size of labels (?) (a guess)
 
 				var s_full = Math.round(Math.min(w, h))*1.2;
-				var fs_full = Math.round(s_full*0.02);
+				var fs_full = Math.round(s_full*0.0185);
 
 				w -= fs_full*19;
 				h -= fs_full*8;
