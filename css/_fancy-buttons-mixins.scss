@@ -1,0 +1,43 @@
+@mixin fancy-btn-base() {
+	cursor: pointer;
+	display: inline-block;
+	border-radius: 3px;
+	padding: 0 0.5em;
+	margin-left: 0.7em;
+	@include no-select();
+	@include nowrap();
+
+	&:active {
+		position: relative;
+		top: 2px;
+	}
+
+	&, &:active, &:hover, &:visited {
+		text-decoration: none;
+	}
+}
+
+@mixin fancy-btn-colors($text, $back, $back_a) {
+	background-color: $back;
+
+	box-shadow: 0 3px 0 darken($back, 12);
+
+	color: $text;
+
+	&:hover, &:active {
+		background-color: $back_a;
+	}
+
+	&:hover {
+		box-shadow: 0 3px 0 darken($back_a, 12);
+	}
+
+	&:active {
+		box-shadow: 0 1px 0 darken($back_a, 12);
+	}
+}
+
+@mixin fancy-btn($text, $back, $back_a) {
+	@include fancy-btn-base();
+	@include fancy-btn-colors($text, $back, $back_a);
+}

@@ -4,10 +4,6 @@
 	@include user-select(none);
 }
 
-@mixin fix-weird-chrome-flicker() {
-	@include backface-visibility(hidden);
-}
-
 @mixin can-select() {
 	@include user-select(initial);
 }
@@ -76,4 +72,24 @@ $break-large: 1024px;
 /** Seems to fix random rendering glitches for no reason */
 @mixin chrome-fairy-dust() {
 	-webkit-transform: translate3d(0,0,0);
+}
+
+@mixin fix-weird-chrome-flicker() {
+	@include backface-visibility(hidden);
+}
+
+@mixin inset-shadow-top($w, $c) {
+	box-shadow: inset 0 $w ($w*2) (-$w) $c;
+}
+
+@mixin inset-shadow-bottom($w, $c) {
+	box-shadow: inset 0 (-$w) ($w*2) (-$w) $c;
+}
+
+@mixin inset-shadow-left($w, $c) {
+	box-shadow: inset $w 0 ($w*2) (-$w) $c;
+}
+
+@mixin inset-shadow-right($w, $c) {
+	box-shadow: inset (-$w) 0 ($w*2) (-$w) $c;
 }

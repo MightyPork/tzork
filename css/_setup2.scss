@@ -1,0 +1,188 @@
+@import "fancy-buttons-mixins";
+
+.DialogGui {
+	position: absolute;
+	left: 50%;
+	@include transform(translate(-50%,0));
+
+	//@include highlight(lime);
+
+	width: 700px;
+	top: .4rem;
+	bottom: .4rem;
+
+	max-height: 100%;
+	max-width: calc(100% - .8em);
+
+	$dlg-fg: #efefef;
+	$radius: 3px;
+
+	.Col {
+		height: 100%;
+
+		&.tabs {
+			float: left;
+			position: relative;
+			padding-top: 3.2rem;
+
+			.Tab {
+				$w: 2em;
+				$h: 5em;
+				$gap: .5em;
+
+				color: #666;
+				background: $dlg-fg;
+				display: block;
+
+				width: $w;
+				height: $h;
+				margin-bottom: $gap;
+				border-top-left-radius: $radius;
+				border-bottom-left-radius: $radius;
+
+				@include inset-shadow-right(5px, rgba(black, .6));
+
+				cursor: pointer;
+				@include no-select();
+				@include nowrap();
+				position:relative;
+
+				// rotated inner text
+				span {
+					display: inline-block;
+					@include transform(rotate(-90deg));
+					@include transform-origin(left top);
+
+					width: $h;
+					position: relative; bottom: -$h;
+					line-height: $w;
+					vertical-align: middle;
+					text-align: center;
+				}
+
+				&.active, &:hover {
+					color: black;
+				}
+
+				&.active {
+					z-index: 999;
+					box-shadow: none;
+				}
+			}
+		}
+
+		&.settings {
+			background: $dlg-fg;
+			overflow: hidden;
+			color: #333;
+			z-index: 10;
+			position: relative;
+
+			border-radius: $radius;
+
+			.Pane {
+				position: absolute;
+				$pad: .5rem;
+				padding: $pad;
+				width: 100%;
+
+				// pane size
+				$p-head-h: 3rem;
+				$p-btns-h: 3.5rem;
+
+				// inner shadows
+				$in-sh-w: 5px;
+				$in-sh-c: rgba(black, .7);
+
+
+				&.heading {
+					top: 0;
+					height: $p-head-h;
+					line-height: $p-head-h - 2*$pad;
+					vertical-align: middle;
+					border-bottom: 2px solid #ddd;
+					font-size: 1.2em;
+				}
+
+				&.content {
+					top: $p-head-h;
+					bottom: $p-btns-h;
+
+					overflow-y: auto;
+
+					textarea {
+						display: block;
+						width: 100%;
+						height: calc(100% - 2.6em);
+
+						resize: none;
+						font-family: "Source Code Pro", Consolas, monospace;
+						padding: .5em;
+						font-size: 1em;
+
+						@include tab-size(4);
+					}
+
+					#json_change_buttons {
+						display: block;
+						text-align: left;
+						margin: $pad 0 0 0;
+
+						a {
+							margin: 0;
+							margin-right: $pad;
+						}
+
+						&.disabled {
+							a.button {
+								cursor: default;
+
+								&:active {
+									top: 0;
+								}
+
+								// special style for disabled button
+								&, &:active, &:hover {
+									box-shadow: 0 3px 0 darken(#BBB, 12);
+									color: #666;
+									background-color: #BBB;
+								}
+							}
+						}
+					}
+				}
+
+				&.buttons {
+					text-align: right;
+					position: absolute;
+					bottom: 0;
+					height: $p-btns-h;
+					line-height: $p-btns-h - 2*$pad;
+					vertical-align: middle;
+
+					@include inset-shadow-top($in-sh-w, $in-sh-c);
+
+					a {
+						margin: 0;
+						margin-left: $pad;
+					}
+				}
+			}
+
+			#{$all-text-inputs} {
+				background: rgba(white, .6);
+				@include appearance(none);
+				border-radius: 3px;
+				border: 0 none;
+
+				box-shadow: inset 0 0 3px rgba(black, .4);
+				padding: .2em;
+
+				&:focus {
+					box-shadow: inset 0 0 5px rgba(black, .6);
+					outline: none;
+				}
+			}
+		}
+	}
+}

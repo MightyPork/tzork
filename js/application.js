@@ -1727,6 +1727,30 @@ var TzorkSetup;
     }
     TzorkSetup.buildProfilesMenu = buildProfilesMenu;
 })(TzorkSetup || (TzorkSetup = {}));
+var TzorkSetupGUI;
+(function (TzorkSetupGUI) {
+    function init() {
+        $('#menu-btn-edit2').on('click', function () {
+            openDialog();
+        });
+    }
+    TzorkSetupGUI.init = init;
+    function openDialog() {
+        var modal = document.getElementById('setup_dialog2');
+        modal.style.display = 'block';
+        setTimeout(function () {
+            modal.style.opacity = "1";
+        }, 1);
+    }
+    function closeDialog() {
+        var modal = document.getElementById('setup_dialog2');
+        modal.style.opacity = "0";
+        setTimeout(function () {
+            modal.style.display = 'none';
+        }, 500);
+    }
+    TzorkSetupGUI.closeDialog = closeDialog;
+})(TzorkSetupGUI || (TzorkSetupGUI = {}));
 var Tzork;
 (function (Tzork) {
     Tzork.theClock;
@@ -1763,6 +1787,7 @@ var Tzork;
         Tzork.theConfig = conf;
         _initMenu();
         _initClock();
+        TzorkSetupGUI.init();
         Utils.fixTextareaTabKey();
     }
     Tzork.init = init;

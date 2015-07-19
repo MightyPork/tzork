@@ -3,6 +3,7 @@
 /// <reference path="TzorkSetup.ts" />
 /// <reference path="Utils.ts" />
 /// <reference path="typing/jquery.d.ts" />
+/// <reference path="TzorkSetupGUI.ts" />
 
 
 module Tzork {
@@ -54,6 +55,7 @@ module Tzork {
 
 		_initMenu();
 		_initClock();
+		TzorkSetupGUI.init();
 
 		Utils.fixTextareaTabKey();
 	}
