@@ -26,8 +26,7 @@ module Tzork {
 				var w = window.innerWidth;
 				var h = window.innerHeight;
 
-				// subtract expected size of labels (?) (a guess)
-
+				// subtract expected size of labels
 				var s_full = Math.round(Math.min(w, h))*1.2;
 				var fs_full = Math.round(s_full*0.0185);
 
