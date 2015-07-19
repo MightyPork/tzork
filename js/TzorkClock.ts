@@ -39,7 +39,7 @@ module Tzork {
 
 				this.setDiskSize(s);
 
-				var fs = Math.round(s*0.019);
+				var fs = Math.round(s*0.025);
 				if(fs < 8) fs = 8;
 
 				var css = '#disc {font-size:'+fs+'px}';
