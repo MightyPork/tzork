@@ -36,44 +36,43 @@
 </head>
 <body onload="main()" id="tzork-bg" class="theme-outer theme-fg">
 
-<!--<div class="Modal" id="setup_dialog" style="opacity: 0; display: none;">-->
-	<!--<div class="Dialog">-->
-		<!--<div>-->
-			<!--<div class="Title">Your Tzork configuration</div>-->
-			<!--<textarea id="people_json" spellcheck="false"></textarea>-->
-
-			<!--<div class="Error" id="people_error"></div>-->
-			<!--<div class="Buttons">-->
-				<!--<a href="#" class="button red icon-profile-delete" onClick="TzorkSetup.submitPeopleEdit('delete'); return false;">Destroy</a>&lt;!&ndash;-->
-				<!--&ndash;&gt;<a href="#" class="button orange icon-cancel" onClick="TzorkSetup.submitPeopleEdit('close'); return false;">Cancel</a>&lt;!&ndash;-->
-				<!--&ndash;&gt;<a href="#" class="button green icon-save" onClick="TzorkSetup.submitPeopleEdit('save'); return false;">Save</a>-->
-			<!--</div>-->
-		<!--</div>-->
-	<!--</div>-->
-<!--</div>-->
-
 <div class="Modal" id="setup_dialog2" style="opacity: 0; display: none;">
 	<div class="DialogGui">
+		<!-- left tabs column -->
 		<div class="Col tabs">
-			<span class="Tab"><span>People</span></span>
-			<span class="Tab active"><span>Theme</span></span>
-			<span class="Tab"><span>JSON</span></span>
+			<span class="Tab active" id="tab-btn-people" data-action="people">
+				<span>People</span>
+			</span>
+
+			<span class="Tab" id="tab-btn-theme" data-action="theme">
+				<span>Theme</span>
+			</span>
+
+			<span class="Tab" id="tab-btn-json" data-action="json">
+				<span>JSON</span>
+			</span>
 		</div>
+
+		<!-- right column -->
 		<div class="Col settings">
+			<!-- heading row -->
 			<div class="Pane heading">
 				<label for="prof_title">Profile</label>
 				<input type="text" id="prof_title" name="title" value="Blah Bluh">
 			</div>
 
+			<!-- people list -->
 			<div class="Pane content" id="pane-people">
 
 			</div>
 
-			<div class="Pane content" id="pane-theme">
+			<!-- theme settings -->
+			<div class="Pane content gone" id="pane-theme">
 
 			</div>
 
-			<div class="Pane content" id="pane-json">
+			<!-- JSON view of the profile -->
+			<div class="Pane content gone" id="pane-json">
 				<textarea id="profile_json" spellcheck="false"></textarea>
 				<div id="json_change_buttons" class="disabled">
 					<a class="button red">Reset</a><!--
@@ -82,7 +81,7 @@
 				<div class="Error" id="json_error"></div>
 			</div>
 
-
+			<!-- dialog close buttons -->
 			<div class="Pane buttons">
 				<a href="#" class="button red icon-profile-delete"
 				   onClick="TzorkSetup.submitPeopleEdit('delete'); return false;">Destroy</a><!--

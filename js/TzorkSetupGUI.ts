@@ -6,6 +6,14 @@ module TzorkSetupGUI {
 		$('#menu-btn-edit2').on('click', function() {
 			openDialog();
 		});
+
+		$('.DialogGui .Tab').on('click', function(){
+			$('.DialogGui .Pane.content').addClass('gone');
+			$('.DialogGui .Tab').removeClass('active');
+			var act = $(this).data('action');
+			$('#pane-'+act).removeClass('gone');
+			$(this).addClass('active');
+		});
 	}
 
 	function openDialog() {
