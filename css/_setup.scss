@@ -1,3 +1,5 @@
+@import "fancy-buttons-mixins";
+
 #setup_btn {
 	@include no-select();
 
@@ -26,52 +28,265 @@
 	color: #111;
 
 	transition: opacity .2s;
-
-	.Dialog {
-		max-width: calc(100% - .4em);
-		max-height: calc(100% - .4em);
-		border-radius: 2px;
-		background: #eaeaea;
-		box-shadow: 0 10px 20px black;
-
-		width: 600px;
-
-		text-align: center;
-
-		position: absolute;
-		left: 50%;
-		top: 50%;
-		@include transform(translate(-50.5%, -50.5%));
-
-		padding: 5px;
-
-		.Title {
-			padding: 0 0 .4em 0;
-			font-size: 1.4em;
-			font-weight: bold;
-			color: #333;
-		}
-
-		.Error {
-			padding: .3em;
-			color: #ad1b31;
-		}
-
-		.Buttons {
-			padding: .4em;
-			line-height: 2.5em;
-		}
-	}
 }
 
-#people_json {
-	display: block;
-	width: 100%;
-	height: 30em;
-	max-height: 80%;
+.DialogGui {
+	position: absolute;
+	left: 50%;
+	@include transform(translate(-50%,0));
 
-	resize: none;
-	font-family: monospace;
+	//@include highlight(lime);
 
-	@include tab-size(2);
+	width: 800px;
+	top: 1rem;
+	bottom: 1rem;
+
+	max-height: 100%;
+	max-width: calc(100% - 2rem);
+
+	@media only screen and (max-width: 639px) {
+		top: .2rem;
+		bottom: .2rem;
+		max-width: calc(100% - .4rem);
+	}
+
+
+	$dlg-fg: #efefef;
+	$radius: 3px;
+	$tab-w: 2em;
+
+	.Col {
+		height: 100%;
+
+		&.tabs {
+			position: absolute;
+			top: 0; left: 0;
+			padding-top:3.2rem;
+
+			width: $tab-w;
+
+			.Tab {
+				$h: 5em;
+				$gap: .5em;
+
+				color: #666;
+				background: $dlg-fg;
+				display: block;
+
+				width: $tab-w;
+				height: $h;
+				margin-bottom: $gap;
+				border-top-left-radius: $radius;
+				border-bottom-left-radius: $radius;
+
+				@include inset-shadow-right(5px, rgba(black, .6));
+
+				cursor: pointer;
+				@include no-select();
+				@include nowrap();
+				position:relative;
+
+				// rotated inner text
+				span {
+					display: inline-block;
+					@include transform(rotate(-90deg));
+					@include transform-origin(left top);
+
+					width: $h;
+					position: relative; bottom: -$h;
+					line-height: $tab-w;
+					vertical-align: middle;
+					text-align: center;
+				}
+
+				&.active, &:hover {
+					color: black;
+				}
+
+				&.active {
+					z-index: 999;
+					box-shadow: none;
+				}
+			}
+		}
+
+		&.settings {
+			background: $dlg-fg;
+			color: #333;
+			z-index: 10;
+			position: absolute;
+			left: $tab-w;
+			width: calc(100% - #{$tab-w});
+			top: 0;
+
+			border-radius: $radius;
+
+			.Pane {
+				position: absolute;
+				$pad: .5rem;
+				padding: $pad;
+				width: 100%;
+
+				// pane size
+				$p-head-h: 3rem;
+				$p-btns-h: 3.5rem;
+
+				// Temporary TODO
+				.ComingSoon {
+					font-size: 3em;
+					padding: .5em;
+					text-align:center;
+				}
+
+				&.heading {
+					top: 0;
+					height: $p-head-h;
+					line-height: $p-head-h - 2*$pad;
+					vertical-align: middle;
+					border-bottom: 2px solid #ddd;
+					font-size: 1.2em;
+
+					input {
+						width: 16em;
+					}
+
+
+					@media only screen and (max-width: 639px) {
+						input {
+							width: 10em;
+						}
+					}
+				}
+
+				&.content {
+					top: $p-head-h;
+					bottom: $p-btns-h;
+
+					overflow-y: auto;
+
+					textarea {
+						display: block;
+						width: 100%;
+						height: calc(100% - 2.6em);
+
+						resize: none;
+						font-family: "Source Code Pro", Consolas, monospace;
+						padding: .5em;
+						font-size: 1em;
+
+						@include tab-size(4);
+					}
+
+					#json_change_buttons {
+						display: block;
+						text-align: left;
+						margin: $pad 0 0 0;
+
+						a {
+							margin: 0;
+							margin-right: $pad;
+						}
+
+						&.disabled {
+							a.button {
+								cursor: default;
+
+								&:active {
+									top: 0;
+								}
+
+								// special style for disabled button
+								&, &:active, &:hover {
+									box-shadow: 0 3px 0 darken(#BBB, 12);
+									color: #666;
+									background-color: #BBB;
+								}
+							}
+						}
+
+						.Error {
+							color: #cc1c34;
+							font-size: 1.1em;
+						}
+					}
+				}
+
+				&.buttons {
+					text-align: right;
+					position: absolute;
+					bottom: 0;
+					height: $p-btns-h;
+					line-height: $p-btns-h - 2*$pad;
+					vertical-align: middle;
+
+					@include inset-shadow-top(4px, rgba(black, .3));
+					background: darken($dlg-fg, 10);
+					@include border-bottom-radius($radius);
+
+					$stop: 639px;
+
+					a {
+						margin: 0;
+						margin-left: $pad;
+
+						span.short {
+							display:none;
+						}
+
+						@media only screen and (max-width: $stop) {
+							span.short {
+								display: inline;
+							}
+
+							span.long {
+								display: none;
+							}
+
+							&::before {
+								margin-right: .2em;
+							}
+
+							padding-left: .3em;
+							padding-right: .3em;
+						}
+					}
+
+					.Right a {
+						@media only screen and (max-width: $stop) {
+							margin-left: $pad/2;
+						}
+					}
+
+					.Left {
+						position: absolute;
+						left: $pad;
+
+						a {
+							margin-left: 0;
+							margin-right: $pad;
+
+							@media only screen and (max-width: $stop) {
+								margin-right: $pad/2;
+							}
+						}
+					}
+				}
+			}
+
+			#{$all-text-inputs} {
+				background: rgba(white, .6);
+				@include appearance(none);
+				border-radius: 3px;
+				border: 0 none;
+
+				box-shadow: inset 0 0 3px rgba(black, .4);
+				padding: .2em;
+
+				&:focus {
+					box-shadow: inset 0 0 5px rgba(black, .6);
+					outline: none;
+				}
+			}
+		}
+	}
 }
