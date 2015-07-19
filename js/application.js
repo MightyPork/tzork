@@ -1622,7 +1622,7 @@ var Tzork;
             var la;
             if (obj.name.indexOf('@') === 0) {
                 la = document.createElement('a');
-                la.href = 'https://twitter.com/' + obj.name;
+                la.href = 'http://twitter.com/' + obj.name;
                 la.target = '_blank';
             }
             else {
@@ -1637,29 +1637,74 @@ var Tzork;
     })();
     Tzork.Clock = Clock;
 })(Tzork || (Tzork = {}));
-var TzorkSetup;
-(function (TzorkSetup) {
-    function openSetupDialog() {
-        document.getElementById('people_error').textContent = '';
-        var ta = document.getElementById('people_json');
-        ta.value = JSON.stringify(Tzork.stripProfile(Tzork.theRepo.getActiveProfile()), null, '\t');
-        var modal = document.getElementById('setup_dialog');
+var TzorkSetupGUI;
+(function (TzorkSetupGUI) {
+    var editedProfileJSON;
+    var jsonSubmitBtnsEnabled;
+    function init() {
+        $('#menu-btn-edit').on('click', openDialog);
+        $('.DialogGui .Tab').on('click', function () {
+            $('.DialogGui .Pane.content').addClass('gone');
+            $('.DialogGui .Tab').removeClass('active');
+            var act = $(this).data('action');
+            $('#pane_' + act).removeClass('gone');
+            $(this).addClass('active');
+        });
+        $('#field_title').on('change paste keypress keyup keydown', function () {
+            var _this = this;
+            setTimeout(function () {
+                editedProfileJSON.title = $(_this).val();
+                updateJsonDisplay();
+            }, 1);
+        });
+        $('#profile_json').on('change paste keypress keyup keydown', function () {
+            enableJsonSubmitButtons(true);
+        });
+    }
+    TzorkSetupGUI.init = init;
+    function enableJsonSubmitButtons(yes) {
+        $('#json_change_buttons').toggleClass('disabled', !yes);
+        jsonSubmitBtnsEnabled = yes;
+        if (!yes) {
+            $('#json_error').empty();
+        }
+    }
+    function updateJsonDisplay() {
+        $('#profile_json').val(JSON.stringify(editedProfileJSON, null, '\t'));
+        enableJsonSubmitButtons(false);
+    }
+    function updateFieldsFromJson() {
+        $('#field_title').val(editedProfileJSON.title);
+    }
+    function openDialog() {
+        editedProfileJSON = Tzork.stripProfile(Tzork.theRepo.getActiveProfile());
+        updateJsonDisplay();
+        updateFieldsFromJson();
+        $('#json_error').empty();
+        var modal = document.getElementById('profile_edit_dialog');
         modal.style.display = 'block';
         setTimeout(function () {
             modal.style.opacity = "1";
         }, 1);
     }
-    TzorkSetup.openSetupDialog = openSetupDialog;
+    TzorkSetupGUI.openDialog = openDialog;
+    function closeDialog() {
+        var modal = document.getElementById('profile_edit_dialog');
+        modal.style.opacity = "0";
+        setTimeout(function () {
+            modal.style.display = 'none';
+        }, 500);
+    }
+    TzorkSetupGUI.closeDialog = closeDialog;
     function applyRepoChangesAndCloseModal() {
         Tzork.theRepo.parse(function () {
             Tzork.theClock.loadActiveProfile();
             Tzork.theRepo.store();
             buildProfilesMenu();
-            hideSetupModal();
+            closeDialog();
         });
     }
-    TzorkSetup.applyRepoChangesAndCloseModal = applyRepoChangesAndCloseModal;
-    function submitPeopleEdit(action) {
+    function submitProfileEdit(action) {
         switch (action) {
             case 'delete':
                 if (confirm('Delete current profile?')) {
@@ -1668,40 +1713,44 @@ var TzorkSetup;
                 }
                 break;
             case 'close':
-                hideSetupModal();
+                closeDialog();
                 break;
             case 'save':
-                try {
-                    var ta = document.getElementById('people_json');
-                    var pp = JSON.parse(ta.value);
-                    Tzork.theRepo.profiles[Tzork.theRepo.activeProfile] = pp;
-                    applyRepoChangesAndCloseModal();
-                }
-                catch (e) {
-                    var er = document.getElementById('people_error');
-                    if (e.message.match(/^Unexpected token [,\]}]/g)) {
-                        er.textContent = 'Syntax error: trailing comma ?';
-                    }
-                    else if (e.message.match(/^Unexpected string/g)) {
-                        er.textContent = 'Syntax error: missing comma ?';
-                    }
-                    else {
-                        er.textContent = 'Syntax error: ' + e.message;
-                    }
-                    console.log('Error in user-entered JSON', e);
-                }
+                Tzork.theRepo.profiles[Tzork.theRepo.activeProfile] = editedProfileJSON;
+                applyRepoChangesAndCloseModal();
                 break;
         }
     }
-    TzorkSetup.submitPeopleEdit = submitPeopleEdit;
-    function hideSetupModal() {
-        var modal = document.getElementById('setup_dialog');
-        modal.style.opacity = "0";
-        setTimeout(function () {
-            modal.style.display = 'none';
-        }, 500);
+    TzorkSetupGUI.submitProfileEdit = submitProfileEdit;
+    function revertJsonEdit() {
+        if (!jsonSubmitBtnsEnabled)
+            return;
+        updateJsonDisplay();
+        enableJsonSubmitButtons(false);
     }
-    TzorkSetup.hideSetupModal = hideSetupModal;
+    TzorkSetupGUI.revertJsonEdit = revertJsonEdit;
+    function submitJsonEdit() {
+        if (!jsonSubmitBtnsEnabled)
+            return;
+        try {
+            editedProfileJSON = JSON.parse($('#profile_json').val());
+            enableJsonSubmitButtons(false);
+        }
+        catch (e) {
+            var er = document.getElementById('json_error');
+            if (e.message.match(/^Unexpected token [,\]}]/g)) {
+                er.textContent = 'Syntax error: trailing comma ?';
+            }
+            else if (e.message.match(/^Unexpected string/g)) {
+                er.textContent = 'Syntax error: missing comma ?';
+            }
+            else {
+                er.textContent = 'Syntax error: ' + e.message;
+            }
+            console.log('Error in user-entered JSON', e);
+        }
+    }
+    TzorkSetupGUI.submitJsonEdit = submitJsonEdit;
     function buildProfilesMenu() {
         var pl = document.getElementById('profiles-dropdown-proflist');
         pl.innerHTML = '';
@@ -1725,38 +1774,7 @@ var TzorkSetup;
             pl.appendChild(el);
         });
     }
-    TzorkSetup.buildProfilesMenu = buildProfilesMenu;
-})(TzorkSetup || (TzorkSetup = {}));
-var TzorkSetupGUI;
-(function (TzorkSetupGUI) {
-    function init() {
-        $('#menu-btn-edit2').on('click', function () {
-            openDialog();
-        });
-        $('.DialogGui .Tab').on('click', function () {
-            $('.DialogGui .Pane.content').addClass('gone');
-            $('.DialogGui .Tab').removeClass('active');
-            var act = $(this).data('action');
-            $('#pane-' + act).removeClass('gone');
-            $(this).addClass('active');
-        });
-    }
-    TzorkSetupGUI.init = init;
-    function openDialog() {
-        var modal = document.getElementById('setup_dialog2');
-        modal.style.display = 'block';
-        setTimeout(function () {
-            modal.style.opacity = "1";
-        }, 1);
-    }
-    function closeDialog() {
-        var modal = document.getElementById('setup_dialog2');
-        modal.style.opacity = "0";
-        setTimeout(function () {
-            modal.style.display = 'none';
-        }, 500);
-    }
-    TzorkSetupGUI.closeDialog = closeDialog;
+    TzorkSetupGUI.buildProfilesMenu = buildProfilesMenu;
 })(TzorkSetupGUI || (TzorkSetupGUI = {}));
 var Tzork;
 (function (Tzork) {
@@ -1766,9 +1784,9 @@ var Tzork;
     function _initMenu() {
         Utils.hoverMenu('#menu-btn-profiles', '#profiles-dropdown');
         document.getElementById('menu-btn-edit').addEventListener('click', function () {
-            TzorkSetup.openSetupDialog();
+            TzorkSetupGUI.openDialog();
         });
-        TzorkSetup.buildProfilesMenu();
+        TzorkSetupGUI.buildProfilesMenu();
         var b = document.getElementById('btn-new-profile');
         b.addEventListener('click', function (e) {
             var name = prompt('New profile name?', 'New Profile');
@@ -1782,7 +1800,7 @@ var Tzork;
                 Tzork.theRepo.activeProfile = Tzork.theRepo.profiles.length - 1;
                 Tzork.theClock.loadActiveProfile();
                 Tzork.theRepo.store();
-                TzorkSetup.buildProfilesMenu();
+                TzorkSetupGUI.buildProfilesMenu();
             });
         });
     }

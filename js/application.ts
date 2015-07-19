@@ -1,6 +1,5 @@
 /// <reference path="TzorkData.ts" />
 /// <reference path="TzorkInit.ts" />
-/// <reference path="TzorkSetup.ts" />
 
 
 function main(): void {

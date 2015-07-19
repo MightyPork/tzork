@@ -344,7 +344,7 @@ module Tzork {
 			if (obj.name.indexOf('@') === 0) {
 				// Twitter name
 				la = <HTMLAnchorElement> document.createElement('a');
-				la.href = 'https://twitter.com/' + obj.name;
+				la.href = 'http://twitter.com/' + obj.name;
 				la.target = '_blank';
 			} else {
 				// Generic name

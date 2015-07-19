@@ -36,7 +36,7 @@
 </head>
 <body onload="main()" id="tzork-bg" class="theme-outer theme-fg">
 
-<div class="Modal" id="setup_dialog2" style="opacity: 0; display: none;">
+<div class="Modal" id="profile_edit_dialog" style="opacity: 0; display: none;">
 	<div class="DialogGui">
 		<!-- left tabs column -->
 		<div class="Col tabs">
@@ -57,45 +57,47 @@
 		<div class="Col settings">
 			<!-- heading row -->
 			<div class="Pane heading">
-				<label for="prof_title">Profile</label>
-				<input type="text" id="prof_title" name="title" value="Blah Bluh">
+				<label for="field_title">Profile</label>
+				<input type="text" id="field_title" name="title" value="Blah Bluh">
 			</div>
 
 			<!-- people list -->
-			<div class="Pane content" id="pane-people">
+			<div class="Pane content" id="pane_people">
 
 			</div>
 
 			<!-- theme settings -->
-			<div class="Pane content gone" id="pane-theme">
+			<div class="Pane content gone" id="pane_theme">
 
 			</div>
 
 			<!-- JSON view of the profile -->
-			<div class="Pane content gone" id="pane-json">
+			<div class="Pane content gone" id="pane_json">
+				<!-- profile JSON view -->
 				<textarea id="profile_json" spellcheck="false"></textarea>
+
+				<!-- buttons to revert or apply changes to the JSON field -->
 				<div id="json_change_buttons" class="disabled">
-					<a class="button red">Reset</a><!--
-					--><a class="button green">Apply</a>
+					<a class="button red" onClick="TzorkSetupGUI.revertJsonEdit(); return false;">Reset</a><!--
+					--><a class="button green" onClick="TzorkSetupGUI.submitJsonEdit(); return false;">Apply</a>
+					<span class="Error" id="json_error"></span>
 				</div>
-				<div class="Error" id="json_error"></div>
 			</div>
 
 			<!-- dialog close buttons -->
 			<div class="Pane buttons">
 				<a href="#" class="button red icon-profile-delete"
-				   onClick="TzorkSetup.submitPeopleEdit('delete'); return false;">Destroy</a><!--
+				   onClick="TzorkSetupGUI.submitProfileEdit('delete'); return false;">Destroy</a><!--
 				--><a href="#" class="button orange icon-cancel"
-				      onClick="TzorkSetupGUI.closeDialog(); return false;">Cancel</a><!--
+				      onClick="TzorkSetupGUI.submitProfileEdit('close'); return false;">Cancel</a><!--
 				--><a href="#" class="button green icon-save"
-				      onClick="TzorkSetup.submitPeopleEdit('save'); return false;">Save</a>
+				      onClick="TzorkSetupGUI.submitProfileEdit('save'); return false;">Save</a>
 			</div>
 		</div>
 	</div>
 </div>
 
 <nav id="menubar">
-	<a id="menu-btn-edit2" class="icon-edit">2</a>
 	<a id="menu-btn-edit" class="icon-edit"></a>
 	<a id="menu-btn-profiles" class="icon-profile"></a>
 	<div id="profiles-dropdown" class="profiles-menu gone">

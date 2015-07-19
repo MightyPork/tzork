@@ -15,10 +15,10 @@ module Tzork {
 		Utils.hoverMenu('#menu-btn-profiles', '#profiles-dropdown');
 
 		document.getElementById('menu-btn-edit').addEventListener('click', () => {
-			TzorkSetup.openSetupDialog();
+			TzorkSetupGUI.openDialog();
 		});
 
-		TzorkSetup.buildProfilesMenu();
+		TzorkSetupGUI.buildProfilesMenu();
 
 		var b = document.getElementById('btn-new-profile');
 		b.addEventListener('click', (e) => {
@@ -38,7 +38,7 @@ module Tzork {
 				Tzork.theRepo.activeProfile = Tzork.theRepo.profiles.length-1;
 				Tzork.theClock.loadActiveProfile();
 				Tzork.theRepo.store();
-				TzorkSetup.buildProfilesMenu();
+				TzorkSetupGUI.buildProfilesMenu();
 			})
 		});
 	}
