@@ -186,6 +186,11 @@
 						margin: 0;
 						margin-left: $pad;
 					}
+
+					.Left {
+						position: absolute;
+						left: $pad;
+					}
 				}
 			}
 
