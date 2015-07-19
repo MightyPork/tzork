@@ -1,7 +1,6 @@
 /// <reference path="Utils.ts" />
 /// <reference path="TzorkInit.ts" />
-/// <reference path="TzorkTheme.ts" />
-
+/// <reference path="Theme.ts" />
 
 module Tzork {
 	export class Clock {
@@ -27,21 +26,21 @@ module Tzork {
 				var h = window.innerHeight;
 
 				// subtract expected size of labels
-				var s_full = Math.round(Math.min(w, h))*1.2;
-				var fs_full = Math.round(s_full*0.0185);
+				var s_full = Math.round(Math.min(w, h)) * 1.2;
+				var fs_full = Math.round(s_full * 0.0185);
 
-				w -= fs_full*19;
-				h -= fs_full*8;
+				w -= fs_full * 19;
+				h -= fs_full * 8;
 
 				var s = Math.round(Math.min(w, h));
-				if(s%2) s++;// round to even (chrome render blur glitch)
+				if (s % 2) s++;// round to even (chrome render blur glitch)
 
 				this.setDiskSize(s);
 
-				var fs = Math.round(s*0.025);
-				if(fs < 8) fs = 8;
+				var fs = Math.round(s * 0.025);
+				if (fs < 8) fs = 8;
 
-				var css = '#disc {font-size:'+fs+'px}';
+				var css = '#disc {font-size:' + fs + 'px}';
 
 				if (s < 250) {
 					css += '.mark {font-size:1.4em}.mark.sixth{font-size:1.8em}';
@@ -125,10 +124,10 @@ module Tzork {
 			}
 
 			// 12h time
-			var twelve = <boolean> theConfig.get('twelve', false);
+			var twelve = <boolean> Tzork.theConfig.get('twelve', false);
 
 			// disc border width (needed for precise positioning)
-			var bdrW = parseInt(window.getComputedStyle(this.disc).borderRightWidth.replace('px',''));
+			var bdrW = parseInt(window.getComputedStyle(this.disc).borderRightWidth.replace('px', ''));
 
 			// The clock marks
 			for (var i = 0; i < 24; i++) {
@@ -152,7 +151,7 @@ module Tzork {
 
 				var angle = Utils.hour2angle(i);
 
-				Utils.positionAtPx(mark, angle, (this.discSize/2)*0.88, this.discSize, -bdrW);
+				Utils.positionAtPx(mark, angle, (this.discSize / 2) * 0.88, this.discSize, -bdrW);
 
 				this.disc.appendChild(mark);
 			}
@@ -238,7 +237,7 @@ module Tzork {
 
 
 		/** Add a bunch of people at specified time (s) */
-		private _addPointsAtTime(secs: number, people: Point[]) {
+		private _addPointsAtTime(secs: number, people: Data.Point[]) {
 			var i;
 
 			var first = people[0];
@@ -255,14 +254,14 @@ module Tzork {
 			var is_left = (quadrant > 0 && quadrant < 3);
 
 			// disc border width (needed for precise positioning)
-			var bdrW = parseInt(window.getComputedStyle(this.disc).borderRightWidth.replace('px',''));
+			var bdrW = parseInt(window.getComputedStyle(this.disc).borderRightWidth.replace('px', ''));
 
 
 			// --- Create & place a bullet ---
 			var bu = <HTMLElement> document.createElement('div');
 			bu.className = 'bullet';
 			bu.style.backgroundColor = first.color;
-			Utils.positionAtPx(bu, angle, this.discSize/2 - 1, this.discSize, -bdrW, 0);
+			Utils.positionAtPx(bu, angle, this.discSize / 2 - 1, this.discSize, -bdrW, 0);
 			this.disc.appendChild(bu);
 
 
@@ -329,16 +328,16 @@ module Tzork {
 
 			// --- Place the list ---
 
-			var xtra = (this.discSize/150)*5;
+			var xtra = (this.discSize / 150) * 5;
 
-			Utils.positionAtPx(list, angle, this.discSize/2 + xtra, this.discSize, -bdrW, octant);
+			Utils.positionAtPx(list, angle, this.discSize / 2 + xtra, this.discSize, -bdrW, octant);
 
 			this.disc.appendChild(list);
 		}
 
 
 		/** Create person (point) label */
-		private _createPointLabel(obj: Point): HTMLElement {
+		private _createPointLabel(obj: Data.Point): HTMLElement {
 			var la;
 
 			if (obj.name.indexOf('@') === 0) {

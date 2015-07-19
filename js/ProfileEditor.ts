@@ -1,7 +1,9 @@
-/// <reference path="TzorkData.ts" />
+/// <reference path="Data.ts" />
 /// <reference path="typing/underscore.d.ts" />
+/// <reference path="Menu.ts" />
 
-module TzorkSetupGUI {
+
+module Tzork.ProfileEditor {
 	var editedProfileJSON;
 	var jsonSubmitBtnsEnabled: boolean;
 
@@ -52,7 +54,7 @@ module TzorkSetupGUI {
 
 
 	export function openDialog() {
-		editedProfileJSON = Tzork.stripProfile(Tzork.theRepo.getActiveProfile());
+		editedProfileJSON = Data.stripProfile(Tzork.theRepo.getActiveProfile());
 		updateJsonDisplay();
 		updateFieldsFromJson();
 
@@ -77,11 +79,11 @@ module TzorkSetupGUI {
 	}
 
 
-	function applyRepoChangesAndCloseModal() {
+	function reloadProfileAndCloseDialog() {
 		Tzork.theRepo.parse(()=> {
 			Tzork.theClock.loadActiveProfile();
 			Tzork.theRepo.store();
-			buildProfilesMenu();
+			Menu.buildProfilesMenu();
 			closeDialog();
 		})
 	}
@@ -93,7 +95,7 @@ module TzorkSetupGUI {
 			case 'delete':
 				if (confirm('Delete current profile?')) {
 					Tzork.theRepo.profiles.splice(Tzork.theRepo.activeProfile, 1);
-					applyRepoChangesAndCloseModal();
+					reloadProfileAndCloseDialog();
 				}
 				break;
 
@@ -103,7 +105,7 @@ module TzorkSetupGUI {
 
 			case 'save':
 				Tzork.theRepo.profiles[Tzork.theRepo.activeProfile] = editedProfileJSON;
-				applyRepoChangesAndCloseModal();
+				reloadProfileAndCloseDialog();
 				break;
 		}
 	}
@@ -135,35 +137,5 @@ module TzorkSetupGUI {
 
 			console.log('Error in user-entered JSON', e);
 		}
-	}
-
-
-	export function buildProfilesMenu() {
-		var pl = document.getElementById('profiles-dropdown-proflist');
-		pl.innerHTML = ''; // empty
-
-		var entries = [];
-		_.each(Tzork.theRepo.profiles, (profile: Tzork.Profile, key: number) => {
-			entries.push({k: key, n: profile.title});
-		});
-
-		entries.sort((a, b)=> {
-			return a.n.localeCompare(b.n);
-		});
-
-		_.each(entries, (e) => {
-			var el = document.createElement('a');
-			el.textContent = e.n;
-			el.dataset['index'] = e.k;
-			el.classList.add('icon-profile');
-
-			el.addEventListener('click', function () {
-				Tzork.theRepo.activeProfile = this.dataset['index'];
-				Tzork.theRepo.store();
-				Tzork.theClock.loadActiveProfile();
-			});
-
-			pl.appendChild(el);
-		});
 	}
 }

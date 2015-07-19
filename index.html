@@ -34,7 +34,7 @@
 	<script src="js/lib/Sortable.js"></script>
 	<script src="js/application.js"></script>
 </head>
-<body onload="main()" id="tzork-bg" class="theme-outer theme-fg">
+<body onload="Tzork.main()" id="tzork-bg" class="theme-outer theme-fg">
 
 <div class="Modal" id="profile_edit_dialog" style="opacity: 0; display: none;">
 	<div class="DialogGui">
@@ -77,9 +77,10 @@
 				<textarea id="profile_json" spellcheck="false"></textarea>
 
 				<!-- buttons to revert or apply changes to the JSON field -->
+				<!-- TODO move bindings to JS file -->
 				<div id="json_change_buttons" class="disabled">
-					<a class="button red" onClick="TzorkSetupGUI.revertJsonEdit(); return false;">Reset</a><!--
-					--><a class="button green" onClick="TzorkSetupGUI.submitJsonEdit(); return false;">Apply</a>
+					<a class="button red" onClick="Tzork.ProfileEditor.revertJsonEdit(); return false;">Reset</a><!--
+					--><a class="button green" onClick="Tzork.ProfileEditor.submitJsonEdit(); return false;">Apply</a>
 					<span class="Error" id="json_error"></span>
 				</div>
 			</div>
@@ -87,11 +88,11 @@
 			<!-- dialog close buttons -->
 			<div class="Pane buttons">
 				<a href="#" class="button red icon-profile-delete"
-				   onClick="TzorkSetupGUI.submitProfileEdit('delete'); return false;">Destroy</a><!--
+				   onClick="Tzork.ProfileEditor.submitProfileEdit('delete'); return false;">Destroy</a><!--
 				--><a href="#" class="button orange icon-cancel"
-				      onClick="TzorkSetupGUI.submitProfileEdit('close'); return false;">Cancel</a><!--
+				      onClick="Tzork.ProfileEditor.submitProfileEdit('close'); return false;">Cancel</a><!--
 				--><a href="#" class="button green icon-save"
-				      onClick="TzorkSetupGUI.submitProfileEdit('save'); return false;">Save</a>
+				      onClick="Tzork.ProfileEditor.submitProfileEdit('save'); return false;">Save</a>
 			</div>
 		</div>
 	</div>

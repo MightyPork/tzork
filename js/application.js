@@ -482,149 +482,152 @@ var Ajax;
     }
     Ajax.get = get;
 })(Ajax || (Ajax = {}));
-var TzResolver;
-(function (TzResolver) {
-    var people_loading = 0;
-    var _tzcache = null;
-    function _getTzFromCache(tz) {
-        if (_tzcache == null) {
-            var hit = localStorage['tz_cache'];
-            if (hit) {
-                try {
-                    _tzcache = JSON.parse(hit);
-                    if (_tzcache === null) {
+var Tzork;
+(function (Tzork) {
+    var TzResolver;
+    (function (TzResolver) {
+        var people_loading = 0;
+        var _tzcache = null;
+        function _getTzFromCache(tz) {
+            if (_tzcache == null) {
+                var hit = localStorage['tz_cache'];
+                if (hit) {
+                    try {
+                        _tzcache = JSON.parse(hit);
+                        if (_tzcache === null) {
+                            _tzcache = {};
+                        }
+                    }
+                    catch (e) {
                         _tzcache = {};
                     }
                 }
-                catch (e) {
+                else {
                     _tzcache = {};
                 }
             }
-            else {
-                _tzcache = {};
-            }
+            return Utils.objGet(_tzcache, tz, null);
         }
-        return Utils.objGet(_tzcache, tz, null);
-    }
-    function _addTzToCache(tz, _tz) {
-        _tzcache[tz] = _tz;
-        localStorage['tz_cache'] = JSON.stringify(_tzcache);
-    }
-    function resolvePointTimezones(points, onDone) {
-        points.forEach(function (obj) {
-            obj._valid = true;
-            var bad = false;
-            ['name', 'color', 'tz'].forEach(function (e) {
-                if (!Utils.keyExists(obj, e)) {
-                    console.error('Missing "' + e + '" field in point object', obj);
-                    bad = true;
+        function _addTzToCache(tz, _tz) {
+            _tzcache[tz] = _tz;
+            localStorage['tz_cache'] = JSON.stringify(_tzcache);
+        }
+        function resolvePointTimezones(points, onDone) {
+            points.forEach(function (obj) {
+                obj._valid = true;
+                var bad = false;
+                ['name', 'color', 'tz'].forEach(function (e) {
+                    if (!Utils.keyExists(obj, e)) {
+                        console.error('Missing "' + e + '" field in point object', obj);
+                        bad = true;
+                    }
+                });
+                if (bad) {
+                    obj._valid = false;
+                    return;
                 }
+                Utils.setIfMissing(obj, 'show', true);
+                people_loading++;
+                _resolveTimezone(obj);
             });
-            if (bad) {
-                obj._valid = false;
+            (function probe() {
+                if (people_loading <= 0) {
+                    onDone();
+                    return;
+                }
+                setTimeout(probe, 5);
+            })();
+        }
+        TzResolver.resolvePointTimezones = resolvePointTimezones;
+        function _resolveTimezone(obj) {
+            obj._tz = obj.tz;
+            if (obj.tz in tz_aliases) {
+                obj._tz = tz_aliases[obj.tz];
+                console.log('TZ "' + obj.tz + '" resolved as "' + obj._tz + '"');
+            }
+            var fromcache = _getTzFromCache(obj.tz);
+            if (fromcache) {
+                obj._tz = fromcache;
+            }
+            if (moment.tz.zone(obj._tz)) {
+                people_loading--;
                 return;
             }
-            Utils.setIfMissing(obj, 'show', true);
-            people_loading++;
-            _resolveTimezone(obj);
-        });
-        (function probe() {
-            if (people_loading <= 0) {
-                onDone();
-                return;
-            }
-            setTimeout(probe, 5);
-        })();
-    }
-    TzResolver.resolvePointTimezones = resolvePointTimezones;
-    function _resolveTimezone(obj) {
-        obj._tz = obj.tz;
-        if (obj.tz in tz_aliases) {
-            obj._tz = tz_aliases[obj.tz];
-            console.log('TZ "' + obj.tz + '" resolved as "' + obj._tz + '"');
-        }
-        var fromcache = _getTzFromCache(obj.tz);
-        if (fromcache) {
-            obj._tz = fromcache;
-        }
-        if (moment.tz.zone(obj._tz)) {
-            people_loading--;
-            return;
-        }
-        _scheduleGoogleReq(obj);
-    }
-    var last_google_call_timestamp = 0;
-    function _scheduleGoogleReq(obj) {
-        var elapsed = (Date.now() - last_google_call_timestamp);
-        var t = Math.max(0, (105 - elapsed));
-        if (t == 0) {
-            last_google_call_timestamp = Date.now();
-            _getTimezoneFromGoogleAPIs(obj);
-            return;
-        }
-        setTimeout(function () {
             _scheduleGoogleReq(obj);
-        }, t);
-    }
-    function _getTimezoneFromGoogleAPIs(obj) {
-        var geoURL = "https://maps.googleapis.com/maps/api/geocode/json?sensor=false&address=" + encodeURIComponent(obj.tz);
-        function ajaxFail(resp) {
-            console.log('FAIL: code ' + resp);
-            obj._valid = false;
-            people_loading--;
         }
-        function geoOK(resp) {
-            try {
-                var rj = JSON.parse(resp);
-                console.log('Reply from geoAPI:', rj);
-                if (rj.status !== 'OK') {
-                    obj._valid = false;
-                    people_loading--;
-                    return;
-                }
-                var results = rj.results;
-                if (results.length > 1) {
-                    console.error('WARNING: Google found multiple matches. Try to be more specific at "' + obj.tz + '"');
-                }
-                var loc = results[0].geometry.location;
-                var now = Math.floor(Date.now() / 1000);
-                var tzURL = "https://maps.googleapis.com/maps/api/timezone/json?location=" + loc.lat + "," + loc.lng + "&timestamp=" + now + "&sensor=false";
-                Ajax.get(tzURL, tzOK, ajaxFail);
+        var last_google_call_timestamp = 0;
+        function _scheduleGoogleReq(obj) {
+            var elapsed = (Date.now() - last_google_call_timestamp);
+            var t = Math.max(0, (105 - elapsed));
+            if (t == 0) {
+                last_google_call_timestamp = Date.now();
+                _getTimezoneFromGoogleAPIs(obj);
+                return;
             }
-            catch (e) {
-                console.log(e);
+            setTimeout(function () {
+                _scheduleGoogleReq(obj);
+            }, t);
+        }
+        function _getTimezoneFromGoogleAPIs(obj) {
+            var geoURL = "https://maps.googleapis.com/maps/api/geocode/json?sensor=false&address=" + encodeURIComponent(obj.tz);
+            function ajaxFail(resp) {
+                console.log('FAIL: code ' + resp);
                 obj._valid = false;
                 people_loading--;
             }
-        }
-        function tzOK(resp) {
-            try {
-                var rj = JSON.parse(resp);
-                console.log('Reply from Google:', rj);
-                if (rj.status !== 'OK') {
+            function geoOK(resp) {
+                try {
+                    var rj = JSON.parse(resp);
+                    console.log('Reply from geoAPI:', rj);
+                    if (rj.status !== 'OK') {
+                        obj._valid = false;
+                        people_loading--;
+                        return;
+                    }
+                    var results = rj.results;
+                    if (results.length > 1) {
+                        console.error('WARNING: Google found multiple matches. Try to be more specific at "' + obj.tz + '"');
+                    }
+                    var loc = results[0].geometry.location;
+                    var now = Math.floor(Date.now() / 1000);
+                    var tzURL = "https://maps.googleapis.com/maps/api/timezone/json?location=" + loc.lat + "," + loc.lng + "&timestamp=" + now + "&sensor=false";
+                    Ajax.get(tzURL, tzOK, ajaxFail);
+                }
+                catch (e) {
+                    console.log(e);
                     obj._valid = false;
                     people_loading--;
-                    return;
                 }
-                console.log('Resolved TZ as ' + rj.timeZoneId);
-                obj._tz = rj.timeZoneId;
-                _addTzToCache(obj.tz, obj._tz);
-                people_loading--;
             }
-            catch (e) {
-                console.log(e);
-                obj._valid = false;
-                people_loading--;
+            function tzOK(resp) {
+                try {
+                    var rj = JSON.parse(resp);
+                    console.log('Reply from Google:', rj);
+                    if (rj.status !== 'OK') {
+                        obj._valid = false;
+                        people_loading--;
+                        return;
+                    }
+                    console.log('Resolved TZ as ' + rj.timeZoneId);
+                    obj._tz = rj.timeZoneId;
+                    _addTzToCache(obj.tz, obj._tz);
+                    people_loading--;
+                }
+                catch (e) {
+                    console.log(e);
+                    obj._valid = false;
+                    people_loading--;
+                }
             }
+            Ajax.get(geoURL, geoOK, ajaxFail);
         }
-        Ajax.get(geoURL, geoOK, ajaxFail);
-    }
-    function getTimeForPoint(obj) {
-        var mmt = moment().tz(obj._tz);
-        return mmt.hour() * 3600 + mmt.minute() * 60 + mmt.second();
-    }
-    TzResolver.getTimeForPoint = getTimeForPoint;
-})(TzResolver || (TzResolver = {}));
+        function getTimeForPoint(obj) {
+            var mmt = moment().tz(obj._tz);
+            return mmt.hour() * 3600 + mmt.minute() * 60 + mmt.second();
+        }
+        TzResolver.getTimeForPoint = getTimeForPoint;
+    })(TzResolver = Tzork.TzResolver || (Tzork.TzResolver = {}));
+})(Tzork || (Tzork = {}));
 if (!Date.now) {
     Date.now = function () {
         return new Date().getTime();
@@ -970,158 +973,161 @@ var tz_def_profile = {
 };
 var Tzork;
 (function (Tzork) {
-    function stripProfile(p) {
-        p = JSON.parse(JSON.stringify(p));
-        delete p._valid;
-        p.points.forEach(function (gp) {
-            delete gp._t;
-            delete gp._tz;
-            delete gp._valid;
-        });
-        return p;
-    }
-    Tzork.stripProfile = stripProfile;
-    function createEmptyProfile() {
-        return {
-            title: 'Tzork Profile',
-            showTitle: true,
-            innerImage: 'images/bg-earth.jpg',
-            innerColor: '',
-            outerImage: '',
-            outerColor: '#0B1A2E',
-            fgColor: '',
-            labelShadows: true,
-            labelHoverBg: '',
-            menuColor: '',
-            points: [
-                {
-                    name: '@MightyPork',
-                    tz: 'Europe/Prague',
-                    color: 'orange',
-                    show: true
-                }
-            ]
-        };
-    }
-    Tzork.createEmptyProfile = createEmptyProfile;
-    function createDefaultProfile() {
-        return JSON.parse(JSON.stringify(tz_def_profile));
-    }
-    Tzork.createDefaultProfile = createDefaultProfile;
-    var LocalRepository = (function () {
-        function LocalRepository() {
-            this.profiles = [];
-            this.activeProfile = 0;
-        }
-        LocalRepository.prototype.getActiveProfile = function () {
-            return this.profiles[this.activeProfile];
-        };
-        LocalRepository.prototype.load = function (onDone) {
-            try {
-                var s = localStorage['repository'];
-                if (s != null) {
-                    var j = JSON.parse(s);
-                    this.profiles = j.profiles || [];
-                    this.activeProfile = parseInt(j.active);
-                }
-            }
-            catch (e) {
-                console.error('Error reading profiles from localStorage', e);
-            }
-            this.parse(onDone);
-        };
-        LocalRepository.prototype.parse = function (onDone) {
-            var must_save = false;
-            if (this.profiles.length == 0) {
-                if (Utils.keyExists(localStorage, 'people')) {
-                    var p = createDefaultProfile();
-                    p.points = JSON.parse(localStorage['people']);
-                    this.profiles.push(p);
-                    delete localStorage['people'];
-                }
-                else {
-                    this.profiles.push(createDefaultProfile());
-                }
-                must_save = true;
-            }
-            this.activeProfile = Utils.clamp(this.activeProfile, 0, this.profiles.length - 1);
-            var loading = 0;
-            this.profiles.forEach(function (p) {
-                Utils.setIfMissing(p, 'points', []);
-                Utils.setIfMissing(p, 'showTitle', true);
-                Utils.setIfMissing(p, 'innerImage', '');
-                Utils.setIfMissing(p, 'innerColor', '');
-                Utils.setIfMissing(p, 'outerImage', '');
-                Utils.setIfMissing(p, 'outerColor', '');
-                Utils.setIfMissing(p, 'fgColor', '');
-                Utils.setIfMissing(p, 'labelShadows', true);
-                Utils.setIfMissing(p, 'labelHoverBg', '');
-                Utils.setIfMissing(p, 'menuColor', '');
-                loading++;
-                TzResolver.resolvePointTimezones(p.points, function () {
-                    loading--;
-                });
+    var Data;
+    (function (Data) {
+        function stripProfile(p) {
+            p = JSON.parse(JSON.stringify(p));
+            delete p._valid;
+            p.points.forEach(function (gp) {
+                delete gp._t;
+                delete gp._tz;
+                delete gp._valid;
             });
-            var self = this;
-            (function probe() {
-                if (loading == 0) {
-                    if (must_save) {
-                        self.store();
+            return p;
+        }
+        Data.stripProfile = stripProfile;
+        function createEmptyProfile() {
+            return {
+                title: 'Tzork Profile',
+                showTitle: true,
+                innerImage: 'images/bg-earth.jpg',
+                innerColor: '',
+                outerImage: '',
+                outerColor: '#0B1A2E',
+                fgColor: '',
+                labelShadows: true,
+                labelHoverBg: '',
+                menuColor: '',
+                points: [
+                    {
+                        name: '@MightyPork',
+                        tz: 'Europe/Prague',
+                        color: 'orange',
+                        show: true
                     }
-                    (typeof onDone == 'function') && onDone();
-                }
-                else {
-                    setTimeout(probe, 5);
-                }
-            })();
-        };
-        LocalRepository.prototype.store = function (onDone) {
-            var outp = [];
-            this.profiles.forEach(function (pr) {
-                outp.push(stripProfile(pr));
-            });
-            localStorage['repository'] = JSON.stringify({
-                profiles: outp,
-                active: this.activeProfile
-            });
-            (typeof onDone == 'function') && onDone();
-        };
-        return LocalRepository;
-    })();
-    Tzork.LocalRepository = LocalRepository;
-    var LocalConfigProvider = (function () {
-        function LocalConfigProvider() {
-            this.local = null;
+                ]
+            };
         }
-        LocalConfigProvider.prototype._read = function () {
-            if (!this.local) {
+        Data.createEmptyProfile = createEmptyProfile;
+        function createDefaultProfile() {
+            return JSON.parse(JSON.stringify(tz_def_profile));
+        }
+        Data.createDefaultProfile = createDefaultProfile;
+        var LocalRepository = (function () {
+            function LocalRepository() {
+                this.profiles = [];
+                this.activeProfile = 0;
+            }
+            LocalRepository.prototype.getActiveProfile = function () {
+                return this.profiles[this.activeProfile];
+            };
+            LocalRepository.prototype.load = function (onDone) {
                 try {
-                    var t = localStorage['config'];
-                    var j = JSON.parse(t);
-                    this.local = j || {};
+                    var s = localStorage['repository'];
+                    if (s != null) {
+                        var j = JSON.parse(s);
+                        this.profiles = j.profiles || [];
+                        this.activeProfile = parseInt(j.active);
+                    }
                 }
                 catch (e) {
-                    this.local = {};
+                    console.error('Error reading profiles from localStorage', e);
                 }
+                this.parse(onDone);
+            };
+            LocalRepository.prototype.parse = function (onDone) {
+                var must_save = false;
+                if (this.profiles.length == 0) {
+                    if (Utils.keyExists(localStorage, 'people')) {
+                        var p = createDefaultProfile();
+                        p.points = JSON.parse(localStorage['people']);
+                        this.profiles.push(p);
+                        delete localStorage['people'];
+                    }
+                    else {
+                        this.profiles.push(createDefaultProfile());
+                    }
+                    must_save = true;
+                }
+                this.activeProfile = Utils.clamp(this.activeProfile, 0, this.profiles.length - 1);
+                var loading = 0;
+                this.profiles.forEach(function (p) {
+                    Utils.setIfMissing(p, 'points', []);
+                    Utils.setIfMissing(p, 'showTitle', true);
+                    Utils.setIfMissing(p, 'innerImage', '');
+                    Utils.setIfMissing(p, 'innerColor', '');
+                    Utils.setIfMissing(p, 'outerImage', '');
+                    Utils.setIfMissing(p, 'outerColor', '');
+                    Utils.setIfMissing(p, 'fgColor', '');
+                    Utils.setIfMissing(p, 'labelShadows', true);
+                    Utils.setIfMissing(p, 'labelHoverBg', '');
+                    Utils.setIfMissing(p, 'menuColor', '');
+                    loading++;
+                    Tzork.TzResolver.resolvePointTimezones(p.points, function () {
+                        loading--;
+                    });
+                });
+                var self = this;
+                (function probe() {
+                    if (loading == 0) {
+                        if (must_save) {
+                            self.store();
+                        }
+                        (typeof onDone == 'function') && onDone();
+                    }
+                    else {
+                        setTimeout(probe, 5);
+                    }
+                })();
+            };
+            LocalRepository.prototype.store = function (onDone) {
+                var outp = [];
+                this.profiles.forEach(function (pr) {
+                    outp.push(stripProfile(pr));
+                });
+                localStorage['repository'] = JSON.stringify({
+                    profiles: outp,
+                    active: this.activeProfile
+                });
+                (typeof onDone == 'function') && onDone();
+            };
+            return LocalRepository;
+        })();
+        Data.LocalRepository = LocalRepository;
+        var LocalConfigProvider = (function () {
+            function LocalConfigProvider() {
+                this.local = null;
             }
-        };
-        LocalConfigProvider.prototype.get = function (key, defval) {
-            this._read();
-            return Utils.objGet(this.local, key, defval);
-        };
-        LocalConfigProvider.prototype.set = function (key, value) {
-            this._read();
-            this.local[key] = value;
-            localStorage['config'] = JSON.stringify(this.local);
-        };
-        LocalConfigProvider.prototype.setIfMissing = function (key, value) {
-            if (!Utils.keyExists(this.local, key)) {
-                this.set(key, value);
-            }
-        };
-        return LocalConfigProvider;
-    })();
-    Tzork.LocalConfigProvider = LocalConfigProvider;
+            LocalConfigProvider.prototype._read = function () {
+                if (!this.local) {
+                    try {
+                        var t = localStorage['config'];
+                        var j = JSON.parse(t);
+                        this.local = j || {};
+                    }
+                    catch (e) {
+                        this.local = {};
+                    }
+                }
+            };
+            LocalConfigProvider.prototype.get = function (key, defval) {
+                this._read();
+                return Utils.objGet(this.local, key, defval);
+            };
+            LocalConfigProvider.prototype.set = function (key, value) {
+                this._read();
+                this.local[key] = value;
+                localStorage['config'] = JSON.stringify(this.local);
+            };
+            LocalConfigProvider.prototype.setIfMissing = function (key, value) {
+                if (!Utils.keyExists(this.local, key)) {
+                    this.set(key, value);
+                }
+            };
+            return LocalConfigProvider;
+        })();
+        Data.LocalConfigProvider = LocalConfigProvider;
+    })(Data = Tzork.Data || (Tzork.Data = {}));
 })(Tzork || (Tzork = {}));
 var RGBColor = (function () {
     function RGBColor(color_string) {
@@ -1542,7 +1548,7 @@ var Tzork;
             p.points.forEach(function (obj) {
                 if (!obj._valid || !obj.show)
                     return;
-                var t = TzResolver.getTimeForPoint(obj);
+                var t = Tzork.TzResolver.getTimeForPoint(obj);
                 obj._t = t;
                 var placed;
                 resolved.some(function (v) {
@@ -1637,191 +1643,202 @@ var Tzork;
     })();
     Tzork.Clock = Clock;
 })(Tzork || (Tzork = {}));
-var TzorkSetupGUI;
-(function (TzorkSetupGUI) {
-    var editedProfileJSON;
-    var jsonSubmitBtnsEnabled;
-    function init() {
-        $('#menu-btn-edit').on('click', openDialog);
-        $('.DialogGui .Tab').on('click', function () {
-            $('.DialogGui .Pane.content').addClass('gone');
-            $('.DialogGui .Tab').removeClass('active');
-            var act = $(this).data('action');
-            $('#pane_' + act).removeClass('gone');
-            $(this).addClass('active');
-        });
-        $('#field_title').on('change paste keypress keyup keydown', function () {
-            var _this = this;
-            setTimeout(function () {
-                editedProfileJSON.title = $(_this).val();
-                updateJsonDisplay();
-            }, 1);
-        });
-        $('#profile_json').on('change paste keypress keyup keydown', function () {
-            enableJsonSubmitButtons(true);
-        });
-    }
-    TzorkSetupGUI.init = init;
-    function enableJsonSubmitButtons(yes) {
-        $('#json_change_buttons').toggleClass('disabled', !yes);
-        jsonSubmitBtnsEnabled = yes;
-        if (!yes) {
-            $('#json_error').empty();
-        }
-    }
-    function updateJsonDisplay() {
-        $('#profile_json').val(JSON.stringify(editedProfileJSON, null, '\t'));
-        enableJsonSubmitButtons(false);
-    }
-    function updateFieldsFromJson() {
-        $('#field_title').val(editedProfileJSON.title);
-    }
-    function openDialog() {
-        editedProfileJSON = Tzork.stripProfile(Tzork.theRepo.getActiveProfile());
-        updateJsonDisplay();
-        updateFieldsFromJson();
-        $('#json_error').empty();
-        var modal = document.getElementById('profile_edit_dialog');
-        modal.style.display = 'block';
-        setTimeout(function () {
-            modal.style.opacity = "1";
-        }, 1);
-    }
-    TzorkSetupGUI.openDialog = openDialog;
-    function closeDialog() {
-        var modal = document.getElementById('profile_edit_dialog');
-        modal.style.opacity = "0";
-        setTimeout(function () {
-            modal.style.display = 'none';
-        }, 500);
-    }
-    TzorkSetupGUI.closeDialog = closeDialog;
-    function applyRepoChangesAndCloseModal() {
-        Tzork.theRepo.parse(function () {
-            Tzork.theClock.loadActiveProfile();
-            Tzork.theRepo.store();
+var Tzork;
+(function (Tzork) {
+    var Menu;
+    (function (Menu) {
+        function init() {
+            Utils.hoverMenu('#menu-btn-profiles', '#profiles-dropdown');
+            document.getElementById('menu-btn-edit').addEventListener('click', function () {
+                Tzork.ProfileEditor.openDialog();
+            });
             buildProfilesMenu();
-            closeDialog();
-        });
-    }
-    function submitProfileEdit(action) {
-        switch (action) {
-            case 'delete':
-                if (confirm('Delete current profile?')) {
-                    Tzork.theRepo.profiles.splice(Tzork.theRepo.activeProfile, 1);
-                    applyRepoChangesAndCloseModal();
+            var b = document.getElementById('btn-new-profile');
+            b.addEventListener('click', function (e) {
+                var name = prompt('New profile name?', 'New Profile');
+                if (name == null) {
+                    return;
                 }
-                break;
-            case 'close':
-                closeDialog();
-                break;
-            case 'save':
-                Tzork.theRepo.profiles[Tzork.theRepo.activeProfile] = editedProfileJSON;
-                applyRepoChangesAndCloseModal();
-                break;
+                var prof = Tzork.Data.createEmptyProfile();
+                prof.title = name;
+                Tzork.theRepo.profiles.push(prof);
+                Tzork.theRepo.parse(function () {
+                    Tzork.theRepo.activeProfile = Tzork.theRepo.profiles.length - 1;
+                    Tzork.theClock.loadActiveProfile();
+                    Tzork.theRepo.store();
+                    buildProfilesMenu();
+                });
+            });
         }
-    }
-    TzorkSetupGUI.submitProfileEdit = submitProfileEdit;
-    function revertJsonEdit() {
-        if (!jsonSubmitBtnsEnabled)
-            return;
-        updateJsonDisplay();
-        enableJsonSubmitButtons(false);
-    }
-    TzorkSetupGUI.revertJsonEdit = revertJsonEdit;
-    function submitJsonEdit() {
-        if (!jsonSubmitBtnsEnabled)
-            return;
-        try {
-            editedProfileJSON = JSON.parse($('#profile_json').val());
+        Menu.init = init;
+        function buildProfilesMenu() {
+            var pl = document.getElementById('profiles-dropdown-proflist');
+            pl.innerHTML = '';
+            var entries = [];
+            _.each(Tzork.theRepo.profiles, function (profile, key) {
+                entries.push({ k: key, n: profile.title });
+            });
+            entries.sort(function (a, b) {
+                return a.n.localeCompare(b.n);
+            });
+            _.each(entries, function (e) {
+                var el = document.createElement('a');
+                el.textContent = e.n;
+                el.dataset['index'] = e.k;
+                el.classList.add('icon-profile');
+                el.addEventListener('click', function () {
+                    Tzork.theRepo.activeProfile = this.dataset['index'];
+                    Tzork.theRepo.store();
+                    Tzork.theClock.loadActiveProfile();
+                });
+                pl.appendChild(el);
+            });
+        }
+        Menu.buildProfilesMenu = buildProfilesMenu;
+    })(Menu = Tzork.Menu || (Tzork.Menu = {}));
+})(Tzork || (Tzork = {}));
+var Tzork;
+(function (Tzork) {
+    var ProfileEditor;
+    (function (ProfileEditor) {
+        var editedProfileJSON;
+        var jsonSubmitBtnsEnabled;
+        function init() {
+            $('#menu-btn-edit').on('click', openDialog);
+            $('.DialogGui .Tab').on('click', function () {
+                $('.DialogGui .Pane.content').addClass('gone');
+                $('.DialogGui .Tab').removeClass('active');
+                var act = $(this).data('action');
+                $('#pane_' + act).removeClass('gone');
+                $(this).addClass('active');
+            });
+            $('#field_title').on('change paste keypress keyup keydown', function () {
+                var _this = this;
+                setTimeout(function () {
+                    editedProfileJSON.title = $(_this).val();
+                    updateJsonDisplay();
+                }, 1);
+            });
+            $('#profile_json').on('change paste keypress keyup keydown', function () {
+                enableJsonSubmitButtons(true);
+            });
+        }
+        ProfileEditor.init = init;
+        function enableJsonSubmitButtons(yes) {
+            $('#json_change_buttons').toggleClass('disabled', !yes);
+            jsonSubmitBtnsEnabled = yes;
+            if (!yes) {
+                $('#json_error').empty();
+            }
+        }
+        function updateJsonDisplay() {
+            $('#profile_json').val(JSON.stringify(editedProfileJSON, null, '\t'));
             enableJsonSubmitButtons(false);
         }
-        catch (e) {
-            var er = document.getElementById('json_error');
-            if (e.message.match(/^Unexpected token [,\]}]/g)) {
-                er.textContent = 'Syntax error: trailing comma ?';
-            }
-            else if (e.message.match(/^Unexpected string/g)) {
-                er.textContent = 'Syntax error: missing comma ?';
-            }
-            else {
-                er.textContent = 'Syntax error: ' + e.message;
-            }
-            console.log('Error in user-entered JSON', e);
+        function updateFieldsFromJson() {
+            $('#field_title').val(editedProfileJSON.title);
         }
-    }
-    TzorkSetupGUI.submitJsonEdit = submitJsonEdit;
-    function buildProfilesMenu() {
-        var pl = document.getElementById('profiles-dropdown-proflist');
-        pl.innerHTML = '';
-        var entries = [];
-        _.each(Tzork.theRepo.profiles, function (profile, key) {
-            entries.push({ k: key, n: profile.title });
-        });
-        entries.sort(function (a, b) {
-            return a.n.localeCompare(b.n);
-        });
-        _.each(entries, function (e) {
-            var el = document.createElement('a');
-            el.textContent = e.n;
-            el.dataset['index'] = e.k;
-            el.classList.add('icon-profile');
-            el.addEventListener('click', function () {
-                Tzork.theRepo.activeProfile = this.dataset['index'];
-                Tzork.theRepo.store();
+        function openDialog() {
+            editedProfileJSON = Tzork.Data.stripProfile(Tzork.theRepo.getActiveProfile());
+            updateJsonDisplay();
+            updateFieldsFromJson();
+            $('#json_error').empty();
+            var modal = document.getElementById('profile_edit_dialog');
+            modal.style.display = 'block';
+            setTimeout(function () {
+                modal.style.opacity = "1";
+            }, 1);
+        }
+        ProfileEditor.openDialog = openDialog;
+        function closeDialog() {
+            var modal = document.getElementById('profile_edit_dialog');
+            modal.style.opacity = "0";
+            setTimeout(function () {
+                modal.style.display = 'none';
+            }, 500);
+        }
+        ProfileEditor.closeDialog = closeDialog;
+        function reloadProfileAndCloseDialog() {
+            Tzork.theRepo.parse(function () {
                 Tzork.theClock.loadActiveProfile();
+                Tzork.theRepo.store();
+                Tzork.Menu.buildProfilesMenu();
+                closeDialog();
             });
-            pl.appendChild(el);
-        });
-    }
-    TzorkSetupGUI.buildProfilesMenu = buildProfilesMenu;
-})(TzorkSetupGUI || (TzorkSetupGUI = {}));
+        }
+        function submitProfileEdit(action) {
+            switch (action) {
+                case 'delete':
+                    if (confirm('Delete current profile?')) {
+                        Tzork.theRepo.profiles.splice(Tzork.theRepo.activeProfile, 1);
+                        reloadProfileAndCloseDialog();
+                    }
+                    break;
+                case 'close':
+                    closeDialog();
+                    break;
+                case 'save':
+                    Tzork.theRepo.profiles[Tzork.theRepo.activeProfile] = editedProfileJSON;
+                    reloadProfileAndCloseDialog();
+                    break;
+            }
+        }
+        ProfileEditor.submitProfileEdit = submitProfileEdit;
+        function revertJsonEdit() {
+            if (!jsonSubmitBtnsEnabled)
+                return;
+            updateJsonDisplay();
+            enableJsonSubmitButtons(false);
+        }
+        ProfileEditor.revertJsonEdit = revertJsonEdit;
+        function submitJsonEdit() {
+            if (!jsonSubmitBtnsEnabled)
+                return;
+            try {
+                editedProfileJSON = JSON.parse($('#profile_json').val());
+                enableJsonSubmitButtons(false);
+            }
+            catch (e) {
+                var er = document.getElementById('json_error');
+                if (e.message.match(/^Unexpected token [,\]}]/g)) {
+                    er.textContent = 'Syntax error: trailing comma ?';
+                }
+                else if (e.message.match(/^Unexpected string/g)) {
+                    er.textContent = 'Syntax error: missing comma ?';
+                }
+                else {
+                    er.textContent = 'Syntax error: ' + e.message;
+                }
+                console.log('Error in user-entered JSON', e);
+            }
+        }
+        ProfileEditor.submitJsonEdit = submitJsonEdit;
+    })(ProfileEditor = Tzork.ProfileEditor || (Tzork.ProfileEditor = {}));
+})(Tzork || (Tzork = {}));
 var Tzork;
 (function (Tzork) {
     Tzork.theClock;
     Tzork.theRepo;
     Tzork.theConfig;
-    function _initMenu() {
-        Utils.hoverMenu('#menu-btn-profiles', '#profiles-dropdown');
-        document.getElementById('menu-btn-edit').addEventListener('click', function () {
-            TzorkSetupGUI.openDialog();
-        });
-        TzorkSetupGUI.buildProfilesMenu();
-        var b = document.getElementById('btn-new-profile');
-        b.addEventListener('click', function (e) {
-            var name = prompt('New profile name?', 'New Profile');
-            if (name == null) {
-                return;
-            }
-            var prof = Tzork.createEmptyProfile();
-            prof.title = name;
-            Tzork.theRepo.profiles.push(prof);
-            Tzork.theRepo.parse(function () {
-                Tzork.theRepo.activeProfile = Tzork.theRepo.profiles.length - 1;
-                Tzork.theClock.loadActiveProfile();
-                Tzork.theRepo.store();
-                TzorkSetupGUI.buildProfilesMenu();
-            });
-        });
-    }
-    function _initClock() {
-        Tzork.theClock = new Tzork.Clock();
-    }
     function init(repo, conf) {
         Tzork.theRepo = repo;
         Tzork.theConfig = conf;
-        _initMenu();
-        _initClock();
-        TzorkSetupGUI.init();
+        Tzork.theClock = new Tzork.Clock();
+        Tzork.ProfileEditor.init();
+        Tzork.Menu.init();
         Utils.fixTextareaTabKey();
     }
     Tzork.init = init;
 })(Tzork || (Tzork = {}));
-function main() {
-    var repo = new Tzork.LocalRepository();
-    var conf = new Tzork.LocalConfigProvider();
-    repo.load(function () {
-        Tzork.init(repo, conf);
-    });
-}
+var Tzork;
+(function (Tzork) {
+    function main() {
+        var repo = new Tzork.Data.LocalRepository();
+        var conf = new Tzork.Data.LocalConfigProvider();
+        repo.load(function () {
+            Tzork.init(repo, conf);
+        });
+    }
+    Tzork.main = main;
+})(Tzork || (Tzork = {}));
 //# sourceMappingURL=application.js.map

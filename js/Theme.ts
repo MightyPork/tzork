@@ -5,7 +5,7 @@ module Tzork {
 	export function applyThemeFromProfile() {
 		var css = '';
 
-		var prof = theRepo.profiles[theRepo.activeProfile];
+		var prof:Data.Profile = Tzork.theRepo.profiles[Tzork.theRepo.activeProfile];
 
 		var out_i, out_c;
 		out_i = prof.outerImage ? 'url(\"' + prof.outerImage + '\")' : 'none';

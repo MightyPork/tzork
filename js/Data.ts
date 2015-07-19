@@ -3,7 +3,7 @@
 /// <reference path="data_default_profile.ts" />
 
 
-module Tzork {
+module Tzork.Data {
     /** Geo point */
     export interface Point {
         name:string;
