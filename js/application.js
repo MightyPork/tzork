@@ -1440,6 +1440,9 @@ var Tzork;
                 var fs = Math.round(s * 0.025);
                 if (fs < 8)
                     fs = 8;
+                var tresh = 400;
+                if (s > tresh)
+                    fs = Math.round(tresh * 0.025 + (s - tresh) * 0.015);
                 var css = '#disc {font-size:' + fs + 'px}';
                 if (s < 250) {
                     css += '.mark {font-size:1.4em}.mark.sixth{font-size:1.8em}';
@@ -1702,7 +1705,8 @@ var Tzork;
     var ProfileEditor;
     (function (ProfileEditor) {
         var editedProfileJSON;
-        var jsonSubmitBtnsEnabled;
+        var jsonSubmitBtnsEnabled = false;
+        var activeTab;
         function init() {
             $('#menu-btn-edit').on('click', openDialog);
             $('.DialogGui .Tab').on('click', function () {
@@ -1711,6 +1715,7 @@ var Tzork;
                 var act = $(this).data('action');
                 $('#pane_' + act).removeClass('gone');
                 $(this).addClass('active');
+                activeTab = act;
             });
             $('#field_title').on('change paste keypress keyup keydown', function () {
                 var _this = this;
@@ -1722,8 +1727,39 @@ var Tzork;
             $('#profile_json').on('change paste keypress keyup keydown', function () {
                 enableJsonSubmitButtons(true);
             });
+            $('#setup-json-btn-revert').on('click', revertJsonEdit);
+            $('#setup-json-btn-apply').on('click', submitJsonEdit);
+            $('#prof-edit-btn-destroy').on('click', function () {
+                submitProfileEdit('delete');
+            });
+            $('#prof-edit-btn-close').on('click', function () {
+                submitProfileEdit('close');
+            });
+            $('#prof-edit-btn-save').on('click', function () {
+                submitProfileEdit('save');
+            });
+            $('.Modal').on('click', function () {
+                submitProfileEdit('close');
+            });
+            $('.DialogGui').on('click', function (e) {
+                e.stopImmediatePropagation();
+                e.preventDefault();
+            });
+            $(window).on('keyup', function (e) {
+                if (e.which == 27) {
+                    submitProfileEdit('close');
+                }
+            });
+            openTab('json');
         }
         ProfileEditor.init = init;
+        function openTab(which) {
+            $('.DialogGui .Pane.content').addClass('gone');
+            $('.DialogGui .Tab').removeClass('active');
+            $('#pane_' + which).removeClass('gone');
+            $('#tab-btn-' + which).addClass('active');
+            activeTab = which;
+        }
         function enableJsonSubmitButtons(yes) {
             $('#json_change_buttons').toggleClass('disabled', !yes);
             jsonSubmitBtnsEnabled = yes;
@@ -1778,6 +1814,10 @@ var Tzork;
                     closeDialog();
                     break;
                 case 'save':
+                    if (activeTab == 'json' && jsonSubmitBtnsEnabled) {
+                        if (!submitJsonEdit())
+                            return;
+                    }
                     Tzork.theRepo.profiles[Tzork.theRepo.activeProfile] = editedProfileJSON;
                     reloadProfileAndCloseDialog();
                     break;
@@ -1797,6 +1837,7 @@ var Tzork;
             try {
                 editedProfileJSON = JSON.parse($('#profile_json').val());
                 enableJsonSubmitButtons(false);
+                return true;
             }
             catch (e) {
                 var er = document.getElementById('json_error');
@@ -1810,6 +1851,7 @@ var Tzork;
                     er.textContent = 'Syntax error: ' + e.message;
                 }
                 console.log('Error in user-entered JSON', e);
+                return false;
             }
         }
         ProfileEditor.submitJsonEdit = submitJsonEdit;

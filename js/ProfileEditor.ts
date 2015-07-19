@@ -1,11 +1,13 @@
 /// <reference path="Data.ts" />
 /// <reference path="typing/underscore.d.ts" />
 /// <reference path="Menu.ts" />
+/// <reference path="typing/jquery.d.ts" />
 
 
 module Tzork.ProfileEditor {
 	var editedProfileJSON;
-	var jsonSubmitBtnsEnabled: boolean;
+	var jsonSubmitBtnsEnabled = false;
+	var activeTab; // tab name
 
 	export function init() {
 		// dialog open button
@@ -18,18 +20,58 @@ module Tzork.ProfileEditor {
 			var act = $(this).data('action');
 			$('#pane_' + act).removeClass('gone');
 			$(this).addClass('active');
+			activeTab = act;
 		});
 
+		// apply changes when title field is edited
 		$('#field_title').on('change paste keypress keyup keydown', function () {
-			setTimeout(()=> {
+			setTimeout(() => {
 				editedProfileJSON.title = $(this).val();
 				updateJsonDisplay();
 			}, 1);
 		});
 
+		// show json submit buttons on json edit
 		$('#profile_json').on('change paste keypress keyup keydown', function () {
 			enableJsonSubmitButtons(true);
 		});
+
+		// bind json submit buttons
+		$('#setup-json-btn-revert').on('click', revertJsonEdit);
+		$('#setup-json-btn-apply').on('click', submitJsonEdit);
+
+		// bind main buttons
+		$('#prof-edit-btn-destroy').on('click', () => {submitProfileEdit('delete')});
+		$('#prof-edit-btn-close').on('click', () => {submitProfileEdit('close')});
+		$('#prof-edit-btn-save').on('click', () => {submitProfileEdit('save')});
+
+		// click outside dialog to close the dialog
+		$('.Modal').on('click', () => {
+			submitProfileEdit('close');
+		});
+		$('.DialogGui').on('click', (e) => {
+			e.stopImmediatePropagation();
+			e.preventDefault();
+		});
+
+		// ESC to close the dialog
+		$(window).on('keyup', (e) => {
+			if(e.which == 27) {
+				submitProfileEdit('close');
+			}
+		});
+
+		openTab('json');
+	}
+
+
+	function openTab(which: string) {
+		$('.DialogGui .Pane.content').addClass('gone');
+		$('.DialogGui .Tab').removeClass('active');
+
+		$('#pane_' + which).removeClass('gone');
+		$('#tab-btn-' + which).addClass('active');
+		activeTab = which;
 	}
 
 
@@ -37,7 +79,7 @@ module Tzork.ProfileEditor {
 		$('#json_change_buttons').toggleClass('disabled', !yes);
 		jsonSubmitBtnsEnabled = yes;
 		if (!yes) {
-			 $('#json_error').empty();
+			$('#json_error').empty();
 		}
 	}
 
@@ -104,6 +146,10 @@ module Tzork.ProfileEditor {
 				break;
 
 			case 'save':
+				if (activeTab == 'json' && jsonSubmitBtnsEnabled) {
+					if (!submitJsonEdit()) return;
+				}
+
 				Tzork.theRepo.profiles[Tzork.theRepo.activeProfile] = editedProfileJSON;
 				reloadProfileAndCloseDialog();
 				break;
@@ -118,12 +164,18 @@ module Tzork.ProfileEditor {
 	}
 
 
+	/**
+	 * Try to apply JSON from the textarea
+	 *
+	 * @returns {boolean} true if applied successfully
+	 */
 	export function submitJsonEdit() {
 		if (!jsonSubmitBtnsEnabled) return;
 
 		try {
 			editedProfileJSON = JSON.parse($('#profile_json').val());
 			enableJsonSubmitButtons(false);
+			return true;
 		} catch (e) {
 			var er = document.getElementById('json_error');
 
@@ -136,6 +188,7 @@ module Tzork.ProfileEditor {
 			}
 
 			console.log('Error in user-entered JSON', e);
+			return false;
 		}
 	}
 }

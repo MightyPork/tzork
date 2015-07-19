@@ -40,6 +40,9 @@ module Tzork {
 				var fs = Math.round(s * 0.025);
 				if (fs < 8) fs = 8;
 
+				var tresh = 400;
+				if (s > tresh) fs = Math.round(tresh * 0.025 + (s - tresh) * 0.015);
+
 				var css = '#disc {font-size:' + fs + 'px}';
 
 				if (s < 250) {

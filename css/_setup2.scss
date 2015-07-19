@@ -7,12 +7,19 @@
 
 	//@include highlight(lime);
 
-	width: 700px;
-	top: .4rem;
-	bottom: .4rem;
+	width: 800px;
+	top: 1rem;
+	bottom: 1rem;
 
 	max-height: 100%;
-	max-width: calc(100% - .8em);
+	max-width: calc(100% - 2rem);
+
+	@media only screen and (max-width: 639px) {
+		top: .2rem;
+		bottom: .2rem;
+		max-width: calc(100% - .4rem);
+	}
+
 
 	$dlg-fg: #efefef;
 	$radius: 3px;
@@ -93,6 +100,13 @@
 				// pane size
 				$p-head-h: 3rem;
 				$p-btns-h: 3.5rem;
+
+				// Temporary TODO
+				.ComingSoon {
+					font-size: 3em;
+					padding: .5em;
+					text-align:center;
+				}
 
 				&.heading {
 					top: 0;

@@ -63,12 +63,12 @@
 
 			<!-- people list -->
 			<div class="Pane content" id="pane_people">
-
+				<div class="ComingSoon">Coming Soon&trade;</div>
 			</div>
 
 			<!-- theme settings -->
 			<div class="Pane content gone" id="pane_theme">
-
+				<div class="ComingSoon">Coming Soon&trade;</div>
 			</div>
 
 			<!-- JSON view of the profile -->
@@ -79,20 +79,17 @@
 				<!-- buttons to revert or apply changes to the JSON field -->
 				<!-- TODO move bindings to JS file -->
 				<div id="json_change_buttons" class="disabled">
-					<a class="button red" onClick="Tzork.ProfileEditor.revertJsonEdit(); return false;">Reset</a><!--
-					--><a class="button green" onClick="Tzork.ProfileEditor.submitJsonEdit(); return false;">Apply</a>
+					<a class="button red" id="setup-json-btn-revert">Reset</a><!--
+					--><a class="button green" id="setup-json-btn-apply">Parse</a>
 					<span class="Error" id="json_error"></span>
 				</div>
 			</div>
 
 			<!-- dialog close buttons -->
 			<div class="Pane buttons">
-				<a href="#" class="button red icon-profile-delete"
-				   onClick="Tzork.ProfileEditor.submitProfileEdit('delete'); return false;">Destroy</a><!--
-				--><a href="#" class="button orange icon-cancel"
-				      onClick="Tzork.ProfileEditor.submitProfileEdit('close'); return false;">Cancel</a><!--
-				--><a href="#" class="button green icon-save"
-				      onClick="Tzork.ProfileEditor.submitProfileEdit('save'); return false;">Save</a>
+				<a class="button red icon-profile-delete" id="prof-edit-btn-destroy">Destroy</a><!--
+				--><a class="button orange icon-cancel" id="prof-edit-btn-close">Cancel</a><!--
+				--><a class="button green icon-save" id="prof-edit-btn-save">Apply & Save</a>
 			</div>
 		</div>
 	</div>
