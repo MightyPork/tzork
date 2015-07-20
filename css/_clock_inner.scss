@@ -9,6 +9,21 @@
 	@include translate(-50%, -50%);
 	text-align: center;
 	text-shadow: 0 0 8px black, 0 0 4px black, 0 0 4px black;
+
+	.ampm {
+		font-size: 50%;
+		display:inline-block;
+		@include transform(rotate(-90deg));
+		@include transform-origin(center center);
+		position: relative;
+		top: -.36em;
+		left: -.1em;
+		line-height: 1;
+	}
+
+	#local-time.twelve {
+		margin-right: -.3em;
+	}
 }
 
 #profile-label {

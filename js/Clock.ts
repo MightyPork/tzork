@@ -166,12 +166,30 @@ module Tzork {
 			// redraw time, wrap colon in span
 			var mmt = moment();
 
-			var t = mmt.format('H:mm');
+			// 12-hour time
+			var twelve = <boolean> Tzork.theConfig.get('twelve', false);
+
+			var t = mmt.format(twelve?'h:mm A':'H:mm');
 			if (t !== this.last_time) {
 				this.last_time = t;
 				// need zero-padded minutes!
 				var parts = t.split(':');
-				document.getElementById('local-time').innerHTML = parts[0] + '<span id="local-time-colon">:</span>' + parts[1];
+
+				var ampm;
+				if (twelve) {
+					ampm = parts[1].substr(parts[1].length-2);
+					parts[1] = parts[1].substr(0, parts[1].length-3);
+				}
+
+				var html = parts[0] + '<span id="local-time-colon">:</span>' + parts[1];
+				if(twelve) html += '<span class="ampm">'+ampm+'</span>';
+				var el = document.getElementById('local-time');
+				el.innerHTML = html;
+				if(twelve) {
+					el.classList.add('twelve');
+				} else {
+					el.classList.remove('twelve');
+				}
 			}
 
 			var s = (new Date()).getSeconds() % 2;
