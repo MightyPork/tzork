@@ -147,6 +147,7 @@ module Tzork {
 				if (twelve) {
 					var j = i;
 					if (j > 12) j -= 12;
+					if (i == 0) j = 12;
 					mark.textContent = '' + j;
 				} else {
 					mark.textContent = '' + i;

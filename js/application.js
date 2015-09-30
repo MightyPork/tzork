@@ -482,6 +482,12 @@ var Ajax;
     }
     Ajax.get = get;
 })(Ajax || (Ajax = {}));
+/// <reference path="data_tz_aliases.ts" />
+/// <reference path="Data.ts" />
+/// <reference path="Ajax.ts" />
+/// <reference path="typing/moment.d.ts" />
+/// <reference path="typing/moment-timezone.d.ts" />
+/// <reference path="typing/googleapis.d.ts" />
 var Tzork;
 (function (Tzork) {
     var TzResolver;
@@ -628,6 +634,8 @@ var Tzork;
         TzResolver.getTimeForPoint = getTimeForPoint;
     })(TzResolver = Tzork.TzResolver || (Tzork.TzResolver = {}));
 })(Tzork || (Tzork = {}));
+/// <reference path="typing/moment.d.ts" />
+/// <reference path="typing/jquery.d.ts" />
 if (!Date.now) {
     Date.now = function () {
         return new Date().getTime();
@@ -971,6 +979,9 @@ var tz_def_profile = {
         }
     ]
 };
+/// <reference path="TzResolver.ts" />
+/// <reference path="Utils.ts" />
+/// <reference path="data_default_profile.ts" />
 var Tzork;
 (function (Tzork) {
     var Data;
@@ -1129,6 +1140,7 @@ var Tzork;
         Data.LocalConfigProvider = LocalConfigProvider;
     })(Data = Tzork.Data || (Tzork.Data = {}));
 })(Tzork || (Tzork = {}));
+/// <reference path="typing/underscore.d.ts" />
 var RGBColor = (function () {
     function RGBColor(color_string) {
         this.ok = false;
@@ -1363,6 +1375,7 @@ var RGBColor = (function () {
     };
     return RGBColor;
 })();
+/// <reference path="RGBColor.ts" />
 var Tzork;
 (function (Tzork) {
     function applyThemeFromProfile() {
@@ -1418,6 +1431,9 @@ var Tzork;
     }
     Tzork.applyThemeFromProfile = applyThemeFromProfile;
 })(Tzork || (Tzork = {}));
+/// <reference path="Utils.ts" />
+/// <reference path="TzorkInit.ts" />
+/// <reference path="Theme.ts" />
 var Tzork;
 (function (Tzork) {
     var Clock = (function () {
@@ -1507,6 +1523,8 @@ var Tzork;
                     var j = i;
                     if (j > 12)
                         j -= 12;
+                    if (i == 0)
+                        j = 12;
                     mark.textContent = '' + j;
                 }
                 else {
@@ -1662,6 +1680,7 @@ var Tzork;
     })();
     Tzork.Clock = Clock;
 })(Tzork || (Tzork = {}));
+/// <reference path="typing/underscore.d.ts" />
 var Tzork;
 (function (Tzork) {
     var Menu;
@@ -1716,6 +1735,10 @@ var Tzork;
         Menu.buildProfilesMenu = buildProfilesMenu;
     })(Menu = Tzork.Menu || (Tzork.Menu = {}));
 })(Tzork || (Tzork = {}));
+/// <reference path="Data.ts" />
+/// <reference path="typing/underscore.d.ts" />
+/// <reference path="Menu.ts" />
+/// <reference path="typing/jquery.d.ts" />
 var Tzork;
 (function (Tzork) {
     var ProfileEditor;
@@ -1745,15 +1768,9 @@ var Tzork;
             });
             $('#setup-json-btn-revert').on('click', revertJsonEdit);
             $('#setup-json-btn-apply').on('click', submitJsonEdit);
-            $('#prof-edit-btn-destroy').on('click', function () {
-                submitProfileEdit('delete');
-            });
-            $('#prof-edit-btn-close').on('click', function () {
-                submitProfileEdit('close');
-            });
-            $('#prof-edit-btn-save').on('click', function () {
-                submitProfileEdit('save');
-            });
+            $('#prof-edit-btn-destroy').on('click', function () { submitProfileEdit('delete'); });
+            $('#prof-edit-btn-close').on('click', function () { submitProfileEdit('close'); });
+            $('#prof-edit-btn-save').on('click', function () { submitProfileEdit('save'); });
             $('.Modal').on('click', function () {
                 submitProfileEdit('close');
             });
@@ -1873,6 +1890,12 @@ var Tzork;
         ProfileEditor.submitJsonEdit = submitJsonEdit;
     })(ProfileEditor = Tzork.ProfileEditor || (Tzork.ProfileEditor = {}));
 })(Tzork || (Tzork = {}));
+/// <reference path="Data.ts" />
+/// <reference path="Clock.ts" />
+/// <reference path="Utils.ts" />
+/// <reference path="typing/jquery.d.ts" />
+/// <reference path="ProfileEditor.ts" />
+/// <reference path="Menu" />
 var Tzork;
 (function (Tzork) {
     Tzork.theClock;
@@ -1888,6 +1911,8 @@ var Tzork;
     }
     Tzork.init = init;
 })(Tzork || (Tzork = {}));
+/// <reference path="Data.ts" />
+/// <reference path="TzorkInit.ts" />
 var Tzork;
 (function (Tzork) {
     function main() {
